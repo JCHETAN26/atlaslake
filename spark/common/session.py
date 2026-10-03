@@ -24,7 +24,7 @@ PACKAGES = [
 
 def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
     prefix = f"spark.sql.catalog.{cfg.catalog_name}"
-    return {
+    conf = {
         prefix: "org.apache.iceberg.spark.SparkCatalog",
         f"{prefix}.catalog-impl": "org.apache.iceberg.jdbc.JdbcCatalog",
         f"{prefix}.uri": cfg.pg.jdbc_url(cfg.pg.catalog_db),
@@ -34,13 +34,16 @@ def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
         f"{prefix}.jdbc.schema-version": "V1",
         f"{prefix}.warehouse": cfg.s3.warehouse,
         f"{prefix}.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
-        f"{prefix}.s3.endpoint": cfg.s3.endpoint,
-        f"{prefix}.s3.path-style-access": "true",
-        f"{prefix}.s3.access-key-id": cfg.s3.access_key,
-        f"{prefix}.s3.secret-access-key": cfg.s3.secret_key,
         f"{prefix}.client.region": cfg.s3.region,
         f"{prefix}.cache-enabled": "false",
     }
+    if cfg.s3.endpoint:  # MinIO locally; empty in AWS (real S3, virtual-hosted style)
+        conf[f"{prefix}.s3.endpoint"] = cfg.s3.endpoint
+        conf[f"{prefix}.s3.path-style-access"] = "true"
+    if cfg.s3.access_key:  # empty in AWS => default credential chain (ECS task role)
+        conf[f"{prefix}.s3.access-key-id"] = cfg.s3.access_key
+        conf[f"{prefix}.s3.secret-access-key"] = cfg.s3.secret_key
+    return conf
 
 
 def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = None) -> SparkSession:
