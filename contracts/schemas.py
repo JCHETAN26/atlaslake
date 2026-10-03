@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import math
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -28,17 +28,17 @@ def subject(topic: str) -> str:
     return f"{topic}-value"
 
 
-@lru_cache(maxsize=None)
+@cache
 def schema_text(topic: str, version: int) -> str:
     return (AVRO_DIR / SCHEMA_FILES[topic][version]).read_text()
 
 
-@lru_cache(maxsize=None)
+@cache
 def schema_json(topic: str, version: int) -> dict:
     return json.loads(schema_text(topic, version))
 
 
-@lru_cache(maxsize=None)
+@cache
 def parsed(topic: str, version: int) -> Any:
     return fastavro.parse_schema(schema_json(topic, version))
 

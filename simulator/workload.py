@@ -15,7 +15,7 @@ import json
 import logging
 import time
 from dataclasses import replace
-from datetime import UTC, datetime
+from datetime import datetime
 
 import numpy as np
 import pandas as pd

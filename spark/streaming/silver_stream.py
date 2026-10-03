@@ -35,10 +35,10 @@ class MetricsListener(StreamingQueryListener):
         self.m = streaming_metrics()
         self.progress: list[dict] = []
 
-    def onQueryStarted(self, event) -> None:  # noqa: N802 (Spark API)
+    def onQueryStarted(self, event) -> None:
         log.info("query started %s", event.name)
 
-    def onQueryProgress(self, event) -> None:  # noqa: N802
+    def onQueryProgress(self, event) -> None:
         p = json.loads(event.progress.json)
         self.progress.append(p)
         self.progress = self.progress[-500:]
@@ -62,10 +62,10 @@ class MetricsListener(StreamingQueryListener):
             if dropped:
                 self.m.late_dropped.labels(ev.TOPIC_ORDERS).inc(dropped)
 
-    def onQueryIdle(self, event) -> None:  # noqa: N802
+    def onQueryIdle(self, event) -> None:
         pass
 
-    def onQueryTerminated(self, event) -> None:  # noqa: N802
+    def onQueryTerminated(self, event) -> None:
         if event.exception:
             self.m.failed_batches.labels(str(event.id)).inc()
             log.error("query terminated with error: %s", event.exception)

@@ -9,7 +9,7 @@ directly in tests/unit/test_spark_transforms.py.
 from __future__ import annotations
 
 import json
-from functools import lru_cache
+from functools import cache
 
 from pyspark.sql import Column, DataFrame
 from pyspark.sql import functions as F
@@ -48,7 +48,7 @@ def _avro_to_spark(t) -> DataType:
     return {"string": StringType(), "long": LongType(), "int": IntegerType(), "boolean": BooleanType()}[t]
 
 
-@lru_cache(maxsize=None)
+@cache
 def record_schema(topic: str) -> StructType:
     """Spark schema of the decoded record JSON (latest reader schema)."""
     avsc = json.loads(schemas.schema_text(topic, schemas.latest_version(topic)))

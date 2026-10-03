@@ -40,8 +40,8 @@ def bronze_raw(spark: SparkSession, datasets: list[str], date_from: date | None 
 
 def resolve_dlq(spark: SparkSession, processed: DataFrame) -> int:
     """Mark PENDING DLQ rows whose original offsets now decode + validate cleanly as REPROCESSED."""
-    from spark.common.decode import decode
     from core.config import settings
+    from spark.common.decode import decode
 
     ok = (decode(processed, settings().kafka.schema_registry_url)
           .filter(F.col("error_codes").isNull())

@@ -86,7 +86,7 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
                     AND q.kafka_offset = dl.kafka_offset
         WHERE q.status IN ('PENDING', 'DISCARDED')""")
     last_seq = con.execute("SELECT coalesce(max(last_seq), 0) FROM pg.ops.relay_checkpoint").fetchone()[0]
-    con.execute(f"""
+    con.execute("""
         CREATE TEMP TABLE pending_proc AS
         SELECT DISTINCT dl.event_id FROM dl
         ANTI JOIN bronze_coords b ON b.topic = dl.topic AND b.kafka_partition = dl.kafka_partition

@@ -25,7 +25,8 @@ def init_all(partitions: int | None = None) -> dict:
 
 
 def reset_source() -> None:
-    from simulator.postgres_sink import connect, init_schema, reset_source as _reset
+    from simulator.postgres_sink import connect, init_schema
+    from simulator.postgres_sink import reset_source as _reset
 
     with connect() as conn:
         init_schema(conn)
@@ -46,10 +47,9 @@ def reset_kafka(partitions: int | None = None) -> None:
 
 
 def reset_lake(spark=None) -> None:
+    from simulator.postgres_sink import connect
     from spark.common.session import get_spark
     from spark.common.tables import create_all, drop_all
-
-    from simulator.postgres_sink import connect
 
     spark = spark or get_spark("atlas-reset")
     drop_all(spark)

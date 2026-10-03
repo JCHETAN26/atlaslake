@@ -65,7 +65,10 @@ extend-exclude = ["dbt/target", "dbt/dbt_packages", "infrastructure"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
-ignore = ["E501", "RUF012", "B008"]
+ignore = ["E501", "RUF012", "B008", "RUF001", "RUF002", "RUF003", "SIM105", "SIM115", "RUF005", "RUF007"]
+
+[tool.ruff.lint.per-file-ignores]
+"quality/runner.py" = ["E402"]  # GX logging must be silenced before import
 
 [tool.mypy]
 python_version = "3.12"

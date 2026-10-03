@@ -12,8 +12,8 @@ import duckdb
 os.environ.setdefault("GX_ANALYTICS_ENABLED", "False")
 logging.getLogger("great_expectations").setLevel(logging.WARNING)
 
-import great_expectations as gx  # noqa: E402
-import great_expectations.expectations as gxe  # noqa: E402
+import great_expectations as gx
+import great_expectations.expectations as gxe
 
 from contracts import events as ev
 from core.config import settings
