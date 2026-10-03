@@ -11,3 +11,4 @@ atlaslake:
       settings:
         memory_limit: "{{ env_var('ATLAS_DUCKDB_MEMORY', '6GB') }}"
         preserve_insertion_order: false
+        TimeZone: UTC

@@ -1,0 +1,14 @@
+data/
+.git/
+.venv/
+evaluation/runs/
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+infrastructure/**/.terraform/
+**/__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.tfstate*
+.env

@@ -7,6 +7,7 @@ consistent, committed Iceberg snapshot, and nothing is copied out of the lake.
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 import duckdb
@@ -26,6 +27,7 @@ def configure(conn: duckdb.DuckDBPyConnection, tables: dict[str, list[str]] | No
     from lakehouse.catalog import catalog
 
     cfg = settings().s3
+    conn.execute("SET TimeZone = 'UTC'")  # date bucketing of timestamptz must not depend on the host
     conn.execute("INSTALL httpfs; LOAD httpfs; INSTALL iceberg; LOAD iceberg;")
     conn.execute(f"""CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, KEY_ID '{cfg.access_key}',
                      SECRET '{cfg.secret_key}', ENDPOINT '{cfg.endpoint_host}', URL_STYLE 'path',
@@ -49,7 +51,12 @@ class Plugin(BasePlugin):
         self.tables = plugin_config.get("tables") or LAKE_TABLES
 
     def configure_connection(self, conn: duckdb.DuckDBPyConnection) -> None:
-        configure(conn, self.tables)
+        try:
+            configure(conn, self.tables)
+        except Exception:
+            # CI `dbt parse/compile` runs without a lake: ATLAS_LAKE_OPTIONAL=1 makes that non-fatal.
+            if os.environ.get("ATLAS_LAKE_OPTIONAL") != "1":
+                raise
 
 
 def connect_gold(read_only: bool = True, with_lake: bool = True) -> duckdb.DuckDBPyConnection:

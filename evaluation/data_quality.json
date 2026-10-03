@@ -1,0 +1,906 @@
+{
+  "benchmark": "data_quality",
+  "context": {
+    "generated_at": "2026-10-03T08:18:36+00:00",
+    "git_sha": "9edc945-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "summary": {
+    "checks": 48,
+    "passed": 48,
+    "failed": 0,
+    "failed_blocking": 0,
+    "failed_warning": 0,
+    "suites_errored": 0,
+    "technical_checks": 41,
+    "business_checks": 7,
+    "engine": "great_expectations 1.23.2",
+    "runtime_s": 45.792
+  },
+  "failures": [],
+  "suite_errors": [],
+  "results": [
+    {
+      "suite": "bronze_ingestion",
+      "layer": "bronze",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "null_payloads",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "raw bytes are always retained",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "bronze_ingestion",
+      "layer": "bronze",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "duplicate_offsets",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "each Kafka offset lands in Bronze exactly once (exactly-once sink)",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "bronze_ingestion",
+      "layer": "bronze",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "corrupt_rate",
+        "min_value": 0,
+        "max_value": 0.01
+      },
+      "severity": "warning",
+      "category": "technical",
+      "description": "undecodable deliveries stay below 1%",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeUnique",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "customer_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "store_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "amount_minor",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeInSet",
+      "kwargs": {
+        "column": "status"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeInSet",
+      "kwargs": {
+        "column": "currency"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_orders",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "sales_channel",
+        "mostly": 0.95
+      },
+      "severity": "warning",
+      "category": "technical",
+      "description": "null threshold: v1 producers (no sales_channel) should be < 5% of orders",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_order_items",
+      "layer": "silver",
+      "expectation": "ExpectCompoundColumnsToBeUnique",
+      "kwargs": {
+        "column_list": [
+          "order_id",
+          "line_number"
+        ]
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 219762,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_order_items",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "quantity",
+        "min_value": 1
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 219762,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_order_items",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "unit_price_minor",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 219762,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_order_items",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "product_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 219762,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeUnique",
+      "kwargs": {
+        "column": "payment_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeInSet",
+      "kwargs": {
+        "column": "status"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "amount_minor",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeInSet",
+      "kwargs": {
+        "column": "currency"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_payments",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "attempt",
+        "min_value": 1,
+        "max_value": 5
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60974,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_customers",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeUnique",
+      "kwargs": {
+        "column": "customer_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 15000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_customers",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "email"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 15000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_customers",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToMatchRegex",
+      "kwargs": {
+        "column": "email",
+        "regex": "^[^@\\s]+@[^@\\s]+$"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 15000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_customers",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToNotBeNull",
+      "kwargs": {
+        "column": "country"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 15000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_customers",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeInSet",
+      "kwargs": {
+        "column": "segment"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 15000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_referential_integrity",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "orphan_items",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_referential_integrity",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "orphan_payments",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_referential_integrity",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "orders_unknown_customer",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_referential_integrity",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "items_unknown_product",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_referential_integrity",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "orders_unknown_store",
+        "min_value": 0,
+        "max_value": 0
+      },
+      "severity": "warning",
+      "category": "technical",
+      "description": "stores are batch-extracted; a just-opened store may lag a run",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_inventory",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeUnique",
+      "kwargs": {
+        "column": "inventory_key"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 48485,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_inventory",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "quantity_reserved",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "reservations can never go negative (dup/lost deltas would show here)",
+      "success": true,
+      "rows_checked": 48485,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "silver_inventory",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "available",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "business",
+      "description": "never oversold",
+      "success": true,
+      "rows_checked": 48485,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "business_kpis",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "payment_success_rate",
+        "min_value": 0.8,
+        "max_value": 0.995
+      },
+      "severity": "blocking",
+      "category": "business",
+      "description": "payment success rate within its historical band",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "business_kpis",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "cancellation_rate",
+        "min_value": 0.0,
+        "max_value": 0.2
+      },
+      "severity": "blocking",
+      "category": "business",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "business_kpis",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "avg_order_value_minor",
+        "min_value": 100,
+        "max_value": 100000
+      },
+      "severity": "warning",
+      "category": "business",
+      "description": "",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "daily_volume_anomalies",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "zscore",
+        "max_value": 4.0,
+        "mostly": 0.99
+      },
+      "severity": "warning",
+      "category": "business",
+      "description": "expected volume: no day > 4\u03c3 from the mean",
+      "success": true,
+      "rows_checked": 32,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "daily_volume_anomalies",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "n",
+        "min_value": 1
+      },
+      "severity": "blocking",
+      "category": "business",
+      "description": "every day in range has orders",
+      "success": true,
+      "rows_checked": 32,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "freshness_and_dlq",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "silver_orders_age_s",
+        "max_value": 86400
+      },
+      "severity": "warning",
+      "category": "technical",
+      "description": "Silver processed within the last day",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "freshness_and_dlq",
+      "layer": "silver",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "dlq_rate",
+        "max_value": 0.02
+      },
+      "severity": "warning",
+      "category": "technical",
+      "description": "DLQ rate below 2% of received deliveries",
+      "success": true,
+      "rows_checked": 1,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_fact_orders",
+      "layer": "gold",
+      "expectation": "ExpectColumnValuesToBeUnique",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_fact_orders",
+      "layer": "gold",
+      "expectation": "ExpectColumnValuesToNotBeInSet",
+      "kwargs": {
+        "column": "customer_sk",
+        "mostly": 0.999
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "SCD2 point-in-time join resolves \u2265 99.9% of orders",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_fact_orders",
+      "layer": "gold",
+      "expectation": "ExpectColumnValuesToNotBeInSet",
+      "kwargs": {
+        "column": "store_sk",
+        "mostly": 0.999
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_fact_orders",
+      "layer": "gold",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "amount_minor",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 60000,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_marts",
+      "layer": "gold",
+      "expectation": "ExpectCompoundColumnsToBeUnique",
+      "kwargs": {
+        "column_list": [
+          "order_date",
+          "store_id",
+          "currency"
+        ]
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 895,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_marts",
+      "layer": "gold",
+      "expectation": "ExpectColumnValuesToBeBetween",
+      "kwargs": {
+        "column": "gross_revenue_minor",
+        "min_value": 0
+      },
+      "severity": "blocking",
+      "category": "technical",
+      "description": "",
+      "success": true,
+      "rows_checked": 895,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    },
+    {
+      "suite": "gold_marts",
+      "layer": "gold",
+      "expectation": "ExpectColumnPairValuesAToBeGreaterThanB",
+      "kwargs": {
+        "column_A": "orders_placed",
+        "column_B": "orders_paid",
+        "or_equal": true
+      },
+      "severity": "blocking",
+      "category": "business",
+      "description": "cannot pay more orders than were placed",
+      "success": true,
+      "rows_checked": 895,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0,
+      "observed_value": null,
+      "partial_unexpected": []
+    }
+  ]
+}

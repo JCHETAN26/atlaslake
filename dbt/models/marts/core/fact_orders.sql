@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('stg_customer_changes') }}
 -- Accumulating-snapshot fact. Grain: ONE ROW PER ORDER (current lifecycle state).
 -- Incremental on silver processing time. Orders whose customer history changed since the last run
 -- are also re-pointed, so late-arriving SCD2 changes never leave a stale customer_sk behind.
@@ -9,7 +10,8 @@ with changed as (
     {% if is_incremental() %}
        or o.customer_id in (
             select customer_id from {{ ref('stg_customer_changes') }}
-            where silver_loaded_at > (select max(silver_updated_at) from {{ this }}))
+            where silver_loaded_at > (select max(dbt_loaded_at) - interval {{ var('incremental_lookback_minutes') }} minute
+                                     from {{ this }}))
     {% endif %}
 )
 select

@@ -78,9 +78,17 @@ def run_relay(
     chaos: ChaosConfig | None = None,
     crash_after_flush_once: bool = False,
     idle_exit_s: float | None = None,
+    metrics_port: int | None = 9109,
 ) -> RelayResult:
     """Drain the outbox (and keep following it if ``follow``)."""
     metrics = relay_metrics()
+    if follow and metrics_port:
+        from monitoring.metrics import serve
+
+        try:
+            serve(metrics_port)
+        except OSError:
+            log.warning("relay metrics port %s busy", metrics_port)
     read_conn = connect()
     log_conn = connect()
     producer = EventProducer(schema_versions=schema_versions, chaos=chaos, delivery_sink=log_conn,

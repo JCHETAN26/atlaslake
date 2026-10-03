@@ -1,0 +1,32 @@
+# Install: make setup (runs `pre-commit install`). Type checking runs via `make typecheck` / CI.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^(dbt/|infrastructure/)
+        args: [--allow-multiple-documents]
+      - id: end-of-file-fixer
+        exclude: ^(evaluation/|simulator/reference_data/)
+      - id: trailing-whitespace
+        exclude: ^(evaluation/|simulator/reference_data/)
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=2000]
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (project venv)
+        entry: env -u PYTHONPATH uv run --no-sync mypy
+        language: system
+        types: [python]
+        files: ^(core|simulator|contracts|producers|ingestion|spark|baseline|quality|reconciliation|lineage|monitoring|cli|benchmarks|lakehouse)/
+        pass_filenames: false
+        args: [core, simulator, contracts, producers, ingestion, spark, baseline, quality, reconciliation, lineage, monitoring, cli, benchmarks, lakehouse]
+        stages: [pre-push]

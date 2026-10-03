@@ -7,7 +7,7 @@
 {% macro incremental_since(column, target_column=none) -%}
     {%- if is_incremental() -%}
     {{ column }} > (
-        select coalesce(max({{ target_column or column }}), timestamp '1900-01-01')
+        select coalesce(max({{ target_column or column.split('.')[-1] }}), timestamp '1900-01-01')
                - interval {{ var('incremental_lookback_minutes') }} minute
         from {{ this }}
     )

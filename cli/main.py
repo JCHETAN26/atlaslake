@@ -32,7 +32,7 @@ DATE_FMT = ["%Y-%m-%d"]
 def _setup_logging(verbose: bool = False) -> None:
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO,
                         format="%(asctime)s %(levelname)s %(name)s: %(message)s", stream=sys.stderr)
-    for noisy in ("py4j", "httpx", "urllib3"):
+    for noisy in ("py4j", "httpx", "urllib3", "great_expectations"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
@@ -227,6 +227,16 @@ def silver_rebuild(
 
     res = run(get_spark("atlas-silver-batch"), dataset or None, _d(date_from), _d(date_to))
     _print(res)
+
+
+@silver_app.command("ingest-stores")
+def silver_ingest_stores(full: bool = False) -> None:
+    """Incremental JDBC extract of store reference data → silver.stores."""
+    _setup_logging()
+    from ingestion.batch.postgres_snapshot import ingest_stores
+    from spark.common.session import get_spark
+
+    _print(ingest_stores(get_spark("atlas-ingest-stores"), full=full))
 
 
 @app.command()
