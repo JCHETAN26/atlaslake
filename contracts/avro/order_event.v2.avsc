@@ -1,0 +1,141 @@
+{
+  "type": "record",
+  "name": "OrderEvent",
+  "namespace": "com.atlaslake.commerce",
+  "doc": "Order lifecycle event (topic commerce.orders). v2 adds sales_channel.",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "string",
+      "doc": "UUID, stable across redelivery"
+    },
+    {
+      "name": "event_type",
+      "type": "string"
+    },
+    {
+      "name": "event_timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-micros"
+      },
+      "doc": "when the fact happened at the source (UTC)"
+    },
+    {
+      "name": "producer",
+      "type": "string"
+    },
+    {
+      "name": "schema_version",
+      "type": "int"
+    },
+    {
+      "name": "order_id",
+      "type": "string"
+    },
+    {
+      "name": "customer_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "store_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "CREATED|PAID|CANCELLED|SHIPPED|DELIVERED"
+    },
+    {
+      "name": "amount_minor",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null,
+      "doc": "order total in minor currency units"
+    },
+    {
+      "name": "currency",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "ISO-4217"
+    },
+    {
+      "name": "items",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "OrderItem",
+            "fields": [
+              {
+                "name": "line_number",
+                "type": "int"
+              },
+              {
+                "name": "product_id",
+                "type": "string"
+              },
+              {
+                "name": "quantity",
+                "type": "int"
+              },
+              {
+                "name": "unit_price_minor",
+                "type": "long"
+              }
+            ]
+          }
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "cancel_reason",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "carrier",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "tracking_number",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "sales_channel",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "WEB|MOBILE|STORE (added in v2)"
+    }
+  ]
+}
