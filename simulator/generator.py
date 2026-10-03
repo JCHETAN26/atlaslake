@@ -435,7 +435,7 @@ class CommerceSimulator:
             pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_1" for o in order_ids], "attempt": 1,
                           "method": method1, "event_type": np.where(fail1, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
                           "status": np.where(fail1, "FAILED", "COMPLETED"),
-                          "failure_reason": np.where(fail1, failure_reasons, None),
+                          "failure_reason": np.where(fail1, failure_reasons, None),  # type: ignore[call-overload]
                           "event_timestamp": pay1_end})[att1],
             pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_2" for o in order_ids], "attempt": 2,
                           "method": method2, "event_type": "PAYMENT_STARTED", "status": "STARTED",
@@ -443,7 +443,7 @@ class CommerceSimulator:
             pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_2" for o in order_ids], "attempt": 2,
                           "method": method2, "event_type": np.where(fail2, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
                           "status": np.where(fail2, "FAILED", "COMPLETED"),
-                          "failure_reason": np.where(fail2, failure_reasons, None),
+                          "failure_reason": np.where(fail2, failure_reasons, None),  # type: ignore[call-overload]
                           "event_timestamp": pay2_end})[retry],
         ]
         payments = pd.concat(pay_frames, ignore_index=True)

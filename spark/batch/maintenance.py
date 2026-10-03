@@ -50,7 +50,8 @@ def file_stats(table: str) -> dict[str, Any]:
     files = [t.file for t in tbl.scan().plan_files()]
     sizes = [f.file_size_in_bytes for f in files]
     snaps = list(tbl.metadata.snapshots)
-    manifests = tbl.current_snapshot().manifests(tbl.io) if tbl.current_snapshot() else []
+    snap = tbl.current_snapshot()
+    manifests = snap.manifests(tbl.io) if snap is not None else []
     return {
         "data_files": len(files),
         "total_bytes": sum(sizes),

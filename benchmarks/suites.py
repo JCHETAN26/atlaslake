@@ -498,8 +498,8 @@ def _checkpoint_lag(query: str = "silver_ingest") -> int | None:
     from producers.topics import end_offsets
 
     cp = settings().checkpoint_dir / query
-    commits = sorted((int(p.name) for p in (cp / "commits").glob("[0-9]*")), default=None) if (cp / "commits").exists() else None
-    if commits is None:
+    commits = sorted(int(p.name) for p in (cp / "commits").glob("[0-9]*")) if (cp / "commits").exists() else []
+    if not commits:
         return None
     lines = (cp / "offsets" / str(commits[-1])).read_text().splitlines()
     offsets = json.loads(lines[-1])

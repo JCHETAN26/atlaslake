@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
+from typing import Any
 
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
@@ -41,7 +42,7 @@ class BatchStats:
     duplicates_known: int = 0
     accepted_new: int = 0
     late_events: int = 0
-    by_topic: dict[str, dict[str, int]] = field(default_factory=dict)
+    by_topic: dict[str, dict[str, Any]] = field(default_factory=dict)
     duration_s: float = 0.0
     skipped_writes: list[str] = field(default_factory=list)
     stage_s: dict[str, float] = field(default_factory=dict)

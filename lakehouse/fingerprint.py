@@ -30,7 +30,7 @@ GOLD_TABLES = ["dim_customer", "dim_product", "fact_orders", "fact_order_items",
 def _fp(con: duckdb.DuckDBPyConnection, relation: str) -> dict[str, Any]:
     cols = [r[0] for r in con.execute(f"DESCRIBE {relation}").fetchall() if r[0] not in PROCESSING_COLUMNS]
     expr = ", ".join(f'"{c}"' for c in cols)
-    n, h = con.execute(f"SELECT count(*), coalesce(sum(hash({expr})::hugeint), 0) FROM {relation}").fetchone()
+    n, h = con.execute(f"SELECT count(*), coalesce(sum(hash({expr})::hugeint), 0) FROM {relation}").fetchone()  # type: ignore[misc]
     return {"rows": int(n), "hash": str(h)}
 
 

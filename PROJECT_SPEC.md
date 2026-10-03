@@ -1,6 +1,6 @@
 # AtlasLake — Project Specification
 
-Status: **Phase 0 (engineering contract)** · Created 2026-10-03
+Status: **implemented** — contract created 2026-10-03 (Phase 0) and kept current as phases landed.
 
 AtlasLake is a streaming + batch lakehouse for commerce data. Its single claim is:
 
@@ -126,7 +126,9 @@ intended test/experiment identifiers; they become real files as phases land.
 | Orders | `ORDER_CREATED`, `ORDER_UPDATED`, `ORDER_CANCELLED`, `ORDER_SHIPPED`, `ORDER_DELIVERED` | `commerce.orders` | `order_id` |
 | Payments | `PAYMENT_STARTED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED` | `commerce.payments` | `order_id` ¹ |
 | Inventory | `INVENTORY_RESERVED`, `INVENTORY_UPDATED` | `commerce.inventory` | `store_id:product_id` |
-| Customers | customer create/update (CDC) | `commerce.customers` | `customer_id` |
+| Customers | `CUSTOMER_CREATED`, `CUSTOMER_UPDATED` (full snapshot) | `commerce.customers` | `customer_id` |
+| Products | `PRODUCT_CREATED`, `PRODUCT_UPDATED` (full snapshot) | `commerce.products` | `product_id` |
+| Stores | — (batch JDBC extract, no CDC) | — | — |
 
 ¹ Keyed by `order_id` (not `payment_id`) so all payment attempts for an order are ordered relative to
 each other. Revisit in Phase 6 if skew is measured.
@@ -134,11 +136,12 @@ each other. Revisit in Phase 6 if skew is measured.
 ### Order lifecycle (valid transitions)
 
 ```
-CREATED ─► PAYMENT_PENDING ─► PAID ─► SHIPPED ─► DELIVERED
-   │              │
-   │              └─► PAYMENT_FAILED ─► (retry → PAYMENT_PENDING) | CANCELLED
-   └─► CANCELLED            (cancellation allowed until SHIPPED)
+CREATED ──► PAID ──► SHIPPED ──► DELIVERED
+   │          │
+   └──────────┴──► CANCELLED      (customer request, or payment failed after ≤ 2 attempts;
+                                    cancellation allowed until SHIPPED)
 ```
+Payment attempts live on their own entity (`STARTED → COMPLETED | FAILED`, up to 2 attempts).
 
 Transitions outside this graph are a validation error (DLQ) for the source generator's output, and a
 quality-check failure if they ever appear in Silver.
@@ -239,6 +242,18 @@ alternatives rejected.
 |---|---|---|---|---|
 | 2026-10-03 | 0 | Money as integer minor units | Avoids float drift breaking C4 | `NUMERIC` everywhere (kept in Postgres source; minor units in events/lake) |
 | 2026-10-03 | 0 | Payments keyed by `order_id` | Per-order ordering across payment attempts | `payment_id` |
+| 2026-10-03 | 1 | Seed data: UCI Online Retail II (real catalogue, prices, basket/quantity/hour/weekday/country distributions), expanded by a seeded generator | Public, no login, CC BY 4.0; derived reference set committed (`simulator/reference_data`) so generation never depends on the download | Olist (Kaggle login), fully synthetic |
+| 2026-10-03 | 3 | Transactional outbox in Postgres + relay instead of Debezium | Entity change and its event commit atomically; relay measured at ~37K events/s single process; no Kafka Connect cluster (RAM budget §7) | Debezium/Kafka Connect |
+| 2026-10-03 | 5 | One Avro record per topic (wide, nullable payload) under TopicNameStrategy + `BACKWARD_TRANSITIVE` | Lets the registry enforce compatibility per topic; consumers decode with the *writer* schema by id | One schema per event type (TopicRecordNameStrategy) |
+| 2026-10-03 | 9-10 | Spark 3.5.9 on Java 11, `local[*]`, Iceberg 1.10 | JDK 11 is what the host has; Spark 4 needs 17 (containers use 17) | Spark 4.x |
+| 2026-10-03 | 10 | Single Kafka → Bronze+DLQ+Silver `foreachBatch` job; Silver dedup = in-batch window + anti-join against the `silver.events` ledger (not Spark watermark dedup) | Spark's stateful dedup *drops* rows behind the watermark — that would be silent loss for very late events (violates C1). Watermark state is used only for the real-time aggregate, where exclusion is the documented policy | `dropDuplicatesWithinWatermark` on the main path |
+| 2026-10-03 | 10 | Idempotent writes: commutative MERGEs + content-addressed batch keys in Iceberg snapshot summaries | Crash/replay safe without multi-table transactions; proven by re-running batches/backfills with identical fingerprints | Exactly-once Kafka transactions |
+| 2026-10-03 | 14 | Iceberg JDBC catalog in Postgres (Spark, PyIceberg and DuckDB share it) | No extra catalog service; transactional commits | REST catalog, Hive metastore |
+| 2026-10-03 | 18 | dbt on DuckDB reading Silver Iceberg in place (custom dbt-duckdb plugin creating `iceberg_scan` views) | No data copy out of the lake; whole Gold build in seconds at 1M events | dbt-spark + Thrift server (RAM) |
+| 2026-10-03 | 20 | Incremental models key on *processing time* (`silver_updated_at`) | Event-time keys miss late events that modify old rows — demonstrated in design review; dims rebuilt in full (cheap, always correct with late SCD2 changes) | event-time high-water mark |
+| 2026-10-03 | 22 | Great Expectations 1.x (programmatic, ephemeral context) + dbt tests | Resolved cleanly alongside Spark/dbt; suites are code (`quality/suites.py`) | Soda Core |
+| 2026-10-03 | 21 | Snowflake as *serving* target loaded from Gold (dims full-replace, facts/marts MERGE by grain key with a watermark) | Exercised against a fake connector in CI; no live account used | Snowflake reading Iceberg directly (documented as alternative) |
+| 2026-10-03 | 7 | MinIO via `bitnamilegacy/minio` | Docker Hub `minio/*` images no longer available | SeaweedFS, RustFS |
 
 ---
 

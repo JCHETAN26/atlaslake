@@ -156,7 +156,7 @@ class DataExporter:
             def silver() -> None:
                 for table, col in SILVER_FRESHNESS_COLUMNS.items():
                     try:
-                        n, ts = con.execute(f"SELECT count(*), max({col}) FROM silver.{table}").fetchone()
+                        n, ts = con.execute(f"SELECT count(*), max({col}) FROM silver.{table}").fetchone()  # type: ignore[misc]
                     except duckdb.Error:
                         continue
                     self.silver_rows.labels(f"silver.{table}").set(n)

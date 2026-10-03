@@ -121,8 +121,9 @@ def build_query(
             m.duplicates.labels(topic).inc(d.get("duplicates_in_batch", 0) + d.get("duplicates_known", 0))
             if d.get("rejected"):
                 m.rejected.labels(topic, "any").inc(d["rejected"])
-            if d.get("max_ing") is not None:
-                m.processing_lag.labels(query).set(max(0.0, time.time() - d["max_ing"].timestamp()))
+            max_ing = d.get("max_ing")
+            if max_ing is not None:
+                m.processing_lag.labels(query).set(max(0.0, time.time() - max_ing.timestamp()))
         log.info("batch %s: %s", batch_id, {k: v for k, v in stats.as_dict().items() if k != "by_topic"})
 
     writer = (raw.writeStream.queryName(query)
@@ -150,7 +151,7 @@ def run(
         except OSError:
             log.warning("metrics port %s busy; not serving", metrics_port)
     q, processor = build_query(spark, trigger_s=trigger_s, max_offsets=max_offsets, available_now=available_now)
-    q.awaitTermination(timeout_s)
+    q.awaitTermination(int(timeout_s) if timeout_s else None)
     if q.isActive:
         q.stop()
     if q.exception():

@@ -54,7 +54,7 @@ def upstream(table: str, depth: int = 10) -> dict[str, Any]:
             if up not in seen:
                 seen.add(up)
                 q.append((up, d + 1))
-    roots = sorted({e["upstream"] for e in out} - {e["dataset"] for e in out})
+    roots = sorted({str(e["upstream"]) for e in out} - {str(e["dataset"]) for e in out})
     return {"table": f"{start[0]}/{start[1]}", "source": "local-graph", "edges": out, "root_sources": roots}
 
 

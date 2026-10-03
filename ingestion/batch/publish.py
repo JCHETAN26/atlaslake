@@ -121,7 +121,9 @@ def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
     if connector is None:
         import snowflake.connector as connector  # type: ignore[no-redef]
     if write_pandas is None:
-        from snowflake.connector.pandas_tools import write_pandas
+        from snowflake.connector.pandas_tools import write_pandas as _wp
+
+        write_pandas = _wp
 
     t0 = time.time()
     sf = connector.connect(**(cfg or {}))
@@ -149,6 +151,7 @@ def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
         write_pandas(sf, df, f"{table.upper()}_LOAD", schema="STAGING", quote_identifiers=True)
         cur.execute("BEGIN")
         cur.execute(merge_sql(table, keys, [c.lower() for c in df.columns]))
+        assert wm_col is not None
         new_mark = df[wm_col.upper()].max()
         cur.execute("DELETE FROM STAGING.PUBLISH_WATERMARKS WHERE TABLE_NAME = %s", (table.upper(),))
         cur.execute("INSERT INTO STAGING.PUBLISH_WATERMARKS VALUES (%s, %s)", (table.upper(), str(new_mark)))

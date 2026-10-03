@@ -72,7 +72,7 @@ def categorize(description: str) -> str:
 
 def _histogram(series: pd.Series, lo: int, hi: int, divisor: float = 1.0) -> dict[str, list[float]]:
     """Empirical histogram after rescaling by ``divisor`` (ceil) and clipping to [lo, hi]."""
-    clipped = np.ceil(series / divisor).clip(lower=lo, upper=hi).astype(int)
+    clipped = pd.Series(np.clip(np.ceil(series.to_numpy() / divisor), lo, hi).astype(int))
     counts = clipped.value_counts().sort_index()
     return {"values": [int(v) for v in counts.index], "probs": (counts / counts.sum()).round(8).tolist()}
 

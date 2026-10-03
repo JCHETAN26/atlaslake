@@ -53,7 +53,8 @@ def prepare_source(scale: Scale, seed: int = SEED, days: float | None = None) ->
         load_stores(conn, sim.world.stores)
         record_run(conn, f"bench-{scale.name}-{seed}", "historical", cfg.to_json())
         totals = apply_stream(conn, sim.stream())
-        conn.execute("VACUUM ANALYZE commerce.orders")
+    with connect(autocommit=True) as conn:  # VACUUM cannot run inside a transaction block
+        conn.execute("VACUUM ANALYZE")
     return {"scale": scale.name, "orders": scale.orders, "days": days, "events": sum(totals.values()),
             "by_topic": totals, "load_s": round(time.time() - t0, 2)}
 

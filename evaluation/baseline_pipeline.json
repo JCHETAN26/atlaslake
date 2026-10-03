@@ -1,0 +1,241 @@
+{
+  "benchmark": "baseline_pipeline",
+  "context": {
+    "generated_at": "2026-10-03T08:50:02+00:00",
+    "git_sha": "78ae964-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "description": "Naive full-refresh pipeline: Postgres \u2192 CSV/Parquet \u2192 pandas \u2192 Postgres",
+  "runs": [
+    {
+      "scale": "100k",
+      "source_load": {
+        "scale": "100k",
+        "orders": 7042,
+        "days": 7.0,
+        "events": 106685,
+        "by_topic": {
+          "commerce.orders": 22385,
+          "commerce.payments": 14396,
+          "commerce.inventory": 65740,
+          "commerce.customers": 1847,
+          "commerce.products": 2317
+        },
+        "load_s": 5.98
+      },
+      "source_events": 106685,
+      "source_rows": {
+        "customers": 1760,
+        "products": 2000,
+        "stores": 30,
+        "orders": 7042,
+        "order_items": 26082,
+        "payments": 7198,
+        "inventory": 17628
+      },
+      "rows_processed": 61740,
+      "stage_runtime_s": {
+        "extract_s": 0.102,
+        "transform_s": 0.099,
+        "load_s": 0.386
+      },
+      "total_runtime_s": 0.587,
+      "staleness_at_completion_s": 0.603,
+      "storage_bytes": {
+        "csv": 4180503,
+        "parquet": 1204901
+      },
+      "rows_loaded": {
+        "dim_customer": 1760,
+        "dim_product": 2000,
+        "dim_store": 30,
+        "fact_orders": 7042,
+        "fact_order_items": 26082,
+        "mart_daily_sales": 200,
+        "mart_order_funnel": 7,
+        "mart_payment_metrics": 79,
+        "mart_inventory_health": 17628
+      },
+      "peak_rss_mb": 503.8,
+      "query_latency": {
+        "revenue_by_day_range": {
+          "n": 10,
+          "p50": 0.0002,
+          "p95": 0.0002,
+          "p99": 0.0003,
+          "min": 0.0001,
+          "max": 0.0003,
+          "mean": 0.0002
+        },
+        "top_products_range": {
+          "n": 10,
+          "p50": 0.0036,
+          "p95": 0.0038,
+          "p99": 0.0038,
+          "min": 0.0035,
+          "max": 0.0038,
+          "mean": 0.0036
+        },
+        "customer_ltv_top100": {
+          "n": 10,
+          "p50": 0.0018,
+          "p95": 0.0019,
+          "p99": 0.0019,
+          "min": 0.0018,
+          "max": 0.0019,
+          "mean": 0.0018
+        },
+        "single_day_orders": {
+          "n": 10,
+          "p50": 0.0002,
+          "p95": 0.0003,
+          "p99": 0.0003,
+          "min": 0.0002,
+          "max": 0.0003,
+          "mean": 0.0002
+        },
+        "funnel_range": {
+          "n": 10,
+          "p50": 0.0001,
+          "p95": 0.0002,
+          "p99": 0.0002,
+          "min": 0.0001,
+          "max": 0.0002,
+          "mean": 0.0001
+        },
+        "store_channel_mix": {
+          "n": 10,
+          "p50": 0.0014,
+          "p95": 0.0015,
+          "p99": 0.0015,
+          "min": 0.0014,
+          "max": 0.0015,
+          "mean": 0.0014
+        }
+      }
+    },
+    {
+      "scale": "1m",
+      "source_load": {
+        "scale": "1m",
+        "orders": 70422,
+        "days": 28.2,
+        "events": 982469,
+        "by_topic": {
+          "commerce.orders": 260085,
+          "commerce.payments": 143020,
+          "commerce.inventory": 558389,
+          "commerce.customers": 18682,
+          "commerce.products": 2293
+        },
+        "load_s": 56.66
+      },
+      "source_events": 982469,
+      "source_rows": {
+        "customers": 17605,
+        "products": 2000,
+        "stores": 30,
+        "orders": 70422,
+        "order_items": 257785,
+        "payments": 71510,
+        "inventory": 50365
+      },
+      "rows_processed": 469717,
+      "stage_runtime_s": {
+        "extract_s": 0.601,
+        "transform_s": 0.47,
+        "load_s": 2.219
+      },
+      "total_runtime_s": 3.29,
+      "staleness_at_completion_s": 3.342,
+      "storage_bytes": {
+        "csv": 34584378,
+        "parquet": 10259739
+      },
+      "rows_loaded": {
+        "dim_customer": 17605,
+        "dim_product": 2000,
+        "dim_store": 30,
+        "fact_orders": 70422,
+        "fact_order_items": 257785,
+        "mart_daily_sales": 846,
+        "mart_order_funnel": 29,
+        "mart_payment_metrics": 338,
+        "mart_inventory_health": 50365
+      },
+      "peak_rss_mb": 1141.8,
+      "query_latency": {
+        "revenue_by_day_range": {
+          "n": 10,
+          "p50": 0.0002,
+          "p95": 0.0003,
+          "p99": 0.0003,
+          "min": 0.0001,
+          "max": 0.0003,
+          "mean": 0.0002
+        },
+        "top_products_range": {
+          "n": 10,
+          "p50": 0.0121,
+          "p95": 0.0121,
+          "p99": 0.0122,
+          "min": 0.0119,
+          "max": 0.0122,
+          "mean": 0.012
+        },
+        "customer_ltv_top100": {
+          "n": 10,
+          "p50": 0.0189,
+          "p95": 0.0201,
+          "p99": 0.0202,
+          "min": 0.0176,
+          "max": 0.0202,
+          "mean": 0.0189
+        },
+        "single_day_orders": {
+          "n": 10,
+          "p50": 0.0004,
+          "p95": 0.0006,
+          "p99": 0.0006,
+          "min": 0.0004,
+          "max": 0.0006,
+          "mean": 0.0005
+        },
+        "funnel_range": {
+          "n": 10,
+          "p50": 0.0001,
+          "p95": 0.0002,
+          "p99": 0.0002,
+          "min": 0.0001,
+          "max": 0.0002,
+          "mean": 0.0001
+        },
+        "store_channel_mix": {
+          "n": 10,
+          "p50": 0.0127,
+          "p95": 0.013,
+          "p99": 0.0131,
+          "min": 0.0127,
+          "max": 0.0131,
+          "mean": 0.0128
+        }
+      }
+    }
+  ]
+}
