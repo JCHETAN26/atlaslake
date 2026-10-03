@@ -351,7 +351,9 @@ def iceberg_partitioning(spark) -> dict[str, Any]:
     # baseline layout: as written by streaming (identity(topic)), compacted so file count isn't the variable
     spark.sql(
         f"CALL {settings().catalog_name}.system.rewrite_data_files(table => 'silver.events', "
-        f"options => map('rewrite-all', 'true', 'target-file-size-bytes', '{64 * 1024 * 1024}'))"
+        f"options => map('rewrite-all', 'true', 'target-file-size-bytes', '{64 * 1024 * 1024}', "
+        f"'max-file-group-size-bytes', '{256 * 1024 * 1024}', 'max-concurrent-file-group-rewrites', '2', "
+        f"'partial-progress.enabled', 'true'))"
     ).collect()
     before = _measure_layout(spark, d, key)
     files_before = file_stats("silver.events")
@@ -361,7 +363,9 @@ def iceberg_partitioning(spark) -> dict[str, Any]:
     spark.sql(
         f"CALL {settings().catalog_name}.system.rewrite_data_files(table => 'silver.events', "
         f"strategy => 'sort', sort_order => 'entity_key', "
-        f"options => map('rewrite-all', 'true', 'target-file-size-bytes', '{64 * 1024 * 1024}'))"
+        f"options => map('rewrite-all', 'true', 'target-file-size-bytes', '{64 * 1024 * 1024}', "
+        f"'max-file-group-size-bytes', '{256 * 1024 * 1024}', 'max-concurrent-file-group-rewrites', '2', "
+        f"'partial-progress.enabled', 'true'))"
     ).collect()
     rewrite_s = time.time() - t0
     after = _measure_layout(spark, d, key)

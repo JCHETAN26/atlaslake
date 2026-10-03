@@ -278,6 +278,7 @@ alternatives rejected.
 | `full_vs_incremental` (incremental slower than full) | Look-back window (clock-skew guard) larger than the run cadence re-read everything | 1-minute look-back; key-set semi-join in `fact_orders` | `results_identical` in the benchmark |
 | `full_vs_incremental` at 10M (fact_orders 50 s for 705K rows) | SCD2 point-in-time join written as `ts < valid_to OR valid_to IS NULL` pushed DuckDB off the hash join (112 s) | `as_of()` macro with an open upper bound (0.09 s, identical result) | dbt tests + Gold fingerprints |
 | Spark driver vanished mid-benchmark at 10M | JVM (6 GB heap) + DuckDB (6 GB limit) + services exceeded 19 GB → killed | driver 5 GB, DuckDB 3 GB; benchmark runner recreates a dead session | — |
+| **chaos test** (1 of 2,751,035 events unexplained) | a delivery corrupted in transit (`UNKNOWN_SCHEMA_ID`) could only be attributed through the relay's delivery log, whose last rows were lost when the relay was stopped → not attributable, not replayable | `atlas-event-id` Kafka header on every delivery (survives payload corruption) + continuous delivery-log writes + graceful SIGTERM | `tests/failure/test_corrupt_attribution.py` (delivery log wiped → still 0 unexplained) |
 | repeated `Connection reset` from S3 | (1) Bitnami MinIO wrapper exited every ~70 s; (2) Docker userland proxy (daemon has `iptables=false`) reset connections under many small writes; (3) container `nofile=1024` | run MinIO binary directly, host networking, `nofile=65536`, S3 retry/backoff policy | small-file experiment: 0 resets |
 
 ---

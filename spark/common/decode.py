@@ -53,6 +53,7 @@ RAW_SCHEMA = StructType(
         StructField("kafka_key", StringType()),
         StructField("payload", BinaryType()),
         StructField("ingestion_timestamp", TimestampType()),
+        StructField("header_event_id", StringType()),  # Kafka header: attribution for undecodable bytes
     ]
 )
 
@@ -137,6 +138,9 @@ def _decode_batches(registry_url: str):
                 decode_record(p, t, None if pd.isna(i) else int(i), reg)
                 for p, t, i in zip(pdf["payload"], pdf["topic"], ingest_us, strict=True)
             ]
+            for row, hdr in zip(rows, pdf["header_event_id"], strict=True):
+                if row["event_id"] is None and isinstance(hdr, str) and hdr:
+                    row["event_id"] = hdr  # payload undecodable: attribute via the header
             dec = pd.DataFrame(rows, index=pdf.index)
             dec["event_timestamp"] = pd.to_datetime(dec["event_timestamp"], unit="us")
             for c in ("schema_id", "schema_version"):
@@ -147,7 +151,12 @@ def _decode_batches(registry_url: str):
 
 
 def standardize_kafka(df: DataFrame) -> DataFrame:
-    """Kafka source columns → RAW_SCHEMA."""
+    """Kafka source columns → RAW_SCHEMA (read with ``includeHeaders=true``)."""
+    header = (
+        F.expr("filter(headers, h -> h.key = 'atlas-event-id')[0].value").cast("string")
+        if "headers" in df.columns
+        else F.lit(None).cast("string")
+    )
     return df.select(
         F.lit("kafka").alias("source"),
         F.col("topic"),
@@ -156,6 +165,7 @@ def standardize_kafka(df: DataFrame) -> DataFrame:
         F.col("key").cast("string").alias("kafka_key"),
         F.col("value").alias("payload"),
         F.col("timestamp").alias("ingestion_timestamp"),
+        header.alias("header_event_id"),
     )
 
 

@@ -1,8 +1,8 @@
 {
   "benchmark": "consumer_recovery",
   "context": {
-    "generated_at": "2026-10-03T10:20:36+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T13:35:57+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -23,145 +23,145 @@
   },
   "workload_orders_per_s": 150,
   "outage_s": 45,
-  "steady_state_lag": 11453,
-  "peak_backlog": 50150,
-  "recovery_time_s": 52.6,
-  "time_from_crash_to_recovered_s": 100.0,
+  "steady_state_lag": 11731,
+  "peak_backlog": 49819,
+  "recovery_time_s": 52.5,
+  "time_from_crash_to_recovered_s": 99.8,
   "records_lost": 0,
   "unknown_origin": 0,
   "unexpected_logical_duplicates": 0,
   "reconciliation_passed": true,
-  "source_events": 1501085,
+  "source_events": 1491964,
   "valid_experiment": true,
   "lag_timeline": [
     {
       "t": 0.0,
-      "lag": 11453,
+      "lag": 11731,
       "phase": "down"
     },
     {
-      "t": 5.2,
-      "lag": 15905,
+      "t": 5.4,
+      "lag": 16845,
       "phase": "down"
     },
     {
-      "t": 10.5,
-      "lag": 21034,
+      "t": 10.6,
+      "lag": 21066,
       "phase": "down"
     },
     {
-      "t": 15.8,
-      "lag": 25448,
+      "t": 15.9,
+      "lag": 25361,
       "phase": "down"
     },
     {
       "t": 21.1,
-      "lag": 29848,
+      "lag": 29906,
       "phase": "down"
     },
     {
       "t": 26.4,
-      "lag": 34516,
+      "lag": 35252,
       "phase": "down"
     },
     {
       "t": 31.6,
-      "lag": 40197,
+      "lag": 39986,
       "phase": "down"
     },
     {
       "t": 36.9,
-      "lag": 45194,
+      "lag": 44792,
       "phase": "down"
     },
     {
       "t": 42.2,
-      "lag": 50150,
+      "lag": 49819,
       "phase": "down"
     },
     {
-      "t": 47.7,
-      "lag": 55119,
+      "t": 47.5,
+      "lag": 56219,
       "phase": "recovering"
     },
     {
-      "t": 50.9,
-      "lag": 59267,
+      "t": 50.7,
+      "lag": 59193,
       "phase": "recovering"
     },
     {
-      "t": 54.2,
-      "lag": 62107,
+      "t": 54.0,
+      "lag": 62281,
       "phase": "recovering"
     },
     {
-      "t": 57.5,
-      "lag": 65151,
+      "t": 57.2,
+      "lag": 65292,
       "phase": "recovering"
     },
     {
-      "t": 60.8,
-      "lag": 68430,
+      "t": 60.5,
+      "lag": 68405,
       "phase": "recovering"
     },
     {
-      "t": 64.0,
-      "lag": 71557,
+      "t": 63.7,
+      "lag": 72510,
       "phase": "recovering"
     },
     {
-      "t": 67.3,
-      "lag": 75794,
+      "t": 67.0,
+      "lag": 75645,
       "phase": "recovering"
     },
     {
-      "t": 70.6,
-      "lag": 79120,
+      "t": 70.4,
+      "lag": 78939,
       "phase": "recovering"
     },
     {
-      "t": 73.9,
-      "lag": 82704,
+      "t": 73.7,
+      "lag": 82030,
       "phase": "recovering"
     },
     {
-      "t": 77.2,
-      "lag": 87249,
+      "t": 77.0,
+      "lag": 85448,
       "phase": "recovering"
     },
     {
-      "t": 80.4,
-      "lag": 81516,
+      "t": 80.3,
+      "lag": 81592,
       "phase": "recovering"
     },
     {
-      "t": 83.6,
-      "lag": 84736,
+      "t": 83.5,
+      "lag": 84967,
       "phase": "recovering"
     },
     {
-      "t": 86.9,
-      "lag": 88386,
+      "t": 86.8,
+      "lag": 89839,
       "phase": "recovering"
     },
     {
-      "t": 90.2,
-      "lag": 93266,
+      "t": 90.1,
+      "lag": 14967,
       "phase": "recovering"
     },
     {
       "t": 93.4,
-      "lag": 17839,
+      "lag": 18566,
       "phase": "recovering"
     },
     {
-      "t": 96.8,
-      "lag": 21517,
+      "t": 96.6,
+      "lag": 21960,
       "phase": "recovering"
     },
     {
-      "t": 100.0,
-      "lag": 11308,
+      "t": 99.8,
+      "lag": 11641,
       "phase": "recovering"
     }
   ]

@@ -101,12 +101,22 @@ def run_relay(
     started = time.time()
     sent = 0
     idle_since = time.time()
+    stopping = {"flag": False}
+
+    def _graceful(signum, _frame) -> None:  # SIGTERM: finish held deliveries + persist the log
+        stopping["flag"] = True
+
+    import signal
+
+    previous = signal.signal(signal.SIGTERM, _graceful)
     try:
-        while True:
+        while not stopping["flag"]:
             rows = read_conn.execute(SELECT_BATCH, (last, batch_size)).fetchall()
             read_conn.commit()
             if not rows:
                 producer.release_due()
+                producer.poll()
+                producer.write_delivery_log()  # persist deliveries of released late/duplicate messages
                 if not follow or (idle_exit_s is not None and time.time() - idle_since > idle_exit_s):
                     break
                 time.sleep(poll_interval_s)
@@ -128,6 +138,7 @@ def run_relay(
                 break
         producer.flush(wait_for_delayed=True)
     finally:
+        signal.signal(signal.SIGTERM, previous)
         read_conn.close()
         log_conn.close()
     return RelayResult(sent, last, round(time.time() - started, 3), producer.stats.as_dict())

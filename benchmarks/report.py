@@ -690,6 +690,125 @@ def section_chaos(sec: list[str]) -> None:
     ]
 
 
+README = REPO_ROOT / "README.md"
+START, END = "<!-- results:start -->", "<!-- results:end -->"
+
+
+def headline_rows() -> list[list[Any]]:
+    rows: list[list[Any]] = []
+    dup, rec, late, bf, sp, fvi, rcn, sch, q, chaos = (
+        _load(n)
+        for n in (
+            "duplicate_test",
+            "consumer_recovery",
+            "late_event_test",
+            "backfill_benchmark",
+            "spark_performance",
+            "full_vs_incremental",
+            "reconciliation",
+            "schema_evolution",
+            "query_performance",
+            "chaos_report",
+        )
+    )
+    if sp:
+        best = max(sp["drains"], key=lambda d: d["events_per_s"] or 0)
+        rows.append(
+            [
+                "Kafka → Bronze/DLQ/Silver throughput",
+                f"{_n(best['events_per_s'])} events/s ({_n(best['received'])} events, maxOffsets {_n(best['max_offsets_per_trigger'])})",
+            ]
+        )
+    if dup:
+        rows.append(
+            [
+                "Duplicates injected → leaked",
+                f"{_n(dup['duplicates_injected'])} → {_n(dup['duplicates_leaked_silver'] + dup['duplicates_leaked_gold'])}",
+            ]
+        )
+    if rec:
+        rows.append(
+            [
+                "Spark `kill -9` mid-stream",
+                f"recovered {_n(rec['recovery_time_s'])} s after restart; lost {_n(rec['records_lost'])}, duplicates {_n(rec['unexpected_logical_duplicates'])}",
+            ]
+        )
+    if late:
+        rows.append(
+            [
+                "Late-data policy (on time / 5 min / 1 h / 1 day)",
+                "all tiers hold" if late["all_policies_hold"] else "VIOLATED",
+            ]
+        )
+    if bf:
+        rows.append(
+            [
+                "Rebuild Silver from Bronze (backfill)",
+                f"{_n(bf['records'])} records in {_n(bf['runtime_s'])} s; identical to streaming: {_n(bf['matches_streaming_state'])}; rerun changes nothing: {_n(bf['rerun_week']['state_unchanged'])}",
+            ]
+        )
+    if fvi:
+        rows.append(
+            [
+                "dbt incremental vs full refresh",
+                f"{_n(fvi.get('speedup_incremental_models'), 2)}× faster, identical results: {_n(fvi['results_identical'])}",
+            ]
+        )
+    if sch:
+        rows.append(
+            [
+                "Breaking schema change",
+                "rejected by registry, consumers unaffected"
+                if sch["breaking_change"]["rejected_safely"] and sch["consumers_healthy_after_rejection"]
+                else "NOT rejected",
+            ]
+        )
+    if q:
+        rows.append(
+            [
+                "Gold vs baseline answers (6 queries)",
+                "identical" if all(v["same_result"] for v in q["queries"].values()) else "DIFFER",
+            ]
+        )
+    if rcn:
+        s_ = rcn["summary"]
+        rows.append(
+            [
+                "Source → Gold reconciliation",
+                f"{_n(s_['source_events'])} events, unexplained {_n(s_['unexplained'])}, passed {_n(s_['passed'])}",
+            ]
+        )
+    if chaos:
+        a = chaos["answers"]
+        rows.append(
+            [
+                "Final chaos test",
+                f"lost data: {'yes' if a['did_we_lose_data'] else 'no'}; duplicates leaked: {'yes' if a['did_duplicates_leak'] else 'no'}; reconciled: {_n(a['did_source_and_gold_reconcile'])}",
+            ]
+        )
+    return rows
+
+
+def update_readme() -> None:
+    if not README.exists():
+        return
+    text = README.read_text()
+    if START not in text or END not in text:
+        return
+    block = "\n".join(
+        [
+            START,
+            "",
+            _table(["Experiment", "Measured (auto-generated from evaluation/)"], headline_rows()),
+            "",
+            END,
+        ]
+    )
+    pre, rest = text.split(START, 1)
+    post = rest.split(END, 1)[1]
+    README.write_text(pre + block + post)
+
+
 def render() -> Path:
     sec = [
         "# AtlasLake — measured results",
@@ -711,6 +830,7 @@ def render() -> Path:
     ):
         fn(sec)
     OUT.write_text("\n".join(sec) + "\n")
+    update_readme()
     return OUT
 
 

@@ -77,7 +77,12 @@ def compact_table(
 ) -> dict[str, Any]:
     before = file_stats(table)
     t0 = time.time()
-    opts = f"map('target-file-size-bytes', '{target_file_mb * MB}', 'min-input-files', '2', 'partial-progress.enabled', 'true')"
+    # bounded file groups + partial progress: a 10M-row table in one group exhausted the driver heap
+    opts = (
+        f"map('target-file-size-bytes', '{target_file_mb * MB}', 'min-input-files', '2', "
+        f"'partial-progress.enabled', 'true', 'max-file-group-size-bytes', '{256 * MB}', "
+        f"'max-concurrent-file-group-rewrites', '2')"
+    )
     sort = f", sort_order => '{sort_order}'" if sort_order else ""
     row = (
         spark.sql(

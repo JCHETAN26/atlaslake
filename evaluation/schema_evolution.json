@@ -1,8 +1,8 @@
 {
   "benchmark": "schema_evolution",
   "context": {
-    "generated_at": "2026-10-03T09:41:07+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T13:11:19+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -38,8 +38,7 @@
     "compatible": false,
     "messages": [
       "{errorType:'MISSING_UNION_BRANCH', description:'The new schema is missing a type inside a union field at path '/fields/8/type/1' in the old schema', additionalInfo:'reader union lacking writer type: LONG'}",
-      "{oldSchemaVersion: 2}",
-      "{oldSchema: '{\"type\":\"record\",\"name\":\"OrderEvent\",\"namespace\":\"com.atlaslake.commerce\",\"doc\":\"Order lifecycle event (topic commerce.orders). v2 adds sales_channel.\",\"fields\":[{\"name\":\"event_id\",\"type\":\"string\",\"doc\":\"UUID, stable across redelivery\"},{\"name\":\"event_type\",\"type\":\"string\"},{\"name\":\"event_timestamp\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-micros\"},\"doc\":\"when the fact happened at the source (UTC)\"},{\"name\":\"producer\",\"type\":\"string\"},{\"name\":\"schema_version\",\"type\":\"int\"},{\"name\":\"order_id\",\"type\":\"string\"},{\"name\":\"customer_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"store_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"status\",\"type\":\"string\",\"doc\":\"CREATED|PAID|CANCELLED|SHIPPED|DELIVERED\"},{\"name\":\"amount_minor\",\"type\":[\"null\",\"long\"],\"doc\":\"order total in minor currency units\",\"default\":null},{\"name\":\"currency\",\"type\":[\"null\",\"string\"],\"doc\":\"ISO-4217\",\"default\":null},{\"name\":\"items\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"OrderItem\",\"fields\":[{\"name\":\"line_number\",\"type\":\"int\"},{\"name\":\"product_id\",\"type\":\"string\"},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"unit_price_minor\",\"type\":\"long\"}]}}],\"default\":null},{\"name\":\"cancel_reason\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"carrier\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"tracking_number\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"sales_channel\",\"type\":[\"null\",\"string\"],\"doc\":\"WEB|MOBILE|STORE (added in v2)\",\"default\":null}]}'}"
+      "{oldSchemaVersion: 2}"
     ],
     "registered": false,
     "rejected_safely": true
@@ -49,45 +48,45 @@
     "mixed_versions": {
       "batches": 1,
       "received": 1000,
-      "elapsed_s": 4.3,
-      "events_per_s": 232.7,
+      "elapsed_s": 4.55,
+      "events_per_s": 219.8,
       "accepted_new": 1000,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 1000,
       "stage_seconds_total": {
-        "decode_validate": 0.661,
-        "bronze_append": 0.318,
-        "dlq_merge": 0.043,
-        "dedup_ledger_antijoin": 0.221,
-        "batch_stats": 0.357,
-        "entity_merges": 1.312,
-        "ledger_append": 0.15
+        "decode_validate": 0.596,
+        "bronze_append": 0.326,
+        "dlq_merge": 0.047,
+        "dedup_ledger_antijoin": 0.243,
+        "batch_stats": 0.441,
+        "entity_merges": 1.445,
+        "ledger_append": 0.153
       },
       "batch_durations_s": [
-        3.077
+        3.267
       ]
     },
     "after_rejection": {
       "batches": 1,
       "received": 100,
-      "elapsed_s": 4.11,
-      "events_per_s": 24.3,
+      "elapsed_s": 4.08,
+      "events_per_s": 24.5,
       "accepted_new": 100,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 100,
       "stage_seconds_total": {
-        "decode_validate": 0.574,
-        "bronze_append": 0.312,
-        "dlq_merge": 0.064,
-        "dedup_ledger_antijoin": 0.244,
-        "batch_stats": 0.416,
-        "entity_merges": 1.274,
-        "ledger_append": 0.157
+        "decode_validate": 0.601,
+        "bronze_append": 0.297,
+        "dlq_merge": 0.046,
+        "dedup_ledger_antijoin": 0.226,
+        "batch_stats": 0.4,
+        "entity_merges": 1.202,
+        "ledger_append": 0.178
       },
       "batch_durations_s": [
-        3.056
+        2.965
       ]
     }
   }

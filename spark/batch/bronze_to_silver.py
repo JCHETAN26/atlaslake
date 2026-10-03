@@ -38,6 +38,7 @@ def bronze_raw(
             df = df.filter(
                 F.col(col) < F.lit(datetime.combine(date_to + timedelta(days=1), datetime.min.time()))
             )
+        df = df.withColumn("header_event_id", F.col("event_id"))  # Bronze keeps the attributed id
         frames.append(df.select(*RAW_SCHEMA.fieldNames()))
     out = frames[0]
     for f in frames[1:]:

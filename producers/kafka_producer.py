@@ -18,6 +18,8 @@ from contracts.registry import SchemaRegistry
 from core.config import settings
 from producers.chaos import Chaos, ChaosConfig
 
+EVENT_ID_HEADER = "atlas-event-id"
+
 
 @dataclass
 class ProducerStats:
@@ -102,8 +104,15 @@ class EventProducer:
     def _produce(self, topic: str, key: str, value: bytes, event_id: str | None, fault: str) -> None:
         while True:
             try:
+                # The event id also travels in a header: headers survive payload corruption, so even an
+                # undecodable delivery can be attributed to its source event (and recovered by replay).
+                headers: dict[str, str | bytes | None] | None = {EVENT_ID_HEADER: event_id} if event_id else None
                 self._producer.produce(
-                    topic, key=key.encode(), value=value, on_delivery=self._on_delivery(event_id, fault)
+                    topic,
+                    key=key.encode(),
+                    value=value,
+                    headers=headers,
+                    on_delivery=self._on_delivery(event_id, fault),
                 )
                 break
             except BufferError:
@@ -170,6 +179,10 @@ class EventProducer:
         while self._delayed and (force or self._delayed[0][0] <= now):
             _, _, topic, key, value, event_id, fault = heapq.heappop(self._delayed)
             self._produce(topic, key, value, event_id, fault)
+
+    def poll(self, timeout: float = 0.0) -> int:
+        """Serve delivery callbacks without flushing (keeps the delivery log current while idle)."""
+        return self._producer.poll(timeout)
 
     def pending_delayed(self) -> int:
         return len(self._delayed)

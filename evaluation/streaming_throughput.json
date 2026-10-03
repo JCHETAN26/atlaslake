@@ -1,8 +1,8 @@
 {
   "benchmark": "streaming_throughput",
   "context": {
-    "generated_at": "2026-10-03T10:16:29+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T13:32:01+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -26,36 +26,36 @@
     {
       "target_orders_per_s": 100,
       "workload": {
-        "events": 61538,
-        "events_per_s": 683.4,
+        "events": 62807,
+        "events_per_s": 697.5,
         "elapsed_s": 90.04,
-        "commit_p95_s": 0.209
+        "commit_p95_s": 0.256
       },
       "latency": {
-        "events": 61538,
+        "events": 62807,
         "end_to_end_s": {
-          "n": 61538,
-          "p50": 12.651,
-          "p95": 34.5897,
-          "p99": 38.5047,
-          "min": 4.9236,
-          "max": 39.4105,
-          "mean": 15.7454
+          "n": 62807,
+          "p50": 11.6833,
+          "p95": 38.6668,
+          "p99": 42.5021,
+          "min": 4.8534,
+          "max": 43.416,
+          "mean": 16.2992
         },
         "kafka_to_silver_s": {
-          "n": 61538,
-          "p50": 12.5695,
-          "p95": 33.2258,
-          "p99": 33.3338,
-          "min": 5.5354,
-          "max": 33.3688,
-          "mean": 15.5462
+          "n": 62807,
+          "p50": 11.7348,
+          "p95": 35.8424,
+          "p99": 35.9424,
+          "min": 5.3716,
+          "max": 35.9794,
+          "mean": 16.0483
         }
       },
       "lag_after_load": [
-        5950,
-        5950,
-        817,
+        7155,
+        1666,
+        1666,
         0
       ],
       "caught_up": true
@@ -63,37 +63,37 @@
     {
       "target_orders_per_s": 300,
       "workload": {
-        "events": 166843,
-        "events_per_s": 1853.0,
-        "elapsed_s": 90.04,
-        "commit_p95_s": 0.379
+        "events": 166453,
+        "events_per_s": 1848.5,
+        "elapsed_s": 90.05,
+        "commit_p95_s": 0.408
       },
       "latency": {
-        "events": 166843,
+        "events": 166453,
         "end_to_end_s": {
-          "n": 166843,
-          "p50": 13.2215,
-          "p95": 28.337,
-          "p99": 30.7117,
-          "min": 6.5809,
-          "max": 31.7476,
-          "mean": 15.0612
+          "n": 166453,
+          "p50": 12.982,
+          "p95": 28.8083,
+          "p99": 31.9601,
+          "min": 6.5375,
+          "max": 32.9874,
+          "mean": 14.9591
         },
         "kafka_to_silver_s": {
-          "n": 166843,
-          "p50": 12.9574,
-          "p95": 28.0314,
-          "p99": 30.3234,
-          "min": 6.951,
-          "max": 31.4034,
-          "mean": 14.8899
+          "n": 166453,
+          "p50": 12.766,
+          "p95": 28.3843,
+          "p99": 31.7493,
+          "min": 6.6421,
+          "max": 32.3143,
+          "mean": 14.7638
         }
       },
       "lag_after_load": [
-        18978,
-        18978,
-        18978,
-        2141,
+        17306,
+        17306,
+        2204,
+        2204,
         0
       ],
       "caught_up": true
@@ -101,36 +101,37 @@
     {
       "target_orders_per_s": 700,
       "workload": {
-        "events": 363647,
-        "events_per_s": 4015.2,
+        "events": 359351,
+        "events_per_s": 3967.7,
         "elapsed_s": 90.57,
-        "commit_p95_s": 0.652
+        "commit_p95_s": 0.712
       },
       "latency": {
-        "events": 363647,
+        "events": 359351,
         "end_to_end_s": {
-          "n": 363647,
-          "p50": 15.7738,
-          "p95": 30.6541,
-          "p99": 34.6273,
-          "min": 8.7193,
-          "max": 35.6515,
-          "mean": 17.4096
+          "n": 359351,
+          "p50": 16.2994,
+          "p95": 31.8785,
+          "p99": 35.7253,
+          "min": 8.8972,
+          "max": 36.8169,
+          "mean": 18.0822
         },
         "kafka_to_silver_s": {
-          "n": 363647,
-          "p50": 15.1929,
-          "p95": 30.5457,
-          "p99": 33.7767,
-          "min": 8.1882,
-          "max": 34.9677,
-          "mean": 16.8564
+          "n": 359351,
+          "p50": 15.8447,
+          "p95": 31.5871,
+          "p99": 35.0904,
+          "min": 8.751,
+          "max": 35.8494,
+          "mean": 17.5207
         }
       },
       "lag_after_load": [
-        75176,
-        33362,
-        33362,
+        59939,
+        59939,
+        14582,
+        14582,
         0
       ],
       "caught_up": true
@@ -138,36 +139,37 @@
     {
       "target_orders_per_s": 1400,
       "workload": {
-        "events": 575807,
-        "events_per_s": 6363.4,
-        "elapsed_s": 90.49,
-        "commit_p95_s": 1.201
+        "events": 572181,
+        "events_per_s": 6344.6,
+        "elapsed_s": 90.18,
+        "commit_p95_s": 1.274
       },
       "latency": {
-        "events": 575807,
+        "events": 572181,
         "end_to_end_s": {
-          "n": 575807,
-          "p50": 21.94,
-          "p95": 38.7548,
-          "p99": 42.1279,
-          "min": 10.3938,
-          "max": 43.0361,
-          "mean": 23.4882
+          "n": 572181,
+          "p50": 22.4651,
+          "p95": 38.8986,
+          "p99": 42.5308,
+          "min": 12.9641,
+          "max": 43.3749,
+          "mean": 23.817
         },
         "kafka_to_silver_s": {
-          "n": 575807,
-          "p50": 20.3786,
-          "p95": 37.2556,
-          "p99": 41.8526,
-          "min": 9.4874,
-          "max": 41.9506,
-          "mean": 22.2165
+          "n": 572181,
+          "p50": 21.3197,
+          "p95": 37.1373,
+          "p99": 42.1453,
+          "min": 12.0967,
+          "max": 42.2233,
+          "mean": 22.5944
         }
       },
       "lag_after_load": [
-        120257,
-        50306,
-        50306,
+        153327,
+        69341,
+        69341,
+        69341,
         0
       ],
       "caught_up": true
@@ -175,115 +177,186 @@
   ],
   "batch_drain_reference": [
     {
-      "max_offsets_per_trigger": 100000,
-      "parallel_table_writes": true,
-      "batches": 10,
-      "received": 982469,
-      "elapsed_s": 124.41,
-      "events_per_s": 7896.9,
-      "accepted_new": 982469,
-      "rejected": 0,
-      "duplicates_detected": 0,
-      "late_events": 982469,
-      "stage_seconds_total": {
-        "decode_validate": 24.558,
-        "bronze_append": 12.177,
-        "dlq_merge": 0.819,
-        "dedup_ledger_antijoin": 11.281,
-        "batch_stats": 8.64,
-        "entity_merges": 50.096,
-        "ledger_append": 4.955
-      },
-      "batch_durations_s": [
-        19.049,
-        11.336,
-        10.957,
-        10.425,
-        10.236,
-        9.778,
-        10.215,
-        10.293,
-        10.524,
-        9.922
-      ]
-    },
-    {
       "max_offsets_per_trigger": 250000,
       "parallel_table_writes": true,
-      "batches": 4,
-      "received": 982469,
-      "elapsed_s": 57.31,
-      "events_per_s": 17144.1,
-      "accepted_new": 982469,
+      "batches": 39,
+      "received": 9508913,
+      "elapsed_s": 708.11,
+      "events_per_s": 13428.6,
+      "accepted_new": 9508913,
       "rejected": 0,
       "duplicates_detected": 0,
-      "late_events": 982469,
+      "late_events": 9508913,
       "stage_seconds_total": {
-        "decode_validate": 11.842,
-        "bronze_append": 4.935,
-        "dlq_merge": 0.259,
-        "dedup_ledger_antijoin": 5.524,
-        "batch_stats": 4.258,
-        "entity_merges": 22.697,
-        "ledger_append": 3.43
+        "decode_validate": 118.075,
+        "bronze_append": 53.092,
+        "dlq_merge": 2.799,
+        "dedup_ledger_antijoin": 84.392,
+        "batch_stats": 43.42,
+        "entity_merges": 329.764,
+        "ledger_append": 35.339
       },
       "batch_durations_s": [
-        13.91,
-        13.238,
-        13.322,
-        12.539
+        22.267,
+        15.662,
+        14.703,
+        14.232,
+        15.235,
+        15.437,
+        13.915,
+        15.144,
+        15.021,
+        15.389,
+        15.342,
+        15.139,
+        16.401,
+        15.776,
+        15.427,
+        15.703,
+        15.432,
+        19.075,
+        16.426,
+        15.37,
+        17.123,
+        17.186,
+        16.735,
+        17.753,
+        16.246,
+        17.686,
+        21.072,
+        19.917,
+        20.238,
+        19.019,
+        18.456,
+        17.729,
+        21.865,
+        20.204,
+        21.077,
+        20.88,
+        19.15,
+        16.661,
+        11.437
       ]
     },
     {
       "max_offsets_per_trigger": 500000,
       "parallel_table_writes": true,
-      "batches": 2,
-      "received": 982469,
-      "elapsed_s": 41.28,
-      "events_per_s": 23802.1,
-      "accepted_new": 982469,
+      "batches": 20,
+      "received": 9508913,
+      "elapsed_s": 443.26,
+      "events_per_s": 21452.4,
+      "accepted_new": 9508913,
       "rejected": 0,
       "duplicates_detected": 0,
-      "late_events": 982469,
+      "late_events": 9508913,
       "stage_seconds_total": {
-        "decode_validate": 8.962,
-        "bronze_append": 3.626,
-        "dlq_merge": 0.122,
-        "dedup_ledger_antijoin": 3.989,
-        "batch_stats": 2.729,
-        "entity_merges": 16.679,
-        "ledger_append": 2.906
+        "decode_validate": 84.428,
+        "bronze_append": 35.802,
+        "dlq_merge": 1.218,
+        "dedup_ledger_antijoin": 55.217,
+        "batch_stats": 25.752,
+        "entity_merges": 190.401,
+        "ledger_append": 29.772
       },
       "batch_durations_s": [
-        19.953,
-        19.094
+        18.371,
+        19.598,
+        19.99,
+        19.079,
+        19.605,
+        19.693,
+        21.075,
+        23.093,
+        22.797,
+        21.507,
+        21.071,
+        21.807,
+        22.65,
+        23.393,
+        22.342,
+        24.697,
+        22.827,
+        23.574,
+        24.966,
+        10.773
       ]
     },
     {
       "max_offsets_per_trigger": 500000,
       "parallel_table_writes": false,
-      "batches": 2,
-      "received": 982469,
-      "elapsed_s": 49.24,
-      "events_per_s": 19951.9,
-      "accepted_new": 982469,
+      "batches": 20,
+      "received": 9508913,
+      "elapsed_s": 546.78,
+      "events_per_s": 17390.9,
+      "accepted_new": 9508913,
       "rejected": 0,
       "duplicates_detected": 0,
-      "late_events": 982469,
+      "late_events": 9508913,
       "stage_seconds_total": {
-        "decode_validate": 9.26,
-        "bronze_append": 6.444,
-        "dlq_merge": 0.12,
-        "dedup_ledger_antijoin": 4.446,
-        "batch_stats": 2.452,
-        "entity_merges": 21.646,
-        "ledger_append": 2.736
+        "decode_validate": 85.171,
+        "bronze_append": 63.425,
+        "dlq_merge": 1.205,
+        "dedup_ledger_antijoin": 53.526,
+        "batch_stats": 25.985,
+        "entity_merges": 268.707,
+        "ledger_append": 28.965
       },
       "batch_durations_s": [
-        22.28,
-        24.853
+        22.711,
+        23.491,
+        23.73,
+        24.038,
+        24.469,
+        26.12,
+        28.359,
+        26.097,
+        26.507,
+        26.852,
+        26.386,
+        29.087,
+        28.27,
+        29.393,
+        30.837,
+        28.555,
+        29.176,
+        29.44,
+        28.82,
+        14.935
+      ]
+    },
+    {
+      "max_offsets_per_trigger": 1000000,
+      "parallel_table_writes": true,
+      "batches": 10,
+      "received": 9508913,
+      "elapsed_s": 320.97,
+      "events_per_s": 29625.3,
+      "accepted_new": 9508913,
+      "rejected": 0,
+      "duplicates_detected": 0,
+      "late_events": 9508913,
+      "stage_seconds_total": {
+        "decode_validate": 68.384,
+        "bronze_append": 27.802,
+        "dlq_merge": 0.599,
+        "dedup_ledger_antijoin": 42.122,
+        "batch_stats": 17.358,
+        "entity_merges": 128.173,
+        "ledger_append": 26.494
+      },
+      "batch_durations_s": [
+        28.546,
+        33.01,
+        30.201,
+        31.889,
+        30.807,
+        31.467,
+        33.064,
+        34.237,
+        34.69,
+        23.178
       ]
     }
   ],
-  "sustained_events_per_s": 6363.4
+  "sustained_events_per_s": 6344.6
 }

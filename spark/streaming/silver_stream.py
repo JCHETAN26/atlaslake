@@ -108,6 +108,7 @@ def build_query(
         spark.readStream.format("kafka")
         .option("kafka.bootstrap.servers", cfg.kafka.bootstrap)
         .option("subscribe", ",".join(topics))
+        .option("includeHeaders", "true")
         .option("startingOffsets", starting_offsets)
         .option("maxOffsetsPerTrigger", str(max_offsets))
         .option("failOnDataLoss", "true")

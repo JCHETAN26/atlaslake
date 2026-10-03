@@ -42,6 +42,7 @@ def build_query(
         spark.readStream.format("kafka")
         .option("kafka.bootstrap.servers", cfg.kafka.bootstrap)
         .option("subscribe", ev.TOPIC_ORDERS)
+        .option("includeHeaders", "true")
         .option("startingOffsets", "earliest")
         .option("failOnDataLoss", "true")
         .load()

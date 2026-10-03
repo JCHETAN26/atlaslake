@@ -1,8 +1,8 @@
 {
   "benchmark": "benchmark_run",
   "context": {
-    "generated_at": "2026-10-03T10:58:19+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T14:02:42+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -21,13 +21,13 @@
       "iceberg-spark-runtime": "1.10.0"
     }
   },
-  "scale": "small",
-  "suite": "iceberg_compaction",
+  "scale": "medium",
+  "suite": "iceberg_partitioning",
   "results": {
-    "iceberg_compaction": {
+    "iceberg_partitioning": {
       "ok": true,
-      "elapsed_s": 890.9
+      "elapsed_s": 83.2
     },
-    "_total_elapsed_s": 890.9
+    "_total_elapsed_s": 83.2
   }
 }

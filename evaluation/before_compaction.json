@@ -1,8 +1,8 @@
 {
   "benchmark": "before_compaction",
   "context": {
-    "generated_at": "2026-10-03T10:53:49+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T13:19:54+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -25,7 +25,7 @@
   "tables": {
     "bronze.orders": {
       "data_files": 54,
-      "total_bytes": 2141968,
+      "total_bytes": 2142003,
       "avg_file_bytes": 39666,
       "small_files_lt_8mb": 54,
       "records": 22385,
@@ -34,27 +34,27 @@
       "metadata_log_entries": 50,
       "spark_count_latency_s": {
         "n": 6,
-        "p50": 0.0515,
-        "p95": 0.0534,
-        "p99": 0.0536,
-        "min": 0.0496,
-        "max": 0.0537,
-        "mean": 0.0516
+        "p50": 0.0457,
+        "p95": 0.0477,
+        "p99": 0.0479,
+        "min": 0.0448,
+        "max": 0.048,
+        "mean": 0.0461
       },
       "duckdb_count_latency_s": {
         "n": 6,
-        "p50": 0.0124,
-        "p95": 0.0127,
-        "p99": 0.0127,
-        "min": 0.0115,
-        "max": 0.0127,
-        "mean": 0.0123
+        "p50": 0.009,
+        "p95": 0.0099,
+        "p99": 0.0101,
+        "min": 0.0086,
+        "max": 0.0102,
+        "mean": 0.0091
       },
-      "planning_s": 0.088
+      "planning_s": 0.0997
     },
     "silver.events": {
       "data_files": 270,
-      "total_bytes": 9639699,
+      "total_bytes": 9639770,
       "avg_file_bytes": 35702,
       "small_files_lt_8mb": 270,
       "records": 106685,
@@ -63,27 +63,27 @@
       "metadata_log_entries": 50,
       "spark_count_latency_s": {
         "n": 6,
-        "p50": 0.0501,
-        "p95": 0.057,
-        "p99": 0.0585,
-        "min": 0.0487,
-        "max": 0.0589,
-        "mean": 0.0514
+        "p50": 0.0458,
+        "p95": 0.0469,
+        "p99": 0.047,
+        "min": 0.0451,
+        "max": 0.047,
+        "mean": 0.046
       },
       "duckdb_count_latency_s": {
         "n": 6,
-        "p50": 0.0123,
-        "p95": 0.0133,
-        "p99": 0.0133,
-        "min": 0.0117,
-        "max": 0.0134,
-        "mean": 0.0124
+        "p50": 0.0096,
+        "p95": 0.0106,
+        "p99": 0.0107,
+        "min": 0.0085,
+        "max": 0.0108,
+        "mean": 0.0097
       },
-      "planning_s": 0.0706
+      "planning_s": 0.0834
     },
     "silver.inventory_movements": {
       "data_files": 71,
-      "total_bytes": 2528926,
+      "total_bytes": 2528932,
       "avg_file_bytes": 35618,
       "small_files_lt_8mb": 71,
       "records": 65740,
@@ -92,27 +92,27 @@
       "metadata_log_entries": 50,
       "spark_count_latency_s": {
         "n": 6,
-        "p50": 0.0463,
-        "p95": 0.0477,
-        "p99": 0.0478,
-        "min": 0.0455,
-        "max": 0.0478,
-        "mean": 0.0465
+        "p50": 0.0481,
+        "p95": 0.0624,
+        "p99": 0.065,
+        "min": 0.0445,
+        "max": 0.0656,
+        "mean": 0.0508
       },
       "duckdb_count_latency_s": {
         "n": 6,
-        "p50": 0.01,
-        "p95": 0.011,
-        "p99": 0.0111,
-        "min": 0.0086,
-        "max": 0.0111,
-        "mean": 0.0099
+        "p50": 0.009,
+        "p95": 0.0108,
+        "p99": 0.0108,
+        "min": 0.0088,
+        "max": 0.0108,
+        "mean": 0.0095
       },
-      "planning_s": 0.0702
+      "planning_s": 0.0808
     },
     "silver.order_items": {
       "data_files": 426,
-      "total_bytes": 2016169,
+      "total_bytes": 2016114,
       "avg_file_bytes": 4732,
       "small_files_lt_8mb": 426,
       "records": 26082,
@@ -121,23 +121,23 @@
       "metadata_log_entries": 50,
       "spark_count_latency_s": {
         "n": 6,
-        "p50": 0.0469,
-        "p95": 0.0653,
-        "p99": 0.0664,
-        "min": 0.046,
-        "max": 0.0667,
-        "mean": 0.0524
+        "p50": 0.0454,
+        "p95": 0.0463,
+        "p99": 0.0463,
+        "min": 0.044,
+        "max": 0.0463,
+        "mean": 0.0453
       },
       "duckdb_count_latency_s": {
         "n": 6,
-        "p50": 0.012,
-        "p95": 0.0147,
-        "p99": 0.0153,
-        "min": 0.0105,
-        "max": 0.0155,
-        "mean": 0.0123
+        "p50": 0.0096,
+        "p95": 0.0108,
+        "p99": 0.0111,
+        "min": 0.0094,
+        "max": 0.0111,
+        "mean": 0.0098
       },
-      "planning_s": 0.0812
+      "planning_s": 0.0892
     }
   }
 }

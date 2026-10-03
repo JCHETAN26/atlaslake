@@ -17,6 +17,26 @@ control plane: Airflow · Great Expectations · reconciliation · OpenLineage/Ma
 * **Design:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and
   [`docs/LATE_DATA_POLICY.md`](docs/LATE_DATA_POLICY.md).
 
+## Headline results
+
+<!-- results:start -->
+
+| Experiment | Measured (auto-generated from evaluation/) |
+|---|---|
+| Kafka → Bronze/DLQ/Silver throughput | 29,625.3 events/s (9,508,913 events, maxOffsets 1,000,000) |
+| Duplicates injected → leaked | 950,951 → 0 |
+| Spark `kill -9` mid-stream | recovered 52.5 s after restart; lost 0, duplicates 0 |
+| Late-data policy (on time / 5 min / 1 h / 1 day) | all tiers hold |
+| Rebuild Silver from Bronze (backfill) | 9,514,989 records in 507.4 s; identical to streaming: ✅ yes; rerun changes nothing: ✅ yes |
+| dbt incremental vs full refresh | 4.18× faster, identical results: ✅ yes |
+| Breaking schema change | rejected by registry, consumers unaffected |
+| Gold vs baseline answers (6 queries) | identical |
+| Source → Gold reconciliation | 9,508,913 events, unexplained 0, passed ✅ yes |
+
+<!-- results:end -->
+
+Full tables, methods and the baseline comparison: [`docs/RESULTS.md`](docs/RESULTS.md).
+
 ## What it guarantees, and how that's checked
 
 | Guarantee | How it is enforced | How it is checked |

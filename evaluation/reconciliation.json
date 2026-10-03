@@ -1,8 +1,8 @@
 {
   "benchmark": "reconciliation",
   "context": {
-    "generated_at": "2026-10-03T10:23:22+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T14:13:18+00:00",
+    "git_sha": "302b783-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -24,30 +24,30 @@
   "scope": {
     "event_date": "all",
     "gold_checked": true,
-    "relay_checkpoint_seq": 982469
+    "relay_checkpoint_seq": 2751035
   },
   "summary": {
-    "passed": true,
-    "source_events": 982469,
-    "accepted": 982469,
+    "passed": false,
+    "source_events": 2751035,
+    "accepted": 2751034,
     "rejected": 0,
     "in_flight": 0,
     "pending_processing": 0,
-    "unexplained": 0,
+    "unexplained": 1,
     "unknown_origin": 0,
     "logical_duplicates": 0,
     "financial_mismatches": 0,
     "gold_vs_silver_mismatches": 0,
-    "orders_excluded_from_financials": 0,
+    "orders_excluded_from_financials": 1,
     "incomplete_orders_held_from_gold": 0,
     "invariant": "source = accepted + rejected + in_flight + pending_processing (+ unexplained == 0)",
-    "runtime_s": 1.846
+    "runtime_s": 9.142
   },
   "events_by_topic": [
     {
       "topic": "commerce.customers",
-      "source_events": 18682,
-      "accepted": 18682,
+      "source_events": 20872,
+      "accepted": 20872,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -55,8 +55,8 @@
     },
     {
       "topic": "commerce.inventory",
-      "source_events": 558389,
-      "accepted": 558389,
+      "source_events": 1613244,
+      "accepted": 1613244,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -64,8 +64,8 @@
     },
     {
       "topic": "commerce.orders",
-      "source_events": 260085,
-      "accepted": 260085,
+      "source_events": 674663,
+      "accepted": 674663,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -73,12 +73,12 @@
     },
     {
       "topic": "commerce.payments",
-      "source_events": 143020,
-      "accepted": 143020,
+      "source_events": 439963,
+      "accepted": 439962,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
-      "unexplained": 0
+      "unexplained": 1
     },
     {
       "topic": "commerce.products",
@@ -3250,40 +3250,48 @@
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
+    },
+    {
+      "event_date": "2026-10-03",
+      "source_events": 1768566,
+      "accepted": 1768565,
+      "rejected": 0,
+      "not_yet_accepted": 1,
+      "unexplained": 1
     }
   ],
   "physical_deliveries": [
     {
       "topic": "commerce.customers",
-      "bronze_rows": 18682,
-      "deliveries_logged": 18682,
-      "duplicates_injected": 0,
-      "corrupt_injected": 0,
-      "invalid_injected": 0
+      "bronze_rows": 20925,
+      "deliveries_logged": 20922,
+      "duplicates_injected": 42,
+      "corrupt_injected": 5,
+      "invalid_injected": 5
     },
     {
       "topic": "commerce.inventory",
-      "bronze_rows": 558389,
-      "deliveries_logged": 558389,
-      "duplicates_injected": 0,
-      "corrupt_injected": 0,
-      "invalid_injected": 0
+      "bronze_rows": 1638658,
+      "deliveries_logged": 1637469,
+      "duplicates_injected": 20951,
+      "corrupt_injected": 1046,
+      "invalid_injected": 3154
     },
     {
       "topic": "commerce.orders",
-      "bronze_rows": 260085,
-      "deliveries_logged": 260085,
-      "duplicates_injected": 0,
-      "corrupt_injected": 0,
-      "invalid_injected": 0
+      "bronze_rows": 684453,
+      "deliveries_logged": 683871,
+      "duplicates_injected": 8072,
+      "corrupt_injected": 406,
+      "invalid_injected": 1190
     },
     {
       "topic": "commerce.payments",
-      "bronze_rows": 143020,
-      "deliveries_logged": 143020,
-      "duplicates_injected": 0,
-      "corrupt_injected": 0,
-      "invalid_injected": 0
+      "bronze_rows": 447043,
+      "deliveries_logged": 446673,
+      "duplicates_injected": 5866,
+      "corrupt_injected": 269,
+      "invalid_injected": 872
     },
     {
       "topic": "commerce.products",
@@ -3305,48 +3313,54 @@
   "financials_source_vs_silver": [
     {
       "currency": "EUR",
-      "source_orders": 10255,
-      "silver_orders": 10255,
-      "source_revenue_minor": 22281602,
-      "silver_revenue_minor": 22281602
+      "source_orders": 30670,
+      "silver_orders": 30670,
+      "source_revenue_minor": 66903154,
+      "silver_revenue_minor": 66903154
     },
     {
       "currency": "GBP",
-      "source_orders": 48761,
-      "silver_orders": 48761,
-      "source_revenue_minor": 90545622,
-      "silver_revenue_minor": 90545622
+      "source_orders": 144694,
+      "silver_orders": 144694,
+      "source_revenue_minor": 269944786,
+      "silver_revenue_minor": 269944786
     },
     {
       "currency": "USD",
-      "source_orders": 5408,
-      "silver_orders": 5408,
-      "source_revenue_minor": 12598675,
-      "silver_revenue_minor": 12598675
+      "source_orders": 15972,
+      "silver_orders": 15972,
+      "source_revenue_minor": 37426085,
+      "silver_revenue_minor": 37426085
     }
   ],
   "financials_silver_vs_gold": [
     {
       "currency": "EUR",
-      "silver_orders": 10255,
-      "gold_orders": 10255,
-      "silver_revenue_minor": 22281602,
-      "gold_revenue_minor": 22281602
+      "silver_orders": 30671,
+      "gold_orders": 30671,
+      "silver_revenue_minor": 66903347,
+      "gold_revenue_minor": 66903347
     },
     {
       "currency": "GBP",
-      "silver_orders": 48761,
-      "gold_orders": 48761,
-      "silver_revenue_minor": 90545622,
-      "gold_revenue_minor": 90545622
+      "silver_orders": 144694,
+      "gold_orders": 144694,
+      "silver_revenue_minor": 269944786,
+      "gold_revenue_minor": 269944786
     },
     {
       "currency": "USD",
-      "silver_orders": 5408,
-      "gold_orders": 5408,
-      "silver_revenue_minor": 12598675,
-      "gold_revenue_minor": 12598675
+      "silver_orders": 15972,
+      "gold_orders": 15972,
+      "silver_revenue_minor": 37426085,
+      "gold_revenue_minor": 37426085
     }
   ],
-  "unexplained_examples": []
+  "unexplained_examples": [
+    {
+      "event_id": "3b734955-5efd-55a9-a52b-0222fa0fccfd",
+      "topic": "commerce.payments",
+      "d": "2026-10-03"
+    }
+  ]
 }
