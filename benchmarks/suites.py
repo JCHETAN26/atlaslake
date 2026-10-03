@@ -61,7 +61,12 @@ def spark_performance(spark, scale: E.Scale) -> dict[str, Any]:
     from core.platform import reset_lake
 
     sweeps = []
-    for max_offsets, parallel in ((100_000, True), (250_000, True), (500_000, True), (500_000, False)):
+    sweep = (
+        [(100_000, True), (250_000, True), (500_000, True), (500_000, False)]
+        if scale.events < 5_000_000
+        else [(250_000, True), (500_000, True), (500_000, False), (1_000_000, True)]
+    )
+    for max_offsets, parallel in sweep:
         reset_lake(spark)
         r = E.drain(spark, max_offsets=max_offsets, parallel_writes=parallel)
         sweeps.append({"max_offsets_per_trigger": max_offsets, "parallel_table_writes": parallel, **r})

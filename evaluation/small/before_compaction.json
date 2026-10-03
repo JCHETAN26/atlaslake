@@ -1,0 +1,143 @@
+{
+  "benchmark": "before_compaction",
+  "context": {
+    "generated_at": "2026-10-03T10:53:49+00:00",
+    "git_sha": "6205b6d-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "micro_batches": 54,
+  "tables": {
+    "bronze.orders": {
+      "data_files": 54,
+      "total_bytes": 2141968,
+      "avg_file_bytes": 39666,
+      "small_files_lt_8mb": 54,
+      "records": 22385,
+      "snapshots": 54,
+      "manifests": 54,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0515,
+        "p95": 0.0534,
+        "p99": 0.0536,
+        "min": 0.0496,
+        "max": 0.0537,
+        "mean": 0.0516
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.0124,
+        "p95": 0.0127,
+        "p99": 0.0127,
+        "min": 0.0115,
+        "max": 0.0127,
+        "mean": 0.0123
+      },
+      "planning_s": 0.088
+    },
+    "silver.events": {
+      "data_files": 270,
+      "total_bytes": 9639699,
+      "avg_file_bytes": 35702,
+      "small_files_lt_8mb": 270,
+      "records": 106685,
+      "snapshots": 54,
+      "manifests": 54,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0501,
+        "p95": 0.057,
+        "p99": 0.0585,
+        "min": 0.0487,
+        "max": 0.0589,
+        "mean": 0.0514
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.0123,
+        "p95": 0.0133,
+        "p99": 0.0133,
+        "min": 0.0117,
+        "max": 0.0134,
+        "mean": 0.0124
+      },
+      "planning_s": 0.0706
+    },
+    "silver.inventory_movements": {
+      "data_files": 71,
+      "total_bytes": 2528926,
+      "avg_file_bytes": 35618,
+      "small_files_lt_8mb": 71,
+      "records": 65740,
+      "snapshots": 54,
+      "manifests": 54,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0463,
+        "p95": 0.0477,
+        "p99": 0.0478,
+        "min": 0.0455,
+        "max": 0.0478,
+        "mean": 0.0465
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.01,
+        "p95": 0.011,
+        "p99": 0.0111,
+        "min": 0.0086,
+        "max": 0.0111,
+        "mean": 0.0099
+      },
+      "planning_s": 0.0702
+    },
+    "silver.order_items": {
+      "data_files": 426,
+      "total_bytes": 2016169,
+      "avg_file_bytes": 4732,
+      "small_files_lt_8mb": 426,
+      "records": 26082,
+      "snapshots": 54,
+      "manifests": 54,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0469,
+        "p95": 0.0653,
+        "p99": 0.0664,
+        "min": 0.046,
+        "max": 0.0667,
+        "mean": 0.0524
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.012,
+        "p95": 0.0147,
+        "p99": 0.0153,
+        "min": 0.0105,
+        "max": 0.0155,
+        "mean": 0.0123
+      },
+      "planning_s": 0.0812
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "benchmark": "backfill_benchmark",
+  "context": {
+    "generated_at": "2026-10-03T09:36:56+00:00",
+    "git_sha": "6205b6d-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "range": [
+    "2024-11-27",
+    "2026-10-03"
+  ],
+  "chunks": 41,
+  "records": 988674,
+  "runtime_s": 115.21,
+  "throughput_records_per_s": 8581.4,
+  "chunk_runtimes_s": [
+    5.089,
+    13.098,
+    13.552,
+    13.953,
+    16.086,
+    6.013,
+    0.443,
+    0.395,
+    0.388,
+    0.399,
+    0.451,
+    0.435,
+    0.404,
+    0.401,
+    0.387,
+    0.393,
+    0.402,
+    0.383,
+    0.384,
+    0.38,
+    0.384,
+    0.367,
+    0.456,
+    0.42,
+    0.404,
+    0.38,
+    0.384,
+    0.398,
+    0.378,
+    0.408,
+    0.432,
+    0.389,
+    0.462,
+    0.409,
+    0.377,
+    0.405,
+    0.363,
+    0.437,
+    0.376,
+    0.37,
+    5.105
+  ],
+  "duplicates_written": 0,
+  "matches_streaming_state": true,
+  "tables_differing_from_streaming": [],
+  "rerun_week": {
+    "range": [
+      "2026-01-01",
+      "2026-01-07"
+    ],
+    "records_read": 241952,
+    "accepted_new": 0,
+    "state_unchanged": true,
+    "gold_rebuilt": {
+      "success": true,
+      "elapsed_s": 10.572
+    }
+  }
+}

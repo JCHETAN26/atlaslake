@@ -31,7 +31,7 @@ SCALES = {
 }
 LADDERS = {"small": ["100k", "1m"], "medium": ["100k", "1m", "10m"], "large": ["100k", "1m", "10m", "50m"]}
 # the scale every non-ladder experiment runs at
-WORKING_SCALE = {"small": "1m", "medium": "1m", "large": "10m"}
+WORKING_SCALE = {"small": "1m", "medium": "10m", "large": "10m"}
 
 
 def prepare_source(scale: Scale, seed: int = SEED, days: float | None = None) -> dict[str, Any]:
