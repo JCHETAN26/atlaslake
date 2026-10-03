@@ -140,11 +140,13 @@ def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
             "reason": "ATLAS_SNOWFLAKE_ACCOUNT/USER/PASSWORD not set (see snowflake/*.sql and docs)",
         }
     if connector is None:
-        import snowflake.connector as connector  # type: ignore[no-redef]
-    if write_pandas is None:
-        from snowflake.connector.pandas_tools import write_pandas as _wp
+        import importlib
 
-        write_pandas = _wp
+        connector = importlib.import_module("snowflake.connector")  # optional extra: [snowflake]
+    if write_pandas is None:
+        import importlib
+
+        write_pandas = importlib.import_module("snowflake.connector.pandas_tools").write_pandas
 
     t0 = time.time()
     sf = connector.connect(**(cfg or {}))

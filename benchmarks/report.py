@@ -74,8 +74,8 @@ def section_comparison(sec: list[str]) -> None:
         ],
         [
             "Throughput",
-            f"{_n(round(brun['source_events'] / brun['total_runtime_s']))} events/s (one full-refresh pass)",
-            f"{_n(best_drain['events_per_s'])} events/s drain · {_n(sustained)} events/s sustained live"
+            f"{_n(round(brun['rows_processed'] / brun['total_runtime_s']))} source rows/s — recomputes from *current state*; consumes no events, keeps no history",
+            f"{_n(best_drain['events_per_s'])} events/s historical drain (validate, dedup, Bronze + DLQ + Silver) · {_n(sustained)} events/s sustained live (bounded by the single-process source workload)"
             if best_drain
             else "—",
         ],
@@ -127,7 +127,61 @@ def section_comparison(sec: list[str]) -> None:
         "",
         _table(["Metric", "Baseline (Phase 4)", "AtlasLake"], rows),
         "",
+        "**How to read this.** The baseline is a full refresh of *current source state*. At small scale it is "
+        "cheap, but it has no event history (no SCD2, no replay), its freshness is bounded by its schedule, "
+        "it cannot absorb duplicate, late or invalid *events*, and its cost grows with total history on every "
+        "run (see the scale ladder below). AtlasLake processes each event once, incrementally, through validation, "
+        "dedup and an immutable Bronze record; its per-event work is higher, and that buys the correctness "
+        "rows of this table.",
+        "",
     ]
+
+
+def section_scaling(sec: list[str]) -> None:
+    """Same suites at different working scales (evaluation/small/ archive vs evaluation/)."""
+    rows = []
+    for label, directory in (
+        ("archive: evaluation/small", settings().evaluation_dir / "small"),
+        ("current: evaluation", settings().evaluation_dir),
+    ):
+        sp = directory / "spark_performance.json"
+        bf = directory / "backfill_benchmark.json"
+        if not sp.exists():
+            continue
+        spd = json.loads(sp.read_text())
+        best = max(spd["drains"], key=lambda d: d["events_per_s"] or 0)
+        bfd = json.loads(bf.read_text()) if bf.exists() else {}
+        rows.append(
+            [
+                spd["scale"],
+                best["received"],
+                best["events_per_s"],
+                best["max_offsets_per_trigger"],
+                best["elapsed_s"],
+                bfd.get("throughput_records_per_s"),
+                bfd.get("matches_streaming_state"),
+                label,
+            ]
+        )
+    if len(rows) > 1:
+        sec += [
+            "## Scaling the AtlasLake pipeline",
+            "",
+            _table(
+                [
+                    "working scale",
+                    "events drained",
+                    "best events/s",
+                    "at maxOffsets",
+                    "drain s",
+                    "backfill records/s",
+                    "backfill == streaming",
+                    "source",
+                ],
+                rows,
+            ),
+            "",
+        ]
 
 
 def section_baseline(sec: list[str]) -> None:
@@ -651,6 +705,7 @@ def render() -> Path:
         section_streaming,
         section_lakehouse,
         section_quality_queries,
+        section_scaling,
         section_baseline,
         section_chaos,
     ):
