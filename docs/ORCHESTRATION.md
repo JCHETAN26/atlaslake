@@ -73,3 +73,12 @@ defaults, backfill params) runs inside the Airflow image. CI does this in the `d
 docker run --rm -v "$PWD":/opt/atlaslake -e PYTHONPATH=/opt/atlaslake atlaslake/airflow:local \
   python -m pytest /opt/atlaslake/tests/unit/test_airflow_dags.py -q -p no:cacheprovider
 ```
+
+## Verified run
+
+`atlaslake_daily` was executed end-to-end inside the `atlaslake/airflow` image against the live stack
+(`airflow dags test atlaslake_daily 2026-01-15`) — result in `evaluation/airflow_daily_run.json` and
+[RESULTS.md](RESULTS.md). On hosts whose Docker daemon gives containers no internet access, the compose
+service mounts the host's Spark jar cache (`~/.ivy2` → `ATLAS_SPARK_IVY_DIR`) and DuckDB extension cache
+(`~/.duckdb/extensions` → `ATLAS_DUCKDB_EXTENSION_DIR`), and runs as uid 1000 so it can write to the
+repo-mounted data directory.

@@ -35,12 +35,19 @@ LAKE_TABLES = {
 }
 
 
+def session_settings(conn: duckdb.DuckDBPyConnection) -> None:
+    """Settings every AtlasLake DuckDB session needs (UTC; offline extension directory if provided)."""
+    conn.execute("SET TimeZone = 'UTC'")
+    if os.environ.get("ATLAS_DUCKDB_EXTENSION_DIR"):
+        conn.execute(f"SET extension_directory = '{os.environ['ATLAS_DUCKDB_EXTENSION_DIR']}'")
+
+
 def configure(conn: duckdb.DuckDBPyConnection, tables: dict[str, list[str]] | None = None) -> dict[str, str]:
     """Load extensions, register the S3 secret, (re)create lake views. Returns {view: metadata_location}."""
     from lakehouse.catalog import catalog
 
     cfg = settings().s3
-    conn.execute("SET TimeZone = 'UTC'")  # date bucketing of timestamptz must not depend on the host
+    session_settings(conn)  # UTC date bucketing; offline extension dir in containers
     conn.execute("INSTALL httpfs; LOAD httpfs; INSTALL iceberg; LOAD iceberg;")
     if cfg.access_key:
         conn.execute(f"""CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, KEY_ID '{cfg.access_key}',

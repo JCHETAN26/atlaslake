@@ -92,6 +92,8 @@ def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = N
             "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider",
         )
     )
+    if os.environ.get("ATLAS_SPARK_IVY_DIR"):  # e.g. pre-populated jar cache inside containers
+        builder = builder.config("spark.jars.ivy", os.environ["ATLAS_SPARK_IVY_DIR"])
     for key, value in {**iceberg_catalog_conf(cfg), **(extra_conf or {})}.items():
         builder = builder.config(key, value)
     spark = builder.getOrCreate()

@@ -64,13 +64,13 @@ _Source: `evaluation/schema_evolution.json` · git `302b783-dirty` · 2026-10-03
 
 ## Reconciliation Source → Gold (Phase 23)
 
-_Source: `evaluation/reconciliation.json` · git `25cff70-dirty` · 2026-10-03T14:31:17+00:00 · 16 CPU / 19.4 GB_
+_Source: `evaluation/reconciliation.json` · git `4fcd62f-dirty` · 2026-10-03T15:04:36+00:00 · 16 CPU / 19.4 GB_
 
 Invariant: `source = accepted + rejected + in_flight + pending_processing (+ unexplained == 0)`
 
 | source events | accepted | rejected | in flight | pending | unexplained | unknown origin | logical dupes | financial mismatches | passed |
 |---|---|---|---|---|---|---|---|---|---|
-| 2,768,662 | 2,768,662 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ✅ yes |
+| 46,567 | 46,567 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ✅ yes |
 
 ## Spark processing (Kafka → Bronze/DLQ/Silver)
 
@@ -160,7 +160,7 @@ Snowflake: not run: no credentials configured.
 
 ## Data quality (Phase 22)
 
-_Source: `evaluation/data_quality.json` · git `25cff70-dirty` · 2026-10-03T14:31:27+00:00 · 16 CPU / 19.4 GB_
+_Source: `evaluation/data_quality.json` · git `4fcd62f-dirty` · 2026-10-03T14:54:01+00:00 · 16 CPU / 19.4 GB_
 
 | checks | passed | failed (blocking) | failed (warning) | technical | business | engine |
 |---|---|---|---|---|---|---|
@@ -172,6 +172,24 @@ _Source: `evaluation/data_quality.json` · git `25cff70-dirty` · 2026-10-03T14:
 |---|---|---|---|---|---|---|---|
 | 1m | 982,469 | 23,802.1 | 500,000 | 41.3 | 8,581.4 | ✅ yes | archive: evaluation/small |
 | 10m | 9,508,913 | 29,625.3 | 1,000,000 | 321.0 | 18,753.6 | ✅ yes | current: evaluation |
+
+## Orchestration: Airflow daily DAG (Phase 24)
+
+_Source: `evaluation/airflow_daily_run.json` · git `4fcd62f-dirty` · 2026-10-03T15:04:50+00:00 · 16 CPU / 19.4 GB_
+
+`atlaslake_daily` for logical date 2026-01-15 00:00:00+00:00: **success**. Executed with `airflow dags test` inside the atlaslake/airflow image against the live stack. dbt_build failed on attempt 1 (dbt subprocess lost the repo on PYTHONPATH inside the container), was fixed, and succeeded on Airflow's automatic retry.
+
+| task (in order) | attempts | final |
+|---|---|---|
+| check_sources | 1 | ✅ |
+| ingest_batch | 1 | ✅ |
+| validate_bronze | 1 | ✅ |
+| spark_transform | 1 | ✅ |
+| quality_check | 1 | ✅ |
+| dbt_build | 2 | ✅ |
+| dbt_test | 1 | ✅ |
+| snowflake_configured | 1 | ✅ |
+| reconcile | 1 | ✅ |
 
 ## Baseline scale ladder (Phase 4)
 

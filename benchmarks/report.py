@@ -184,6 +184,23 @@ def section_scaling(sec: list[str]) -> None:
         ]
 
 
+def section_orchestration(sec: list[str]) -> None:
+    d = _load("airflow_daily_run")
+    if not d:
+        return
+    rows = [[t, n, "✅" if d["final_state"] == "success" else "—"] for t, n in d["task_attempts"].items()]
+    sec += [
+        "## Orchestration: Airflow daily DAG (Phase 24)",
+        "",
+        _ctx(d),
+        "",
+        f"`{d['dag_id']}` for logical date {d['logical_date']}: **{d['final_state']}**. {d['note']}",
+        "",
+        _table(["task (in order)", "attempts", "final"], rows),
+        "",
+    ]
+
+
 def section_baseline(sec: list[str]) -> None:
     d = _load("baseline_pipeline")
     if not d:
@@ -837,6 +854,7 @@ def render() -> Path:
         section_lakehouse,
         section_quality_queries,
         section_scaling,
+        section_orchestration,
         section_baseline,
         section_chaos,
     ):

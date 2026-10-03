@@ -27,7 +27,9 @@ def dbt(args: list[str]) -> dict[str, Any]:
     exe = Path(sys.executable).parent / "dbt"
     cmd = [str(exe), *args, "--project-dir", str(DBT_DIR), "--profiles-dir", str(DBT_DIR)]
     t0 = time.time()
-    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    # exactly the repo on the path: the dbt-duckdb plugin lives in `lakehouse` (and foreign entries such as
+    # a ROS install on the host must not leak in)
+    env = {**os.environ, "PYTHONPATH": str(REPO_ROOT)}
     proc = subprocess.run(cmd, cwd=DBT_DIR, env=env, capture_output=True, text=True)
     elapsed = time.time() - t0
     nodes = []

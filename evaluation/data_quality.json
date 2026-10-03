@@ -1,13 +1,13 @@
 {
   "benchmark": "data_quality",
   "context": {
-    "generated_at": "2026-10-03T14:31:27+00:00",
-    "git_sha": "25cff70-dirty",
+    "generated_at": "2026-10-03T14:54:01+00:00",
+    "git_sha": "4fcd62f-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
-      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
-      "python": "3.12.11"
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.36",
+      "python": "3.12.14"
     },
     "versions": {
       "pyspark": "3.5.9",
@@ -31,7 +31,7 @@
     "technical_checks": 41,
     "business_checks": 7,
     "engine": "great_expectations 1.23.2",
-    "runtime_s": 9.829
+    "runtime_s": 62.38
   },
   "failures": [
     {
@@ -52,7 +52,7 @@
       "unexpected_percent": 3.3333333333333335,
       "observed_value": null,
       "partial_unexpected": [
-        "5.382910443426988"
+        "5.382910443426989"
       ]
     }
   ],
@@ -740,7 +740,7 @@
       "unexpected_percent": 3.3333333333333335,
       "observed_value": null,
       "partial_unexpected": [
-        "5.382910443426988"
+        "5.382910443426989"
       ]
     },
     {

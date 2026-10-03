@@ -320,7 +320,12 @@ def gold_build(full_refresh: bool = False, select: str = typer.Option(None)) -> 
     _setup_logging()
     from lineage.dbt_runner import dbt_build
 
-    raise typer.Exit(dbt_build(full_refresh=full_refresh, select=select)["returncode"])
+    res = dbt_build(full_refresh=full_refresh, select=select)
+    if not res["success"]:
+        console.print(res["exception"] or "dbt failed")
+    else:
+        console.print(f"dbt build ok: {len(res['nodes'])} nodes in {res['elapsed_s']} s")
+    raise typer.Exit(res["returncode"])
 
 
 @app.command()

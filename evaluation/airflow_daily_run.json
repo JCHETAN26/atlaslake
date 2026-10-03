@@ -1,0 +1,53 @@
+{
+  "benchmark": "airflow_daily_run",
+  "context": {
+    "generated_at": "2026-10-03T15:04:50+00:00",
+    "git_sha": "4fcd62f-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "dag_id": "atlaslake_daily",
+  "logical_date": "2026-01-15 00:00:00+00:00",
+  "final_state": "success",
+  "tasks_in_order": [
+    "check_sources",
+    "ingest_batch",
+    "validate_bronze",
+    "spark_transform",
+    "quality_check",
+    "dbt_build",
+    "dbt_test",
+    "snowflake_configured",
+    "reconcile"
+  ],
+  "task_attempts": {
+    "check_sources": 1,
+    "ingest_batch": 1,
+    "validate_bronze": 1,
+    "spark_transform": 1,
+    "quality_check": 1,
+    "dbt_build": 2,
+    "dbt_test": 1,
+    "snowflake_configured": 1,
+    "reconcile": 1
+  },
+  "retried_tasks": {
+    "dbt_build": 1
+  },
+  "note": "Executed with `airflow dags test` inside the atlaslake/airflow image against the live stack. dbt_build failed on attempt 1 (dbt subprocess lost the repo on PYTHONPATH inside the container), was fixed, and succeeded on Airflow's automatic retry."
+}

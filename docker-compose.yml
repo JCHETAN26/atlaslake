@@ -239,6 +239,8 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
     command: standalone
+    # uid 1000 owns the exFAT repo mount (checkpoints, gold.duckdb); gid 0 is what the Airflow image expects
+    user: "1000:0"
     ports: ["8085:8080"]
     extra_hosts: ["host.docker.internal:host-gateway"]
     environment:
@@ -255,8 +257,13 @@ services:
       ATLAS_S3_ENDPOINT: http://host.docker.internal:9000
       ATLAS_PUSHGATEWAY: pushgateway:9091
       ATLAS_OPENLINEAGE_URL: http://marquez:5000
+      ATLAS_SPARK_IVY_DIR: /ivy2
+      ATLAS_DUCKDB_EXTENSION_DIR: /duckdb-extensions
     volumes:
       - .:/opt/atlaslake
+      # containers have no internet here (daemon iptables=false): reuse the host's resolved Spark jars
+      - ${HOME}/.ivy2:/ivy2
+      - ${HOME}/.duckdb/extensions:/duckdb-extensions
 
 volumes:
   pgdata:

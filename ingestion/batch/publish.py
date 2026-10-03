@@ -49,8 +49,10 @@ WATERMARK_COL = {
 
 def _gold() -> duckdb.DuckDBPyConnection:
     """In-memory session with the Gold file attached read-only as ``gold_db`` (always fully qualified)."""
+    from lakehouse.duckdb_plugin import session_settings
+
     con = duckdb.connect()
-    con.execute("SET TimeZone = 'UTC'")
+    session_settings(con)
     con.execute(f"ATTACH '{settings().gold_duckdb}' AS gold_db (READ_ONLY)")
     return con
 
