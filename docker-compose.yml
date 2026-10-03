@@ -1,0 +1,253 @@
+# AtlasLake local platform.
+#
+#   docker compose up -d                                  # core: postgres, minio, kafka, schema-registry, kafka-ui
+#   docker compose --profile monitoring up -d             # + prometheus, grafana, pushgateway, kafka-exporter, alertmanager
+#   docker compose --profile lineage up -d                # + marquez api/web
+#   docker compose --profile orchestration up -d          # + airflow
+#
+# Spark runs as a local process (local[*]) against these services; see spark/common/session.py.
+# Postgres/Kafka data live in named volumes (the repo drive is exFAT and cannot host them);
+# lake data (MinIO) is bind-mounted into ./data/minio so large tables stay on the big drive.
+
+x-restart: &restart
+  restart: unless-stopped
+
+services:
+  postgres:
+    <<: *restart
+    image: postgres:16
+    container_name: atlas-postgres
+    environment:
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: ${ATLAS_PG_PASSWORD:-atlas}
+      POSTGRES_DB: commerce
+    command: >
+      postgres
+        -c shared_buffers=1GB
+        -c work_mem=64MB
+        -c maintenance_work_mem=512MB
+        -c max_wal_size=8GB
+        -c checkpoint_timeout=15min
+        -c max_connections=200
+        -c wal_level=logical
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas -d commerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    shm_size: 1g
+
+  minio:
+    <<: *restart
+    image: bitnamilegacy/minio:2025.7.23
+    container_name: atlas-minio
+    user: "1000:1000"   # matches the owner of the exFAT bind mount
+    environment:
+      MINIO_ROOT_USER: ${ATLAS_S3_ACCESS_KEY:-atlas}
+      MINIO_ROOT_PASSWORD: ${ATLAS_S3_SECRET_KEY:-atlas-secret-key}
+      MINIO_DEFAULT_BUCKETS: atlaslake
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+      MINIO_DATA_DIR: /bitnami/minio/data
+    ports: ["9000:9000", "9001:9001"]
+    volumes:
+      - ./data/minio:/bitnami/minio/data
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  kafka:
+    <<: *restart
+    image: apache/kafka:4.1.0
+    container_name: atlas-kafka
+    ports: ["9092:9092"]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_HEAP_OPTS: "-Xms1g -Xmx1g"
+      KAFKA_MESSAGE_MAX_BYTES: 2097152
+    volumes:
+      - kafkadata:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  schema-registry:
+    <<: *restart
+    image: confluentinc/cp-schema-registry:7.9.2
+    container_name: atlas-schema-registry
+    depends_on:
+      kafka: { condition: service_healthy }
+    ports: ["8081:8081"]
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
+      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: BACKWARD_TRANSITIVE
+      SCHEMA_REGISTRY_HEAP_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:8081/subjects >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  kafka-ui:
+    <<: *restart
+    image: kafbat/kafka-ui:v1.3.0
+    container_name: atlas-kafka-ui
+    depends_on:
+      kafka: { condition: service_healthy }
+    ports: ["8080:8080"]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: atlaslake
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+      DYNAMIC_CONFIG_ENABLED: "false"
+
+  # ---------------------------------------------------------------- monitoring
+  prometheus:
+    <<: *restart
+    profiles: ["monitoring"]
+    image: prom/prometheus:v3.5.0
+    container_name: atlas-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    ports: ["9090:9090"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - promdata:/prometheus
+
+  alertmanager:
+    <<: *restart
+    profiles: ["monitoring"]
+    image: prom/alertmanager:v0.28.1
+    container_name: atlas-alertmanager
+    ports: ["9093:9093"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - ./monitoring/alertmanager:/etc/alertmanager:ro
+
+  pushgateway:
+    <<: *restart
+    profiles: ["monitoring"]
+    image: prom/pushgateway:v1.11.1
+    container_name: atlas-pushgateway
+    ports: ["9091:9091"]
+
+  kafka-exporter:
+    <<: *restart
+    profiles: ["monitoring"]
+    image: danielqsj/kafka-exporter:v1.9.0
+    container_name: atlas-kafka-exporter
+    command: ["--kafka.server=kafka:29092", "--topic.filter=commerce\\..*", "--group.filter=.*"]
+    ports: ["9308:9308"]
+    depends_on:
+      kafka: { condition: service_healthy }
+
+  grafana:
+    <<: *restart
+    profiles: ["monitoring"]
+    image: grafana/grafana:12.1.1
+    container_name: atlas-grafana
+    ports: ["3000:3000"]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${ATLAS_GRAFANA_PASSWORD:-atlas}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+
+  # ------------------------------------------------------------------- lineage
+  marquez:
+    <<: *restart
+    profiles: ["lineage"]
+    image: marquezproject/marquez:0.51.1
+    container_name: atlas-marquez
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports: ["5000:5000", "5001:5001"]
+    environment:
+      MARQUEZ_PORT: 5000
+      MARQUEZ_ADMIN_PORT: 5001
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: marquez
+      POSTGRES_USER: marquez
+      POSTGRES_PASSWORD: marquez
+    volumes:
+      - ./lineage/marquez.yml:/usr/src/app/marquez.yml:ro
+    command: ["/usr/src/app/entrypoint.sh"]
+
+  marquez-web:
+    <<: *restart
+    profiles: ["lineage"]
+    image: marquezproject/marquez-web:0.51.1
+    container_name: atlas-marquez-web
+    depends_on: [marquez]
+    ports: ["3001:3000"]
+    environment:
+      MARQUEZ_HOST: marquez
+      MARQUEZ_PORT: 5000
+      WEB_PORT: 3000
+
+  # ------------------------------------------------------------- orchestration
+  airflow:
+    <<: *restart
+    profiles: ["orchestration"]
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    image: atlaslake/airflow:local
+    container_name: atlas-airflow
+    depends_on:
+      postgres: { condition: service_healthy }
+    command: standalone
+    ports: ["8085:8080"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/atlaslake/airflow/dags
+      SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+      ATLAS_ENV: docker
+      ATLAS_PG_HOST: postgres
+      ATLAS_KAFKA_BOOTSTRAP: kafka:29092
+      ATLAS_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      ATLAS_S3_ENDPOINT: http://minio:9000
+      ATLAS_PUSHGATEWAY: pushgateway:9091
+      ATLAS_OPENLINEAGE_URL: http://marquez:5000
+    volumes:
+      - .:/opt/atlaslake
+
+volumes:
+  pgdata:
+  kafkadata:
+  promdata:
+  grafanadata:
