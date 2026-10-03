@@ -76,6 +76,25 @@ GOLD_PUBLISHED = [
 ]
 
 
+_AVAILABLE: bool | None = None
+
+
+def _available() -> bool:
+    """One fast TCP probe per process: never pay HTTP retry back-off when Marquez is not running."""
+    global _AVAILABLE
+    if _AVAILABLE is None:
+        import socket
+        from urllib.parse import urlparse
+
+        u = urlparse(settings().openlineage_url)
+        try:
+            with socket.create_connection((u.hostname or "localhost", u.port or 80), timeout=0.5):
+                _AVAILABLE = True
+        except OSError:
+            _AVAILABLE = False
+    return _AVAILABLE
+
+
 def _client():
     from openlineage.client import OpenLineageClient
     from openlineage.client.transport.http import HttpConfig, HttpTransport
@@ -100,6 +119,8 @@ def emit(
     facets: dict[str, Any] | None = None,
 ) -> bool:
     """Emit START + COMPLETE/FAIL for one job run."""
+    if not _available():
+        return False
     try:
         from openlineage.client.event_v2 import Job, Run, RunEvent, RunState
 

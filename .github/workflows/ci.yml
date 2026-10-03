@@ -169,6 +169,8 @@ jobs:
       - run: uv run --no-sync python -m pytest tests/integration -x -p no:cacheprovider
       - name: End-to-end smoke (simulate → relay → stream → Gold → reconcile)
         run: |
+          # integration tests inject events straight into Kafka (no source row) — start from a clean platform
+          uv run --no-sync atlas reset --yes
           uv run --no-sync atlas simulate --orders 2000 --days 3 --reset-source
           uv run --no-sync atlas relay
           uv run --no-sync atlas stream --available-now --metrics-port 0
