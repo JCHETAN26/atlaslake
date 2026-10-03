@@ -64,13 +64,13 @@ _Source: `evaluation/schema_evolution.json` · git `302b783-dirty` · 2026-10-03
 
 ## Reconciliation Source → Gold (Phase 23)
 
-_Source: `evaluation/reconciliation.json` · git `302b783-dirty` · 2026-10-03T13:56:57+00:00 · 16 CPU / 19.4 GB_
+_Source: `evaluation/reconciliation.json` · git `25cff70-dirty` · 2026-10-03T14:31:17+00:00 · 16 CPU / 19.4 GB_
 
 Invariant: `source = accepted + rejected + in_flight + pending_processing (+ unexplained == 0)`
 
 | source events | accepted | rejected | in flight | pending | unexplained | unknown origin | logical dupes | financial mismatches | passed |
 |---|---|---|---|---|---|---|---|---|---|
-| 9,508,913 | 9,508,913 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ✅ yes |
+| 2,768,662 | 2,768,662 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ✅ yes |
 
 ## Spark processing (Kafka → Bronze/DLQ/Silver)
 
@@ -160,11 +160,11 @@ Snowflake: not run: no credentials configured.
 
 ## Data quality (Phase 22)
 
-_Source: `evaluation/data_quality.json` · git `302b783-dirty` · 2026-10-03T13:57:32+00:00 · 16 CPU / 19.4 GB_
+_Source: `evaluation/data_quality.json` · git `25cff70-dirty` · 2026-10-03T14:31:27+00:00 · 16 CPU / 19.4 GB_
 
 | checks | passed | failed (blocking) | failed (warning) | technical | business | engine |
 |---|---|---|---|---|---|---|
-| 48 | 48 | 0 | 0 | 41 | 7 | great_expectations 1.23.2 |
+| 48 | 47 | 0 | 1 | 41 | 7 | great_expectations 1.23.2 |
 
 ## Scaling the AtlasLake pipeline
 
@@ -182,4 +182,25 @@ _Source: `evaluation/baseline_pipeline.json` · git `c23bd7a-dirty` · 2026-10-0
 | 100k | 106,685 | 61,740 | 0.1 | 0.1 | 0.4 | 0.6 | 1.2 | 501.2 |
 | 1m | 982,469 | 469,717 | 0.6 | 0.4 | 2.6 | 3.6 | 10.3 | 1,150.2 |
 | 10m | 9,508,913 | 4,244,071 | 4.9 | 4.3 | 16.9 | 26.1 | 82.6 | 2,224.2 |
+
+## Final chaos test (Phase 45)
+
+_Source: `evaluation/chaos_report.json` · git `25cff70-dirty` · 2026-10-03T14:31:27+00:00 · 16 CPU / 19.4 GB_
+
+| Question | Measured answer |
+|---|---|
+| Did we lose data? | no (0 unexplained) |
+| Did duplicates leak? | no (35,707 injected) |
+| Did Spark recover? | ✅ yes |
+| How long did recovery take? | 123.2 s (peak backlog 656,412 records) |
+| Did late events resolve correctly? | ✅ yes |
+| Did the DLQ work? | quarantined 7,018, replayed 7,018, unresolved 0 |
+| Did schema protection work? | see evaluation/schema_evolution.json (breaking change rejected) |
+| Did Source and Gold reconcile? | ✅ yes |
+| Backfill during chaos idempotent? | ✅ yes |
+| Sustained throughput | 7,405.8 events/s |
+| End-to-end latency | p50 69.7 s / p95 118.3 s |
+| Alerts received by webhook | 4 |
+
+> The **first** chaos run did not pass: 1 of 2,751,035 source events was unexplained — a delivery corrupted in transit whose delivery-log row was lost could not be attributed or replayed. Fixed by stamping every delivery with an `atlas-event-id` Kafka header (survives payload corruption) and persisting the relay's delivery log continuously; regression test `tests/failure/test_corrupt_attribution.py`. That run is kept as `evaluation/chaos_report_run1_found_defect.json`.
 

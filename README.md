@@ -31,7 +31,8 @@ control plane: Airflow · Great Expectations · reconciliation · OpenLineage/Ma
 | dbt incremental vs full refresh | 4.18× faster, identical results: ✅ yes |
 | Breaking schema change | rejected by registry, consumers unaffected |
 | Gold vs baseline answers (6 queries) | identical |
-| Source → Gold reconciliation | 9,508,913 events, unexplained 0, passed ✅ yes |
+| Source → Gold reconciliation | 2,768,662 events, unexplained 0, passed ✅ yes |
+| Final chaos test | lost data: no; duplicates leaked: no; reconciled: ✅ yes |
 
 <!-- results:end -->
 

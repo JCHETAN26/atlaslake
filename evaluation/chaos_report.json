@@ -1,0 +1,439 @@
+{
+  "benchmark": "chaos_report",
+  "context": {
+    "generated_at": "2026-10-03T14:31:27+00:00",
+    "git_sha": "25cff70-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "parameters": {
+    "orders_per_s": 1400,
+    "phase_s": 60,
+    "history_scale": "1m"
+  },
+  "history": {
+    "events": 982469,
+    "relay_events_per_s": 34947.1,
+    "stream_events_per_s": 17574.0
+  },
+  "answers": {
+    "did_we_lose_data": false,
+    "records_unexplained": 0,
+    "did_duplicates_leak": false,
+    "duplicates_injected": 35707,
+    "did_spark_recover": true,
+    "recovery_time_s": 123.2,
+    "peak_backlog_records": 656412,
+    "did_late_events_resolve": true,
+    "did_dlq_work": {
+      "quarantined_by_reason": {
+        "MISSING_STORE_ID": 3155,
+        "CORRUPT_PAYLOAD": 1033,
+        "NEGATIVE_AMOUNT": 555,
+        "MISSING_ORDER_ID": 545,
+        "INVALID_STATUS": 519,
+        "INVALID_CURRENCY": 489,
+        "UNKNOWN_SCHEMA_ID": 371,
+        "AVRO_DECODE_ERROR": 343,
+        "MISSING_CUSTOMER_ID": 8
+      },
+      "replayed": 7018,
+      "unresolved": 0,
+      "dlq_status_after_replay": {
+        "REPLAYED": 7018
+      }
+    },
+    "did_schema_protection_work": "see evaluation/schema_evolution.json (breaking change rejected)",
+    "did_source_and_gold_reconcile": true,
+    "compaction_effect": {
+      "silver.events": {
+        "files_before": 48,
+        "files_after": 5,
+        "avg_kb_before": 4731,
+        "avg_kb_after": 45362
+      },
+      "bronze.orders": {
+        "files_before": 12,
+        "files_after": 1,
+        "avg_kb_before": 4656,
+        "avg_kb_after": 55452
+      },
+      "bronze.inventory": {
+        "files_before": 12,
+        "files_after": 1,
+        "avg_kb_before": 8925,
+        "avg_kb_after": 105553
+      },
+      "silver.inventory_movements": {
+        "files_before": 40,
+        "files_after": 30,
+        "avg_kb_before": 1325,
+        "avg_kb_after": 1747
+      }
+    },
+    "incremental_vs_full": "see evaluation/full_vs_incremental.json",
+    "sustained_throughput_events_per_s": 7405.8,
+    "end_to_end_latency_s": {
+      "n": 1779175,
+      "p50": 69.7203,
+      "p95": 118.3443,
+      "p99": 125.3466,
+      "min": 15.3995,
+      "max": 148.6106,
+      "mean": 66.8074
+    },
+    "backfill_idempotent": true,
+    "quality_blocking_failures": 0,
+    "alerts_received": 4
+  },
+  "reconciliation_summary": {
+    "passed": true,
+    "source_events": 2768662,
+    "accepted": 2768662,
+    "rejected": 0,
+    "in_flight": 0,
+    "pending_processing": 0,
+    "unexplained": 0,
+    "unknown_origin": 0,
+    "logical_duplicates": 0,
+    "financial_mismatches": 0,
+    "gold_vs_silver_mismatches": 0,
+    "orders_excluded_from_financials": 0,
+    "incomplete_orders_held_from_gold": 0,
+    "invariant": "source = accepted + rejected + in_flight + pending_processing (+ unexplained == 0)",
+    "runtime_s": 12.154
+  },
+  "lag_timeline": [
+    {
+      "t": 0.1,
+      "lag": 133813
+    },
+    {
+      "t": 5.4,
+      "lag": 176186
+    },
+    {
+      "t": 10.8,
+      "lag": 218819
+    },
+    {
+      "t": 16.0,
+      "lag": 262604
+    },
+    {
+      "t": 21.3,
+      "lag": 313611
+    },
+    {
+      "t": 26.5,
+      "lag": 357667
+    },
+    {
+      "t": 31.8,
+      "lag": 403197
+    },
+    {
+      "t": 37.1,
+      "lag": 459037
+    },
+    {
+      "t": 42.3,
+      "lag": 506229
+    },
+    {
+      "t": 47.6,
+      "lag": 555655
+    },
+    {
+      "t": 52.9,
+      "lag": 605759
+    },
+    {
+      "t": 58.2,
+      "lag": 656412
+    },
+    {
+      "t": 63.8,
+      "lag": 717935
+    },
+    {
+      "t": 67.0,
+      "lag": 739357
+    },
+    {
+      "t": 70.3,
+      "lag": 774241
+    },
+    {
+      "t": 73.6,
+      "lag": 798225
+    },
+    {
+      "t": 76.8,
+      "lag": 834622
+    },
+    {
+      "t": 80.1,
+      "lag": 847466
+    },
+    {
+      "t": 83.4,
+      "lag": 863316
+    },
+    {
+      "t": 86.7,
+      "lag": 884438
+    },
+    {
+      "t": 90.0,
+      "lag": 918968
+    },
+    {
+      "t": 93.2,
+      "lag": 933557
+    },
+    {
+      "t": 96.4,
+      "lag": 950413
+    },
+    {
+      "t": 99.7,
+      "lag": 988583
+    },
+    {
+      "t": 103.0,
+      "lag": 898855
+    },
+    {
+      "t": 106.2,
+      "lag": 916449
+    },
+    {
+      "t": 109.4,
+      "lag": 937551
+    },
+    {
+      "t": 112.5,
+      "lag": 959389
+    },
+    {
+      "t": 115.8,
+      "lag": 978050
+    },
+    {
+      "t": 119.0,
+      "lag": 998315
+    },
+    {
+      "t": 122.2,
+      "lag": 1023690
+    },
+    {
+      "t": 125.4,
+      "lag": 647005
+    },
+    {
+      "t": 128.6,
+      "lag": 667547
+    },
+    {
+      "t": 131.9,
+      "lag": 689532
+    },
+    {
+      "t": 135.2,
+      "lag": 721277
+    },
+    {
+      "t": 138.3,
+      "lag": 733558
+    },
+    {
+      "t": 141.5,
+      "lag": 753744
+    },
+    {
+      "t": 144.7,
+      "lag": 776013
+    },
+    {
+      "t": 147.9,
+      "lag": 812062
+    },
+    {
+      "t": 151.2,
+      "lag": 429632
+    },
+    {
+      "t": 154.4,
+      "lag": 465197
+    },
+    {
+      "t": 157.6,
+      "lag": 484878
+    },
+    {
+      "t": 160.9,
+      "lag": 511435
+    },
+    {
+      "t": 164.1,
+      "lag": 531885
+    },
+    {
+      "t": 167.3,
+      "lag": 558007
+    },
+    {
+      "t": 170.5,
+      "lag": 182019
+    },
+    {
+      "t": 173.8,
+      "lag": 200799
+    },
+    {
+      "t": 177.0,
+      "lag": 237020
+    },
+    {
+      "t": 180.3,
+      "lag": 247257
+    },
+    {
+      "t": 183.5,
+      "lag": 286810
+    },
+    {
+      "t": 186.7,
+      "lag": 112076
+    }
+  ],
+  "timeline": [
+    {
+      "t": "2026-10-03T14:21:52+00:00",
+      "step": "prepare_history",
+      "scale": "1m"
+    },
+    {
+      "t": "2026-10-03T14:24:18+00:00",
+      "step": "traffic_started",
+      "orders_per_s": 1400,
+      "faults": "dup 2%, late 1% (+20s), invalid 0.3%, corrupt 0.1%"
+    },
+    {
+      "t": "2026-10-03T14:25:18+00:00",
+      "step": "spark_killed",
+      "lag_before": 125549
+    },
+    {
+      "t": "2026-10-03T14:26:22+00:00",
+      "step": "backlog_built",
+      "peak_backlog": 656412
+    },
+    {
+      "t": "2026-10-03T14:26:22+00:00",
+      "step": "spark_restarted"
+    },
+    {
+      "t": "2026-10-03T14:28:25+00:00",
+      "step": "backlog_recovered",
+      "seconds": 123.2
+    },
+    {
+      "t": "2026-10-03T14:29:34+00:00",
+      "step": "traffic_stopped",
+      "workload": {
+        "run_id": "live-7-1791037459",
+        "orders_created": 220147,
+        "events": 1786193,
+        "by_topic": {
+          "commerce.orders": 418458,
+          "commerce.payments": 301746,
+          "commerce.inventory": 1063757,
+          "commerce.customers": 2232,
+          "commerce.products": 0
+        },
+        "elapsed_s": 241.19,
+        "events_per_s": 7405.8,
+        "ticks": 157,
+        "commit_p95_s": 2.121,
+        "pending_future_events": 1142906
+      }
+    },
+    {
+      "t": "2026-10-03T14:30:06+00:00",
+      "step": "historical_backfill",
+      "records": 961494,
+      "accepted_new": 0,
+      "state_unchanged": true
+    },
+    {
+      "t": "2026-10-03T14:30:33+00:00",
+      "step": "compaction",
+      "tables": {
+        "silver.events": {
+          "files_before": 48,
+          "files_after": 5,
+          "avg_kb_before": 4731,
+          "avg_kb_after": 45362
+        },
+        "bronze.orders": {
+          "files_before": 12,
+          "files_after": 1,
+          "avg_kb_before": 4656,
+          "avg_kb_after": 55452
+        },
+        "bronze.inventory": {
+          "files_before": 12,
+          "files_after": 1,
+          "avg_kb_before": 8925,
+          "avg_kb_after": 105553
+        },
+        "silver.inventory_movements": {
+          "files_before": 40,
+          "files_after": 30,
+          "avg_kb_before": 1325,
+          "avg_kb_after": 1747
+        }
+      }
+    },
+    {
+      "t": "2026-10-03T14:30:51+00:00",
+      "step": "dlq_replayed",
+      "pending_before": 6623,
+      "replayed": 7018,
+      "accepted_after_replay": 7018
+    },
+    {
+      "t": "2026-10-03T14:31:05+00:00",
+      "step": "dbt_build",
+      "success": true,
+      "elapsed_s": 9.272
+    },
+    {
+      "t": "2026-10-03T14:31:27+00:00",
+      "step": "reconciled",
+      "passed": true
+    }
+  ],
+  "elapsed_s": 575.4,
+  "corrections": [
+    "quarantined_by_reason recomputed from ops.dlq after the run: the original aggregation keyed by the first error code without summing, undercounting rows with differing code combinations (fixed in benchmarks/chaos.py)."
+  ]
+}

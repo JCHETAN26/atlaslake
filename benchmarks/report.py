@@ -688,6 +688,18 @@ def section_chaos(sec: list[str]) -> None:
         _table(["Question", "Measured answer"], rows),
         "",
     ]
+    first = _load("chaos_report_run1_found_defect")
+    if first:
+        fs = first["reconciliation_summary"]
+        sec += [
+            f"> The **first** chaos run did not pass: {_n(fs['unexplained'])} of {_n(fs['source_events'])} source "
+            "events was unexplained — a delivery corrupted in transit whose delivery-log row was lost could not be "
+            "attributed or replayed. Fixed by stamping every delivery with an `atlas-event-id` Kafka header (survives "
+            "payload corruption) and persisting the relay's delivery log continuously; regression test "
+            "`tests/failure/test_corrupt_attribution.py`. That run is kept as "
+            "`evaluation/chaos_report_run1_found_defect.json`.",
+            "",
+        ]
 
 
 README = REPO_ROOT / "README.md"

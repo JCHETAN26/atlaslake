@@ -195,10 +195,12 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
     _timeline(tl, "compaction", tables=comp_summary)
 
     # DLQ: inspect + replay authoritative copies for semantically invalid/corrupt records
+    # primary reason = first violated rule; aggregate in SQL so different code combinations add up
     dlq_before = {
-        r["error_codes"].split(",")[0]: r["n"]
+        r["reason"]: int(r["n"])
         for r in spark.sql(
-            f"SELECT error_codes, count(*) AS n FROM {fq('ops.dlq')} WHERE status='PENDING' GROUP BY 1"
+            f"SELECT split(error_codes, ',')[0] AS reason, count(*) AS n FROM {fq('ops.dlq')} "
+            "WHERE status='PENDING' GROUP BY 1"
         ).collect()
     }
     rep = replay(recover_from_source=True, spark=spark)

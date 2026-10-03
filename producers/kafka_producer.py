@@ -106,7 +106,9 @@ class EventProducer:
             try:
                 # The event id also travels in a header: headers survive payload corruption, so even an
                 # undecodable delivery can be attributed to its source event (and recovered by replay).
-                headers: dict[str, str | bytes | None] | None = {EVENT_ID_HEADER: event_id} if event_id else None
+                headers: dict[str, str | bytes | None] | None = (
+                    {EVENT_ID_HEADER: event_id} if event_id else None
+                )
                 self._producer.produce(
                     topic,
                     key=key.encode(),
