@@ -1,0 +1,53 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'atlas_data_logical_duplicates{table="silver.orders"}'
+        values: '0 0 3 3'
+      - series: 'atlas_data_reconciliation_passed'
+        values: '1 1 0 0'
+      - series: 'atlas_data_reconciliation_unexplained'
+        values: '0 0 12 12'
+      - series: 'atlas_job_success{job="dbt_build"}'
+        values: '1 0 0'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: DuplicateLeak
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: DuplicateLeak
+        exp_alerts:
+          - exp_labels: {severity: critical, team: data-platform, table: silver.orders}
+            exp_annotations:
+              summary: "Logical duplicates leaked into silver.orders"
+              description: "3 duplicate business keys — guarantee C2 violated."
+      - eval_time: 3m
+        alertname: ReconciliationMismatch
+        exp_alerts:
+          - exp_labels: {severity: critical, team: data-platform}
+            exp_annotations:
+              summary: "Source → Gold reconciliation failed"
+              description: "Unexplained records: 12. See evaluation/reconciliation.json; run `atlas reconcile`."
+      - eval_time: 2m
+        alertname: JobFailed
+        exp_alerts:
+          - exp_labels: {severity: critical, team: data-platform, job: dbt_build}
+            exp_annotations:
+              summary: "Batch job dbt_build failed"
+              description: "Last run reported failure. Check Airflow task logs."
+
+  - interval: 1m
+    input_series:
+      - series: 'atlas_stream_last_progress_timestamp{query="silver_ingest"}'
+        values: '0x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: StreamingQueryStalled
+        exp_alerts:
+          - exp_labels: {severity: critical, team: data-platform, query: silver_ingest}
+            exp_annotations:
+              summary: "Streaming query silver_ingest has made no progress"
+              description: "No micro-batch progress for 10m 0s. Check the Spark driver and Kafka connectivity."

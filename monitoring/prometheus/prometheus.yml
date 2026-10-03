@@ -1,0 +1,51 @@
+# AtlasLake Prometheus (Phase 30). Mounted at /etc/prometheus by docker-compose (profile: monitoring).
+global:
+  scrape_interval: 10s
+  evaluation_interval: 15s
+  external_labels:
+    platform: atlaslake
+
+rule_files:
+  - alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Batch jobs push final metrics (atlas_job_*); keep their own job/instance labels.
+  - job_name: pushgateway
+    honor_labels: true
+    static_configs:
+      - targets: ["pushgateway:9091"]
+
+  - job_name: kafka
+    static_configs:
+      - targets: ["kafka-exporter:9308"]
+
+  - job_name: minio
+    metrics_path: /minio/v2/metrics/cluster
+    static_configs:
+      - targets: ["minio:9000"]
+
+  # Processes running on the host (Spark driver, outbox relay, data exporter).
+  - job_name: atlas-streaming
+    static_configs:
+      - targets: ["host.docker.internal:9108"]
+        labels: {component: spark-streaming}
+
+  - job_name: atlas-relay
+    static_configs:
+      - targets: ["host.docker.internal:9109"]
+        labels: {component: outbox-relay}
+
+  - job_name: atlas-data
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["host.docker.internal:9110"]
+        labels: {component: data-exporter}

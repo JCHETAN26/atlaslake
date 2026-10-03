@@ -1,0 +1,113 @@
+# AtlasLake alert rules (Phase 30). Catalog + runbooks: docs/MONITORING.md
+groups:
+  - name: atlaslake-streaming
+    rules:
+      - alert: StreamingQueryStalled
+        expr: (time() - atlas_stream_last_progress_timestamp) > 300
+        for: 2m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "Streaming query {{ $labels.query }} has made no progress"
+          description: "No micro-batch progress for {{ $value | humanizeDuration }}. Check the Spark driver and Kafka connectivity."
+
+      - alert: StreamingTargetDown
+        expr: up{job="atlas-streaming"} == 0
+        for: 5m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "Streaming job metrics endpoint is down"
+          description: "Prometheus cannot scrape host:9108 — the Spark streaming driver is probably not running."
+
+      - alert: ConsumerLagGrowing
+        expr: deriv(atlas_stream_consumer_lag[10m]) > 0 and atlas_stream_consumer_lag > 10000
+        for: 10m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "Kafka backlog for {{ $labels.query }} is growing"
+          description: "Consumer lag {{ $value | humanize }} records and still rising for 10m; ingest rate exceeds processing rate."
+
+      - alert: KafkaConsumerGroupLagHigh
+        expr: sum by (consumergroup, topic) (kafka_consumergroup_lag) > 100000
+        for: 10m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "Consumer group {{ $labels.consumergroup }} lag high on {{ $labels.topic }}"
+          description: "Lag {{ $value | humanize }} records."
+
+      - alert: StreamingBatchFailures
+        expr: increase(atlas_stream_failed_batches_total[10m]) > 0
+        for: 0m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "Streaming micro-batch failed"
+          description: "{{ $value }} failed micro-batch(es) in the last 10m."
+
+      - alert: DLQRateSpike
+        expr: >
+          sum(rate(atlas_stream_rejected_events_total[5m]))
+            / clamp_min(sum(rate(atlas_stream_input_rows_total[5m])), 1) > 0.01
+        for: 5m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "More than 1% of incoming events are being rejected to the DLQ"
+          description: "Rejection ratio {{ $value | humanizePercentage }}. Inspect ops.dlq error_codes; replay with `atlas replay-dlq`."
+
+  - name: atlaslake-data
+    rules:
+      - alert: DLQBacklog
+        expr: sum(atlas_data_dlq_pending) > 1000
+        for: 15m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "DLQ has {{ $value }} pending records"
+          description: "Records are waiting for correction/replay."
+
+      - alert: ReconciliationMismatch
+        expr: atlas_data_reconciliation_unexplained > 0 or atlas_data_reconciliation_passed == 0
+        for: 0m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "Source → Gold reconciliation failed"
+          description: "Unexplained records: {{ $value }}. See evaluation/reconciliation.json; run `atlas reconcile`."
+
+      - alert: FreshnessBreach
+        expr: max(atlas_data_silver_freshness_seconds) > 3600 or atlas_data_gold_freshness_seconds > 86400
+        for: 10m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "Data freshness SLO breached"
+          description: "Silver/Gold has not been updated for {{ $value | humanizeDuration }}."
+
+      - alert: QualityCheckFailed
+        expr: atlas_data_quality_failed > 0
+        for: 0m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "{{ $value }} data-quality check(s) failing"
+          description: "See evaluation/data_quality.json; run `atlas quality`."
+
+      - alert: DuplicateLeak
+        expr: atlas_data_logical_duplicates > 0
+        for: 0m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "Logical duplicates leaked into {{ $labels.table }}"
+          description: "{{ $value }} duplicate business keys — guarantee C2 violated."
+
+      - alert: RelayBacklogHigh
+        expr: atlas_relay_backlog > 100000
+        for: 10m
+        labels: {severity: warning, team: data-platform}
+        annotations:
+          summary: "Outbox relay backlog {{ $value | humanize }} events"
+          description: "Source changes are not reaching Kafka; check `atlas relay`."
+
+  - name: atlaslake-jobs
+    rules:
+      - alert: JobFailed
+        expr: atlas_job_success == 0
+        for: 0m
+        labels: {severity: critical, team: data-platform}
+        annotations:
+          summary: "Batch job {{ $labels.job }} failed"
+          description: "Last run reported failure. Check Airflow task logs."
