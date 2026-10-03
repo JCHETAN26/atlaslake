@@ -1,8 +1,8 @@
 {
   "benchmark": "query_performance",
   "context": {
-    "generated_at": "2026-10-03T09:33:26+00:00",
-    "git_sha": "6205b6d-dirty",
+    "generated_at": "2026-10-03T12:13:49+00:00",
+    "git_sha": "f5a2376-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -21,14 +21,14 @@
       "iceberg-spark-runtime": "1.10.0"
     }
   },
-  "scale": "1m",
+  "scale": "10m",
   "queries": {
     "revenue_by_day_range": {
       "baseline_postgres": {
-        "cold_s": 0.0043,
+        "cold_s": 0.0044,
         "warm": {
           "n": 25,
-          "p50": 0.0001,
+          "p50": 0.0002,
           "p95": 0.0003,
           "p99": 0.0003,
           "min": 0.0001,
@@ -36,128 +36,128 @@
           "mean": 0.0002
         },
         "rows_returned": 21,
-        "bytes_touched": 40960,
-        "result_digest": "5b1020b6ce31"
+        "bytes_touched": 49152,
+        "result_digest": "3447ca59b1fd"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.0026,
+        "cold_s": 0.0025,
         "warm": {
           "n": 25,
-          "p50": 0.0009,
-          "p95": 0.0011,
-          "p99": 0.0012,
+          "p50": 0.001,
+          "p95": 0.0013,
+          "p99": 0.0013,
           "min": 0.0008,
           "max": 0.0013,
-          "mean": 0.0009
+          "mean": 0.001
         },
         "rows_returned": 21,
-        "rows_scanned": 846,
-        "result_digest": "5b1020b6ce31"
+        "rows_scanned": 2696,
+        "result_digest": "3447ca59b1fd"
       },
       "same_result": true
     },
     "top_products_range": {
       "baseline_postgres": {
-        "cold_s": 0.0241,
+        "cold_s": 0.0474,
         "warm": {
           "n": 25,
-          "p50": 0.0128,
-          "p95": 0.0134,
-          "p99": 0.0134,
-          "min": 0.0122,
-          "max": 0.0135,
-          "mean": 0.0128
+          "p50": 0.0395,
+          "p95": 0.0403,
+          "p99": 0.0407,
+          "min": 0.0382,
+          "max": 0.0409,
+          "mean": 0.0394
         },
         "rows_returned": 20,
-        "bytes_touched": 7020544,
-        "result_digest": "5774d2297af5"
+        "bytes_touched": 21807104,
+        "result_digest": "c4b9298ffa6a"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.0029,
+        "cold_s": 0.0043,
         "warm": {
           "n": 25,
-          "p50": 0.0016,
-          "p95": 0.0019,
-          "p99": 0.002,
-          "min": 0.0014,
-          "max": 0.002,
-          "mean": 0.0016
+          "p50": 0.0022,
+          "p95": 0.0024,
+          "p99": 0.0024,
+          "min": 0.0019,
+          "max": 0.0024,
+          "mean": 0.0021
         },
         "rows_returned": 20,
-        "rows_scanned": 257785,
-        "result_digest": "5774d2297af5"
+        "rows_scanned": 910786,
+        "result_digest": "c4b9298ffa6a"
       },
       "same_result": true
     },
     "customer_ltv_top100": {
       "baseline_postgres": {
-        "cold_s": 0.0213,
+        "cold_s": 0.2881,
         "warm": {
           "n": 25,
-          "p50": 0.0182,
-          "p95": 0.0187,
-          "p99": 0.0189,
-          "min": 0.0178,
-          "max": 0.019,
-          "mean": 0.0183
+          "p50": 0.2582,
+          "p95": 0.2897,
+          "p99": 0.2916,
+          "min": 0.2542,
+          "max": 0.2919,
+          "mean": 0.2638
         },
         "rows_returned": 100,
-        "bytes_touched": 8978432,
-        "result_digest": "5dc75f904b0f"
+        "bytes_touched": 88670208,
+        "result_digest": "0fec645675f6"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.0061,
+        "cold_s": 0.0236,
         "warm": {
           "n": 25,
-          "p50": 0.0052,
-          "p95": 0.0057,
-          "p99": 0.0069,
-          "min": 0.0048,
-          "max": 0.0073,
-          "mean": 0.0053
+          "p50": 0.0191,
+          "p95": 0.0208,
+          "p99": 0.021,
+          "min": 0.0174,
+          "max": 0.0211,
+          "mean": 0.0193
         },
         "rows_returned": 100,
-        "rows_scanned": 70422,
-        "result_digest": "5dc75f904b0f"
+        "rows_scanned": 704225,
+        "result_digest": "0fec645675f6"
       },
       "same_result": true
     },
     "single_day_orders": {
       "baseline_postgres": {
-        "cold_s": 0.0017,
+        "cold_s": 0.0022,
         "warm": {
           "n": 25,
-          "p50": 0.0004,
-          "p95": 0.0006,
-          "p99": 0.0006,
-          "min": 0.0004,
-          "max": 0.0006,
-          "mean": 0.0004
+          "p50": 0.001,
+          "p95": 0.0015,
+          "p99": 0.0017,
+          "min": 0.0009,
+          "max": 0.0018,
+          "mean": 0.0011
         },
         "rows_returned": 1,
-        "bytes_touched": 2088960,
-        "result_digest": "4f7467fc6316"
+        "bytes_touched": 7168000,
+        "result_digest": "3353176ff7d5"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.0008,
+        "cold_s": 0.0013,
         "warm": {
           "n": 25,
-          "p50": 0.0005,
-          "p95": 0.0005,
-          "p99": 0.0005,
-          "min": 0.0004,
-          "max": 0.0005,
-          "mean": 0.0005
+          "p50": 0.0008,
+          "p95": 0.0009,
+          "p99": 0.0009,
+          "min": 0.0006,
+          "max": 0.0009,
+          "mean": 0.0007
         },
         "rows_returned": 1,
-        "rows_scanned": 70422,
-        "result_digest": "4f7467fc6316"
+        "rows_scanned": 704225,
+        "result_digest": "3353176ff7d5"
       },
       "same_result": true
     },
     "funnel_range": {
       "baseline_postgres": {
-        "cold_s": 0.0002,
+        "cold_s": 0.0003,
         "warm": {
           "n": 25,
           "p50": 0.0001,
@@ -169,55 +169,55 @@
         },
         "rows_returned": 7,
         "bytes_touched": 8192,
-        "result_digest": "00c809406966"
+        "result_digest": "922db8b0aa01"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.001,
+        "cold_s": 0.0011,
         "warm": {
           "n": 25,
           "p50": 0.0006,
           "p95": 0.0006,
-          "p99": 0.0006,
+          "p99": 0.0008,
           "min": 0.0005,
-          "max": 0.0006,
+          "max": 0.0008,
           "mean": 0.0006
         },
         "rows_returned": 7,
-        "rows_scanned": 29,
-        "result_digest": "00c809406966"
+        "rows_scanned": 90,
+        "result_digest": "922db8b0aa01"
       },
       "same_result": true
     },
     "store_channel_mix": {
       "baseline_postgres": {
-        "cold_s": 0.0128,
+        "cold_s": 0.0558,
         "warm": {
           "n": 25,
-          "p50": 0.0129,
-          "p95": 0.0132,
-          "p99": 0.0133,
-          "min": 0.0125,
-          "max": 0.0133,
-          "mean": 0.0129
+          "p50": 0.0568,
+          "p95": 0.0572,
+          "p99": 0.0573,
+          "min": 0.056,
+          "max": 0.0574,
+          "mean": 0.0568
         },
         "rows_returned": 90,
-        "bytes_touched": 8978432,
-        "result_digest": "2aa469423554"
+        "bytes_touched": 88801280,
+        "result_digest": "034e5f0f016c"
       },
       "atlaslake_gold_duckdb": {
-        "cold_s": 0.0026,
+        "cold_s": 0.006,
         "warm": {
           "n": 25,
-          "p50": 0.0024,
-          "p95": 0.0027,
-          "p99": 0.0032,
-          "min": 0.0023,
-          "max": 0.0033,
-          "mean": 0.0025
+          "p50": 0.0059,
+          "p95": 0.0063,
+          "p99": 0.0064,
+          "min": 0.0039,
+          "max": 0.0065,
+          "mean": 0.0056
         },
         "rows_returned": 90,
-        "rows_scanned": 70422,
-        "result_digest": "2aa469423554"
+        "rows_scanned": 704225,
+        "result_digest": "034e5f0f016c"
       },
       "same_result": true
     }

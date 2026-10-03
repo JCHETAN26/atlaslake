@@ -20,3 +20,10 @@
     case when {{ col }} is null then null
          else substr({{ col }}, 1, 1) || '***@' || split_part({{ col }}, '@', 2) end
 {%- endmacro %}
+
+{# SCD2 point-in-time predicate. Written with an open-ended upper bound instead of
+   `(ts < valid_to OR valid_to IS NULL)`: the OR form forces DuckDB off the hash join and took 112 s
+   on 705K orders; this form takes 0.09 s with an identical result (benchmarked, see PROJECT_SPEC §8). #}
+{% macro as_of(dim, ts) -%}
+    {{ ts }} >= {{ dim }}.valid_from and {{ ts }} < coalesce({{ dim }}.valid_to, timestamp '9999-12-31')
+{%- endmacro %}

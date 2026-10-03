@@ -33,6 +33,37 @@ ORDER = [
 ]
 
 
+def _alive(spark) -> bool:
+    try:
+        spark.sql("SELECT 1").collect()
+        return True
+    except Exception:
+        return False
+
+
+def ensure_spark(spark):
+    """Recreate the session if the driver JVM died (e.g. killed under memory pressure)."""
+    if spark is not None and _alive(spark):
+        return spark
+    from pyspark import SparkContext
+    from pyspark.sql import SparkSession
+
+    from spark.common.session import get_spark
+
+    log.warning("Spark driver is gone; starting a fresh session")
+    try:
+        if spark is not None:
+            spark.stop()
+    except Exception:
+        pass
+    SparkContext._active_spark_context = None
+    SparkContext._gateway = None
+    SparkContext._jvm = None
+    SparkSession._instantiatedSession = None
+    SparkSession._activeSession = None
+    return get_spark("atlas-benchmark")
+
+
 def run_benchmarks(suite: str = "all", scale: str = "small") -> dict[str, Any]:
     from spark.common.session import get_spark
 
@@ -46,6 +77,7 @@ def run_benchmarks(suite: str = "all", scale: str = "small") -> dict[str, Any]:
             continue
         t0 = time.time()
         log.info("=== %s ===", name)
+        spark = ensure_spark(spark)
         try:
             if name == "baseline_pipeline":
                 S.baseline_pipeline(E.LADDERS[scale])

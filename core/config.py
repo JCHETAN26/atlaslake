@@ -88,7 +88,7 @@ class Settings:
     pushgateway: str = field(default_factory=lambda: _env("PUSHGATEWAY", "localhost:9091"))
     openlineage_url: str = field(default_factory=lambda: _env("OPENLINEAGE_URL", "http://localhost:5000"))
     spark_master: str = field(default_factory=lambda: _env("SPARK_MASTER", "local[*]"))
-    spark_driver_memory: str = field(default_factory=lambda: _env("SPARK_DRIVER_MEMORY", "6g"))
+    spark_driver_memory: str = field(default_factory=lambda: _env("SPARK_DRIVER_MEMORY", "5g"))
 
     @property
     def checkpoint_dir(self) -> Path:

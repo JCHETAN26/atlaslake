@@ -13,6 +13,5 @@ from {{ ref('stg_inventory_movements') }} m
 left join {{ ref('dim_store') }} s on s.store_id = m.store_id
 left join {{ ref('dim_product') }} p
        on p.product_id = m.product_id
-      and m.event_timestamp >= p.valid_from
-      and (m.event_timestamp < p.valid_to or p.valid_to is null)
+      and {{ as_of('p', 'm.event_timestamp') }}
 where {{ incremental_since('m.silver_loaded_at') }}

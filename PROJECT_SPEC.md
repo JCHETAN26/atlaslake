@@ -276,6 +276,8 @@ alternatives rejected.
 | `backfill_benchmark` (Silver wiped → rebuilt from Bronze) | Content-addressed batch markers outlived a table wipe; a backfill chunk equal to an earlier micro-batch was skipped (inventory missing) | markers only count within the current table lineage (stop at unkeyed delete/overwrite) | `tests/unit/test_idempotency_markers.py` |
 | `consumer_recovery` showing a zero backlog | Live workload restock ids restarted per run → outbox unique violation → workload died silently | per-run id namespace; live suites now fail loudly if the workload dies | `test_restock_ids_are_unique_across_independent_live_runs` |
 | `full_vs_incremental` (incremental slower than full) | Look-back window (clock-skew guard) larger than the run cadence re-read everything | 1-minute look-back; key-set semi-join in `fact_orders` | `results_identical` in the benchmark |
+| `full_vs_incremental` at 10M (fact_orders 50 s for 705K rows) | SCD2 point-in-time join written as `ts < valid_to OR valid_to IS NULL` pushed DuckDB off the hash join (112 s) | `as_of()` macro with an open upper bound (0.09 s, identical result) | dbt tests + Gold fingerprints |
+| Spark driver vanished mid-benchmark at 10M | JVM (6 GB heap) + DuckDB (6 GB limit) + services exceeded 19 GB → killed | driver 5 GB, DuckDB 3 GB; benchmark runner recreates a dead session | — |
 | repeated `Connection reset` from S3 | (1) Bitnami MinIO wrapper exited every ~70 s; (2) Docker userland proxy (daemon has `iptables=false`) reset connections under many small writes; (3) container `nofile=1024` | run MinIO binary directly, host networking, `nofile=65536`, S3 retry/backoff policy | small-file experiment: 0 resets |
 
 ---

@@ -46,6 +46,5 @@ select
 from changed o
 left join {{ ref('dim_customer') }} c
        on c.customer_id = o.customer_id
-      and o.order_timestamp >= c.valid_from
-      and (o.order_timestamp < c.valid_to or c.valid_to is null)
+      and {{ as_of('c', 'o.order_timestamp') }}
 left join {{ ref('dim_store') }} s on s.store_id = o.store_id

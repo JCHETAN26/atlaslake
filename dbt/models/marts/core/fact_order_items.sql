@@ -18,6 +18,5 @@ select
 from items i
 left join {{ ref('dim_product') }} p
        on p.product_id = i.product_id
-      and i.order_timestamp >= p.valid_from
-      and (i.order_timestamp < p.valid_to or p.valid_to is null)
+      and {{ as_of('p', 'i.order_timestamp') }}
 left join {{ ref('fact_orders') }} fo on fo.order_id = i.order_id
