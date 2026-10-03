@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 
 from pyspark.sql import SparkSession
 
@@ -44,6 +45,9 @@ def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
 def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = None) -> SparkSession:
     cfg = settings()
     os.environ.setdefault("AWS_REGION", cfg.s3.region)
+    # The platform runs in UTC end-to-end: Spark collects timestamps as naive *process-local* times.
+    os.environ["TZ"] = "UTC"
+    time.tzset()
     # Workers must run the driver's interpreter (and see the repo packages).
     os.environ["PYSPARK_PYTHON"] = sys.executable
     os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
