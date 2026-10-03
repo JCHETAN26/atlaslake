@@ -12,14 +12,12 @@ from core.config import settings
 @lru_cache(maxsize=1)
 def s3fs() -> fs.S3FileSystem:
     cfg = settings().s3
-    return fs.S3FileSystem(
-        access_key=cfg.access_key,
-        secret_key=cfg.secret_key,
-        endpoint_override=cfg.endpoint_host,
-        scheme="https" if cfg.use_ssl else "http",
-        region=cfg.region,
-        allow_bucket_creation=True,
-    )
+    kwargs: dict = {"region": cfg.region, "allow_bucket_creation": True}
+    if cfg.access_key:  # empty in AWS => default credential chain (task role)
+        kwargs.update(access_key=cfg.access_key, secret_key=cfg.secret_key)
+    if cfg.endpoint:
+        kwargs.update(endpoint_override=cfg.endpoint_host, scheme="https" if cfg.use_ssl else "http")
+    return fs.S3FileSystem(**kwargs)
 
 
 def ensure_bucket() -> None:

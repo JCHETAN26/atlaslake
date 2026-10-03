@@ -13,7 +13,7 @@ select
     count(*)                                                        as attempts,
     count(*) filter (where status = 'COMPLETED')                    as completed,
     count(*) filter (where status = 'FAILED')                       as failed,
-    coalesce(sum(amount_minor) filter (where status = 'COMPLETED'), 0) as completed_amount_minor,
+    coalesce(sum(amount_minor) filter (where status = 'COMPLETED'), 0)::bigint as completed_amount_minor,
     round(count(*) filter (where status = 'COMPLETED') / count(*), 4) as success_rate,
     round(median(seconds_to_outcome), 3)                            as median_seconds_to_outcome,
     max(dbt_loaded_at)                                              as max_dbt_loaded_at

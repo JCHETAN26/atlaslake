@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -20,26 +22,29 @@ def _env() -> None:
 
 
 def dbt(args: list[str]) -> dict[str, Any]:
-    from dbt.cli.main import dbtRunner
-
+    """Run dbt in a subprocess (isolates the DuckDB file lock/memory, exactly like Airflow does)."""
     _env()
+    exe = Path(sys.executable).parent / "dbt"
+    cmd = [str(exe), *args, "--project-dir", str(DBT_DIR), "--profiles-dir", str(DBT_DIR)]
     t0 = time.time()
-    res = dbtRunner().invoke([*args, "--project-dir", str(DBT_DIR), "--profiles-dir", str(DBT_DIR)])
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    proc = subprocess.run(cmd, cwd=DBT_DIR, env=env, capture_output=True, text=True)
     elapsed = time.time() - t0
     nodes = []
-    if res.result is not None and hasattr(res.result, "results"):
-        for r in res.result.results:
-            resp = getattr(r, "adapter_response", {}) or {}
+    results_path = DBT_DIR / "target" / "run_results.json"
+    if results_path.exists() and results_path.stat().st_mtime >= t0 - 1:
+        for r in json.loads(results_path.read_text()).get("results", []):
+            resp = r.get("adapter_response") or {}
+            name = r["unique_id"].split(".")[-1] if not r["unique_id"].startswith("test.") else r["unique_id"].split(".")[2]
             nodes.append({
-                "node": r.node.name, "resource_type": str(r.node.resource_type), "status": str(r.status),
-                "execution_time_s": round(r.execution_time or 0, 3),
-                "rows_affected": resp.get("rows_affected"),
-                "failures": getattr(r, "failures", None),
-                "message": (r.message or "")[:300] if hasattr(r, "message") else None,
+                "node": name, "resource_type": r["unique_id"].split(".")[0], "status": r["status"],
+                "execution_time_s": round(r.get("execution_time") or 0, 3),
+                "rows_affected": resp.get("rows_affected"), "failures": r.get("failures"),
+                "message": (r.get("message") or "")[:300],
             })
-    return {"args": args, "success": bool(res.success), "returncode": 0 if res.success else 1,
-            "elapsed_s": round(elapsed, 3), "nodes": nodes,
-            "exception": str(res.exception) if res.exception else None}
+    ok = proc.returncode == 0
+    return {"args": args, "success": ok, "returncode": proc.returncode, "elapsed_s": round(elapsed, 3),
+            "nodes": nodes, "exception": None if ok else proc.stdout[-3000:] + proc.stderr[-2000:]}
 
 
 def dbt_build(full_refresh: bool = False, select: str | None = None, emit_lineage: bool = True) -> dict[str, Any]:

@@ -13,8 +13,8 @@ select
     f.order_date, f.store_id, f.currency,
     count(*)                                                      as orders_placed,
     count(*) filter (where f.is_revenue)                          as orders_paid,
-    coalesce(sum(f.amount_minor) filter (where f.is_revenue), 0)  as gross_revenue_minor,
-    coalesce(sum(f.item_count) filter (where f.is_revenue), 0)    as items_sold,
+    coalesce(sum(f.amount_minor) filter (where f.is_revenue), 0)::bigint  as gross_revenue_minor,
+    coalesce(sum(f.item_count) filter (where f.is_revenue), 0)::bigint    as items_sold,
     round(sum(f.amount_minor) filter (where f.is_revenue)
           / nullif(count(*) filter (where f.is_revenue), 0), 2)   as avg_order_value_minor,
     max(f.dbt_loaded_at)                                          as max_dbt_loaded_at

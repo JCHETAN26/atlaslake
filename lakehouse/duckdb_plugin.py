@@ -29,9 +29,13 @@ def configure(conn: duckdb.DuckDBPyConnection, tables: dict[str, list[str]] | No
     cfg = settings().s3
     conn.execute("SET TimeZone = 'UTC'")  # date bucketing of timestamptz must not depend on the host
     conn.execute("INSTALL httpfs; LOAD httpfs; INSTALL iceberg; LOAD iceberg;")
-    conn.execute(f"""CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, KEY_ID '{cfg.access_key}',
-                     SECRET '{cfg.secret_key}', ENDPOINT '{cfg.endpoint_host}', URL_STYLE 'path',
-                     USE_SSL {str(cfg.use_ssl).lower()}, REGION '{cfg.region}')""")
+    if cfg.access_key:
+        conn.execute(f"""CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, KEY_ID '{cfg.access_key}',
+                         SECRET '{cfg.secret_key}', ENDPOINT '{cfg.endpoint_host}', URL_STYLE 'path',
+                         USE_SSL {str(cfg.use_ssl).lower()}, REGION '{cfg.region}')""")
+    else:  # AWS: IAM role credentials via the default chain
+        conn.execute("INSTALL aws; LOAD aws;")
+        conn.execute(f"CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, PROVIDER credential_chain, REGION '{cfg.region}')")
     cat = catalog()
     out = {}
     for ns, names in (tables or LAKE_TABLES).items():

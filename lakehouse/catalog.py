@@ -13,18 +13,13 @@ from core.config import settings
 @lru_cache(maxsize=1)
 def catalog() -> SqlCatalog:
     cfg = settings()
-    return SqlCatalog(
-        cfg.catalog_name,
-        uri=cfg.pg.sqlalchemy_url(cfg.pg.catalog_db),
-        warehouse=cfg.s3.warehouse,
-        **{
-            "s3.endpoint": cfg.s3.endpoint,
-            "s3.access-key-id": cfg.s3.access_key,
-            "s3.secret-access-key": cfg.s3.secret_key,
-            "s3.region": cfg.s3.region,
-            "s3.path-style-access": "true",
-        },
-    )
+    props = {"s3.region": cfg.s3.region}
+    if cfg.s3.endpoint:
+        props.update({"s3.endpoint": cfg.s3.endpoint, "s3.path-style-access": "true"})
+    if cfg.s3.access_key:  # empty in AWS => default credential chain
+        props.update({"s3.access-key-id": cfg.s3.access_key, "s3.secret-access-key": cfg.s3.secret_key})
+    return SqlCatalog(cfg.catalog_name, uri=cfg.pg.sqlalchemy_url(cfg.pg.catalog_db),
+                      warehouse=cfg.s3.warehouse, **props)
 
 
 def load_table(name: str) -> Table:
