@@ -44,6 +44,7 @@ class BatchStats:
     by_topic: dict[str, dict[str, int]] = field(default_factory=dict)
     duration_s: float = 0.0
     skipped_writes: list[str] = field(default_factory=list)
+    stage_s: dict[str, float] = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return {k: v for k, v in self.__dict__.items()}
@@ -78,10 +79,22 @@ def _merge(spark: SparkSession, df: DataFrame, sql: str, view: str, **fmt: str) 
     df.sparkSession.sql(sql.format(source=view, **fmt))
 
 
+class _Lap:
+    def __init__(self, sink: dict[str, float]) -> None:
+        self.sink, self.t = sink, time.perf_counter()
+
+    def __call__(self, name: str) -> None:
+        now = time.perf_counter()
+        self.sink[name] = round(self.sink.get(name, 0.0) + now - self.t, 3)
+        self.t = now
+
+
 class SilverProcessor:
     def __init__(self, spark: SparkSession, query: str, write_bronze: bool = True,
-                 allowed_lateness_s: int = ALLOWED_LATENESS_S) -> None:
+                 allowed_lateness_s: int = ALLOWED_LATENESS_S, parallel_writes: bool = True) -> None:
         self.spark = spark
+        # Writes to *different* Iceberg tables are independent commits: run them concurrently.
+        self.parallel_writes = parallel_writes
         self.query = query
         self.write_bronze = write_bronze
         self.allowed_lateness_s = allowed_lateness_s
@@ -99,29 +112,35 @@ class SilverProcessor:
         stats = BatchStats()
         decoded = decoded.persist()
         try:
+            lap = _Lap(stats.stage_s)
             stats.received = decoded.count()
+            lap("decode_validate")
             if stats.received == 0:
                 return stats
             topics = [r["topic"] for r in decoded.select("topic").distinct().collect()]
             now = F.current_timestamp()
 
             if self.write_bronze:
-                for topic in topics:
-                    rows = decoded.filter(F.col("topic") == topic)
-                    bronze = rows.select(
-                        "source", "topic", "kafka_partition", "kafka_offset", "kafka_key", "payload",
-                        "ingestion_timestamp", "schema_id", "schema_version", "event_id", "event_type",
-                        "event_timestamp",
-                        F.when(F.col("error_codes").isin("CORRUPT_PAYLOAD", "AVRO_DECODE_ERROR", "UNKNOWN_SCHEMA_ID"),
-                               F.col("error_codes")).alias("decode_error"),
-                        now.alias("bronze_loaded_at"))
-                    key = content_key(rows, ["topic", "kafka_partition", "kafka_offset"], f"bronze:{topic}")
-                    append_once(spark, bronze, f"bronze.{ev.TOPIC_TO_DATASET[topic]}", key, stats)
-
+                def bronze_task(topic: str):
+                    def run() -> None:
+                        rows = decoded.filter(F.col("topic") == topic)
+                        bronze = rows.select(
+                            "source", "topic", "kafka_partition", "kafka_offset", "kafka_key", "payload",
+                            "ingestion_timestamp", "schema_id", "schema_version", "event_id", "event_type",
+                            "event_timestamp",
+                            F.when(F.col("error_codes").isin("CORRUPT_PAYLOAD", "AVRO_DECODE_ERROR", "UNKNOWN_SCHEMA_ID"),
+                                   F.col("error_codes")).alias("decode_error"),
+                            now.alias("bronze_loaded_at"))
+                        key = content_key(rows, ["topic", "kafka_partition", "kafka_offset"], f"bronze:{topic}")
+                        append_once(spark, bronze, f"bronze.{ev.TOPIC_TO_DATASET[topic]}", key, stats)
+                    return run
+                self._run_all([bronze_task(t) for t in topics])
+            lap("bronze_append")
             invalid = decoded.filter(F.col("error_codes").isNotNull())
             valid = decoded.filter(F.col("error_codes").isNull())
             self._write_dlq(invalid)
 
+            lap("dlq_merge")
             ranked = valid.withColumn("_rn", F.row_number().over(
                 Window.partitionBy("event_id").orderBy("ingestion_timestamp", "kafka_partition", "kafka_offset")))
             deduped = ranked.filter("_rn = 1").drop("_rn")
@@ -132,6 +151,8 @@ class SilverProcessor:
                                        & F.col("event_timestamp").between(bounds["lo"], bounds["hi"]))
             new = deduped.join(ledger.select("event_id"), "event_id", "left_anti").persist()
 
+            new.count()
+            lap("dedup_ledger_antijoin")
             per_topic = {r["topic"]: r.asDict() for r in decoded.groupBy("topic").agg(
                 F.count("*").alias("received"),
                 F.sum(F.col("error_codes").isNotNull().cast("int")).alias("rejected")).collect()}
@@ -161,12 +182,15 @@ class SilverProcessor:
             stats.accepted_new = sum(d["accepted_new"] for d in per_topic.values())
             stats.late_events = sum(d["late"] for d in per_topic.values())
 
+            lap("batch_stats")
             if stats.accepted_new:
                 self._apply_entities(new, topics, stats)
+                lap("entity_merges")
                 ledger_rows = new.select("event_id", "event_type", "topic", "entity_key", "event_timestamp",
                                          "ingestion_timestamp", "schema_version", "kafka_partition",
                                          "kafka_offset", "source", "record_json", now.alias("silver_loaded_at"))
                 ledger_rows.writeTo(fq("silver.events")).append()
+                lap("ledger_append")
             new.unpersist()
             stats.duration_s = round(time.time() - t0, 3)
             self._write_batch_stats(batch_id, stats)
@@ -188,30 +212,46 @@ class SilverProcessor:
         _merge(self.spark, dlq, T.MERGE_INSERT_ONLY, "dlq_batch", target=fq("ops.dlq"),
                on="t.dlq_id = s.dlq_id AND t.topic = s.topic")
 
+    def _run_all(self, tasks: list) -> None:
+        if not self.parallel_writes or len(tasks) <= 1:
+            for t in tasks:
+                t()
+            return
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=len(tasks), thread_name_prefix="silver-write") as pool:
+            for f in [pool.submit(t) for t in tasks]:
+                f.result()  # re-raise the first failure: the batch fails and is retried as a whole
+
     def _apply_entities(self, new: DataFrame, topics: list[str], stats: BatchStats) -> None:
         spark = self.spark
-        if ev.TOPIC_ORDERS in topics:
+        tasks = []
+
+        def orders_task() -> None:
             orders = T.typed(new, ev.TOPIC_ORDERS)
             _merge(spark, T.reduce_orders(orders), T.MERGE_ORDERS, "orders_patch", target=fq("silver.orders"))
-            items = T.order_items(orders)
-            _merge(spark, items, T.MERGE_INSERT_ONLY, "items_patch", target=fq("silver.order_items"),
+            _merge(spark, T.order_items(orders), T.MERGE_INSERT_ONLY, "items_patch", target=fq("silver.order_items"),
                    on="t.order_id = s.order_id AND t.line_number = s.line_number")
-        if ev.TOPIC_PAYMENTS in topics:
+
+        def payments_task() -> None:
             pays = T.typed(new, ev.TOPIC_PAYMENTS)
             _merge(spark, T.reduce_payments(pays), T.MERGE_PAYMENTS, "payments_patch", target=fq("silver.payments"))
-        if ev.TOPIC_CUSTOMERS in topics:
+
+        def customers_task() -> None:
             cust = T.typed(new, ev.TOPIC_CUSTOMERS)
             _merge(spark, T.customers_state(cust), T.MERGE_LWW, "customers_patch", target=fq("silver.customers"),
                    key="customer_id")
             _merge(spark, T.customer_changes(cust), T.MERGE_INSERT_ONLY, "customer_changes_patch",
                    target=fq("silver.customer_changes"), on="t.event_id = s.event_id")
-        if ev.TOPIC_PRODUCTS in topics:
+
+        def products_task() -> None:
             prod = T.typed(new, ev.TOPIC_PRODUCTS)
             _merge(spark, T.products_state(prod), T.MERGE_LWW, "products_patch", target=fq("silver.products"),
                    key="product_id")
             _merge(spark, T.product_changes(prod), T.MERGE_INSERT_ONLY, "product_changes_patch",
                    target=fq("silver.product_changes"), on="t.event_id = s.event_id")
-        if ev.TOPIC_INVENTORY in topics:
+
+        def inventory_task() -> None:
             mov = T.inventory_movements(T.typed(new, ev.TOPIC_INVENTORY)).persist()
             if not mov.isEmpty():
                 key = content_key(mov, ["event_id"], "inventory")
@@ -235,6 +275,13 @@ class SilverProcessor:
                      .option(f"snapshot-property.{BATCH_KEY_PROP}", key).overwrite(F.lit(True)))
                 append_once(spark, mov, "silver.inventory_movements", key.replace("inventory", "movements", 1), stats)
             mov.unpersist()
+
+        for topic, task in ((ev.TOPIC_ORDERS, orders_task), (ev.TOPIC_PAYMENTS, payments_task),
+                            (ev.TOPIC_CUSTOMERS, customers_task), (ev.TOPIC_PRODUCTS, products_task),
+                            (ev.TOPIC_INVENTORY, inventory_task)):
+            if topic in topics:
+                tasks.append(task)
+        self._run_all(tasks)
 
     def _write_batch_stats(self, batch_id: int, stats: BatchStats) -> None:
         rows = [(self.query, int(batch_id), t, int(d.get("received", 0)), int(d.get("received", 0)) - int(d["rejected"]),
