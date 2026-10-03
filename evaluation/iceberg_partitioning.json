@@ -1,0 +1,224 @@
+{
+  "benchmark": "iceberg_partitioning",
+  "context": {
+    "generated_at": "2026-10-03T09:07:42+00:00",
+    "git_sha": "cd7c5d4-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "table": "silver.events",
+  "query_date": "2026-01-11",
+  "layout_before": "PARTITIONED BY (topic) \u2014 initial streaming layout",
+  "layout_after": "PARTITIONED BY (topic, days(event_timestamp)), files sorted by entity_key",
+  "partition_evolution_rewrite_s": 19.28,
+  "files_before": {
+    "data_files": 5,
+    "total_bytes": 85477552,
+    "avg_file_bytes": 17095510,
+    "small_files_lt_8mb": 2,
+    "records": 988822,
+    "snapshots": 12,
+    "manifests": 8,
+    "metadata_log_entries": 12
+  },
+  "files_after": {
+    "data_files": 516,
+    "total_bytes": 77710167,
+    "avg_file_bytes": 150601,
+    "small_files_lt_8mb": 516,
+    "records": 988822,
+    "snapshots": 13,
+    "manifests": 2,
+    "metadata_log_entries": 15
+  },
+  "before": {
+    "orders_one_day": {
+      "files_scanned": 1,
+      "bytes_scanned": 26393007,
+      "rows_in_scanned_files": 261373,
+      "files_total": 5,
+      "bytes_total": 85477552,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0798,
+        "p95": 0.1328,
+        "p99": 0.1396,
+        "min": 0.0662,
+        "max": 0.1413,
+        "mean": 0.0916
+      },
+      "cold_s": 0.1675
+    },
+    "payments_week": {
+      "files_scanned": 1,
+      "bytes_scanned": 11951853,
+      "rows_in_scanned_files": 143232,
+      "files_total": 5,
+      "bytes_total": 85477552,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0773,
+        "p95": 0.0945,
+        "p99": 0.0955,
+        "min": 0.0672,
+        "max": 0.0958,
+        "mean": 0.0807
+      },
+      "cold_s": 0.1116
+    },
+    "all_topics_one_day": {
+      "files_scanned": 5,
+      "bytes_scanned": 85477552,
+      "rows_in_scanned_files": 988822,
+      "files_total": 5,
+      "bytes_total": 85477552,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.1116,
+        "p95": 0.1268,
+        "p99": 0.1298,
+        "min": 0.0985,
+        "max": 0.1305,
+        "mean": 0.1128
+      },
+      "cold_s": 0.1488
+    },
+    "entity_lookup": {
+      "files_scanned": 1,
+      "bytes_scanned": 26393007,
+      "rows_in_scanned_files": 261373,
+      "files_total": 5,
+      "bytes_total": 85477552,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.1139,
+        "p95": 0.1941,
+        "p99": 0.2198,
+        "min": 0.1069,
+        "max": 0.2263,
+        "mean": 0.1305
+      },
+      "cold_s": 0.2293
+    }
+  },
+  "after": {
+    "orders_one_day": {
+      "files_scanned": 1,
+      "bytes_scanned": 717166,
+      "rows_in_scanned_files": 8044,
+      "files_total": 516,
+      "bytes_total": 77710167,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0687,
+        "p95": 0.0736,
+        "p99": 0.0747,
+        "min": 0.0644,
+        "max": 0.0749,
+        "mean": 0.0689
+      },
+      "cold_s": 0.0855
+    },
+    "payments_week": {
+      "files_scanned": 7,
+      "bytes_scanned": 2552809,
+      "rows_in_scanned_files": 35672,
+      "files_total": 516,
+      "bytes_total": 77710167,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0836,
+        "p95": 0.0939,
+        "p99": 0.0958,
+        "min": 0.0717,
+        "max": 0.0963,
+        "mean": 0.084
+      },
+      "cold_s": 0.0911
+    },
+    "all_topics_one_day": {
+      "files_scanned": 5,
+      "bytes_scanned": 1952084,
+      "rows_in_scanned_files": 25445,
+      "files_total": 516,
+      "bytes_total": 77710167,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0812,
+        "p95": 0.1496,
+        "p99": 0.1623,
+        "min": 0.0748,
+        "max": 0.1655,
+        "mean": 0.0966
+      },
+      "cold_s": 0.1112
+    },
+    "entity_lookup": {
+      "files_scanned": 5,
+      "bytes_scanned": 3671291,
+      "rows_in_scanned_files": 40445,
+      "files_total": 516,
+      "bytes_total": 77710167,
+      "latency_s": {
+        "n": 8,
+        "p50": 0.0759,
+        "p95": 0.0906,
+        "p99": 0.094,
+        "min": 0.0722,
+        "max": 0.0949,
+        "mean": 0.0781
+      },
+      "cold_s": 0.0934
+    }
+  },
+  "improvement": {
+    "orders_one_day": {
+      "files_scanned": "1 -> 1",
+      "bytes_scanned_reduction_pct": 97.3,
+      "p50_latency_change_pct": -13.9
+    },
+    "payments_week": {
+      "files_scanned": "1 -> 7",
+      "bytes_scanned_reduction_pct": 78.6,
+      "p50_latency_change_pct": 8.2
+    },
+    "all_topics_one_day": {
+      "files_scanned": "5 -> 5",
+      "bytes_scanned_reduction_pct": 97.7,
+      "p50_latency_change_pct": -27.2
+    },
+    "entity_lookup": {
+      "files_scanned": "1 -> 5",
+      "bytes_scanned_reduction_pct": 86.1,
+      "p50_latency_change_pct": -33.4
+    }
+  },
+  "partition_columns_before": [
+    "partition",
+    "spec_id",
+    "record_count",
+    "file_count",
+    "total_data_file_size_in_bytes",
+    "position_delete_record_count",
+    "position_delete_file_count",
+    "equality_delete_record_count",
+    "equality_delete_file_count",
+    "last_updated_at",
+    "last_updated_snapshot_id"
+  ]
+}

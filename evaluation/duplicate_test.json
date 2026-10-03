@@ -1,0 +1,61 @@
+{
+  "benchmark": "duplicate_test",
+  "context": {
+    "generated_at": "2026-10-03T09:11:01+00:00",
+    "git_sha": "cd7c5d4-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "scale": "1m",
+  "duplicate_probability": 0.1,
+  "original_events": 982469,
+  "deliveries": 1080620,
+  "duplicates_injected": 98151,
+  "duplicates_detected": 98151,
+  "accepted_unique": 982469,
+  "duplicates_leaked_silver": 0,
+  "duplicates_leaked_gold": 0,
+  "reconciliation_passed": true,
+  "unexplained": 0,
+  "financial_mismatches": 0,
+  "stream": {
+    "batches": 3,
+    "received": 1080620,
+    "elapsed_s": 69.22,
+    "events_per_s": 15612.4,
+    "accepted_new": 982469,
+    "rejected": 0,
+    "duplicates_detected": 98151,
+    "late_events": 982469,
+    "stage_seconds_total": {
+      "decode_validate": 21.714,
+      "bronze_append": 5.518,
+      "dlq_merge": 0.237,
+      "dedup_ledger_antijoin": 6.06,
+      "batch_stats": 3.949,
+      "entity_merges": 23.761,
+      "ledger_append": 3.565
+    },
+    "batch_durations_s": [
+      28.15,
+      23.587,
+      13.114
+    ]
+  },
+  "all_duplicates_detected": true
+}

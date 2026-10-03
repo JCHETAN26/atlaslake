@@ -1,0 +1,94 @@
+{
+  "benchmark": "schema_evolution",
+  "context": {
+    "generated_at": "2026-10-03T09:11:38+00:00",
+    "git_sha": "cd7c5d4-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "compatibility_level": "BACKWARD_TRANSITIVE",
+  "registered_versions": [
+    1,
+    2
+  ],
+  "v1_events_readable": true,
+  "v1_sales_channel_null": true,
+  "v2_events_readable": true,
+  "v2_sales_channel_present": true,
+  "events_by_schema_version": {
+    "1": 500,
+    "2": 600
+  },
+  "breaking_change": {
+    "compatible": false,
+    "messages": [
+      "{errorType:'MISSING_UNION_BRANCH', description:'The new schema is missing a type inside a union field at path '/fields/8/type/1' in the old schema', additionalInfo:'reader union lacking writer type: LONG'}",
+      "{oldSchemaVersion: 2}",
+      "{oldSchema: '{\"type\":\"record\",\"name\":\"OrderEvent\",\"namespace\":\"com.atlaslake.commerce\",\"doc\":\"Order lifecycle event (topic commerce.orders). v2 adds sales_channel.\",\"fields\":[{\"name\":\"event_id\",\"type\":\"string\",\"doc\":\"UUID, stable across redelivery\"},{\"name\":\"event_type\",\"type\":\"string\"},{\"name\":\"event_timestamp\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-micros\"},\"doc\":\"when the fact happened at the source (UTC)\"},{\"name\":\"producer\",\"type\":\"string\"},{\"name\":\"schema_version\",\"type\":\"int\"},{\"name\":\"order_id\",\"type\":\"string\"},{\"name\":\"customer_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"store_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"status\",\"type\":\"string\",\"doc\":\"CREATED|PAID|CANCELLED|SHIPPED|DELIVERED\"},{\"name\":\"amount_minor\",\"type\":[\"null\",\"long\"],\"doc\":\"order total in minor currency units\",\"default\":null},{\"name\":\"currency\",\"type\":[\"null\",\"string\"],\"doc\":\"ISO-4217\",\"default\":null},{\"name\":\"items\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"OrderItem\",\"fields\":[{\"name\":\"line_number\",\"type\":\"int\"},{\"name\":\"product_id\",\"type\":\"string\"},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"unit_price_minor\",\"type\":\"long\"}]}}],\"default\":null},{\"name\":\"cancel_reason\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"carrier\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"tracking_number\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"sales_channel\",\"type\":[\"null\",\"string\"],\"doc\":\"WEB|MOBILE|STORE (added in v2)\",\"default\":null}]}'}"
+    ],
+    "registered": false,
+    "rejected_safely": true
+  },
+  "consumers_healthy_after_rejection": true,
+  "drains": {
+    "mixed_versions": {
+      "batches": 1,
+      "received": 1000,
+      "elapsed_s": 4.31,
+      "events_per_s": 232.1,
+      "accepted_new": 1000,
+      "rejected": 0,
+      "duplicates_detected": 0,
+      "late_events": 1000,
+      "stage_seconds_total": {
+        "decode_validate": 0.656,
+        "bronze_append": 0.334,
+        "dlq_merge": 0.047,
+        "dedup_ledger_antijoin": 0.22,
+        "batch_stats": 0.351,
+        "entity_merges": 1.27,
+        "ledger_append": 0.156
+      },
+      "batch_durations_s": [
+        3.048
+      ]
+    },
+    "after_rejection": {
+      "batches": 1,
+      "received": 100,
+      "elapsed_s": 4.1,
+      "events_per_s": 24.4,
+      "accepted_new": 100,
+      "rejected": 0,
+      "duplicates_detected": 0,
+      "late_events": 100,
+      "stage_seconds_total": {
+        "decode_validate": 0.578,
+        "bronze_append": 0.311,
+        "dlq_merge": 0.053,
+        "dedup_ledger_antijoin": 0.241,
+        "batch_stats": 0.381,
+        "entity_merges": 1.26,
+        "ledger_append": 0.193
+      },
+      "batch_durations_s": [
+        3.032
+      ]
+    }
+  }
+}

@@ -69,6 +69,11 @@ def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = N
             "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
         )
         .config("spark.driver.memory", cfg.spark_driver_memory)
+        .config(
+            "spark.driver.extraJavaOptions",
+            # as_uri() percent-encodes the space in the repo path ("Extreme SSD")
+            f"-Dlog4j2.configurationFile={Path(__file__).with_name('log4j2.properties').as_uri()}",
+        )
         .config("spark.local.dir", str(local_dir))
         .config("spark.sql.session.timeZone", "UTC")
         .config("spark.sql.shuffle.partitions", os.environ.get("ATLAS_SHUFFLE_PARTITIONS", "16"))

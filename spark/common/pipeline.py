@@ -60,10 +60,24 @@ def content_key(df: DataFrame, cols: list[str], scope: str) -> str:
 
 
 def already_committed(spark: SparkSession, table: str, key: str, lookback: int = 50) -> bool:
+    """True iff a commit carrying ``key`` is still part of the table's *current* lineage.
+
+    Walk snapshots newest → oldest: finding the key means the write is present; hitting a destructive
+    commit made by someone else (a DELETE, or an overwrite without a batch key) first means any older
+    marker no longer proves anything — e.g. Silver was wiped and is being rebuilt by a backfill whose
+    event set happens to equal an earlier micro-batch. Compaction (``replace``) keeps data and is
+    walked through.
+    """
     rows = spark.sql(
-        f"SELECT summary['{BATCH_KEY_PROP}'] AS k FROM {fq(table)}.snapshots ORDER BY committed_at DESC LIMIT {lookback}"
+        f"SELECT summary['{BATCH_KEY_PROP}'] AS k, operation FROM {fq(table)}.snapshots "
+        f"ORDER BY committed_at DESC LIMIT {lookback}"
     ).collect()
-    return any(r["k"] == key for r in rows)
+    for r in rows:
+        if r["k"] == key:
+            return True
+        if r["k"] is None and r["operation"] in ("delete", "overwrite"):
+            return False
+    return False
 
 
 def append_once(spark: SparkSession, df: DataFrame, table: str, key: str, stats: BatchStats) -> bool:

@@ -1,8 +1,8 @@
 {
   "benchmark": "baseline_pipeline",
   "context": {
-    "generated_at": "2026-10-03T08:50:02+00:00",
-    "git_sha": "78ae964-dirty",
+    "generated_at": "2026-10-03T08:57:03+00:00",
+    "git_sha": "cd7c5d4",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -37,7 +37,7 @@
           "commerce.customers": 1847,
           "commerce.products": 2317
         },
-        "load_s": 5.98
+        "load_s": 4.94
       },
       "source_events": 106685,
       "source_rows": {
@@ -51,12 +51,12 @@
       },
       "rows_processed": 61740,
       "stage_runtime_s": {
-        "extract_s": 0.102,
-        "transform_s": 0.099,
-        "load_s": 0.386
+        "extract_s": 0.117,
+        "transform_s": 0.09,
+        "load_s": 0.388
       },
-      "total_runtime_s": 0.587,
-      "staleness_at_completion_s": 0.603,
+      "total_runtime_s": 0.595,
+      "staleness_at_completion_s": 0.613,
       "storage_bytes": {
         "csv": 4180503,
         "parquet": 1204901
@@ -72,12 +72,12 @@
         "mart_payment_metrics": 79,
         "mart_inventory_health": 17628
       },
-      "peak_rss_mb": 503.8,
+      "peak_rss_mb": 505.6,
       "query_latency": {
         "revenue_by_day_range": {
           "n": 10,
           "p50": 0.0002,
-          "p95": 0.0002,
+          "p95": 0.0003,
           "p99": 0.0003,
           "min": 0.0001,
           "max": 0.0003,
@@ -103,12 +103,12 @@
         },
         "single_day_orders": {
           "n": 10,
-          "p50": 0.0002,
-          "p95": 0.0003,
-          "p99": 0.0003,
+          "p50": 0.0003,
+          "p95": 0.0004,
+          "p99": 0.0004,
           "min": 0.0002,
-          "max": 0.0003,
-          "mean": 0.0002
+          "max": 0.0004,
+          "mean": 0.0003
         },
         "funnel_range": {
           "n": 10,
@@ -144,7 +144,7 @@
           "commerce.customers": 18682,
           "commerce.products": 2293
         },
-        "load_s": 56.66
+        "load_s": 42.02
       },
       "source_events": 982469,
       "source_rows": {
@@ -158,12 +158,12 @@
       },
       "rows_processed": 469717,
       "stage_runtime_s": {
-        "extract_s": 0.601,
-        "transform_s": 0.47,
-        "load_s": 2.219
+        "extract_s": 0.565,
+        "transform_s": 0.446,
+        "load_s": 2.11
       },
-      "total_runtime_s": 3.29,
-      "staleness_at_completion_s": 3.342,
+      "total_runtime_s": 3.121,
+      "staleness_at_completion_s": 3.172,
       "storage_bytes": {
         "csv": 34584378,
         "parquet": 10259739
@@ -179,43 +179,43 @@
         "mart_payment_metrics": 338,
         "mart_inventory_health": 50365
       },
-      "peak_rss_mb": 1141.8,
+      "peak_rss_mb": 1132.0,
       "query_latency": {
         "revenue_by_day_range": {
           "n": 10,
           "p50": 0.0002,
-          "p95": 0.0003,
-          "p99": 0.0003,
+          "p95": 0.0004,
+          "p99": 0.0004,
           "min": 0.0001,
-          "max": 0.0003,
+          "max": 0.0004,
           "mean": 0.0002
         },
         "top_products_range": {
           "n": 10,
-          "p50": 0.0121,
-          "p95": 0.0121,
-          "p99": 0.0122,
-          "min": 0.0119,
-          "max": 0.0122,
-          "mean": 0.012
+          "p50": 0.0123,
+          "p95": 0.0125,
+          "p99": 0.0125,
+          "min": 0.0122,
+          "max": 0.0125,
+          "mean": 0.0123
         },
         "customer_ltv_top100": {
           "n": 10,
-          "p50": 0.0189,
-          "p95": 0.0201,
-          "p99": 0.0202,
-          "min": 0.0176,
-          "max": 0.0202,
-          "mean": 0.0189
+          "p50": 0.018,
+          "p95": 0.0181,
+          "p99": 0.0181,
+          "min": 0.0178,
+          "max": 0.0181,
+          "mean": 0.018
         },
         "single_day_orders": {
           "n": 10,
           "p50": 0.0004,
-          "p95": 0.0006,
-          "p99": 0.0006,
+          "p95": 0.0005,
+          "p99": 0.0005,
           "min": 0.0004,
-          "max": 0.0006,
-          "mean": 0.0005
+          "max": 0.0005,
+          "mean": 0.0004
         },
         "funnel_range": {
           "n": 10,
@@ -228,11 +228,11 @@
         },
         "store_channel_mix": {
           "n": 10,
-          "p50": 0.0127,
-          "p95": 0.013,
-          "p99": 0.0131,
-          "min": 0.0127,
-          "max": 0.0131,
+          "p50": 0.0128,
+          "p95": 0.0135,
+          "p99": 0.0136,
+          "min": 0.0125,
+          "max": 0.0136,
           "mean": 0.0128
         }
       }

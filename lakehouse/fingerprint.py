@@ -83,7 +83,7 @@ def gold_fingerprint() -> dict[str, dict[str, Any]]:
     if not path.exists():
         return {}
     with duckdb.connect(str(path), read_only=True) as con:
-        return {t: _fp(con, f"gold.{t}") for t in GOLD_TABLES}
+        return {t: _fp(con, f"gold.gold.{t}") for t in GOLD_TABLES}
 
 
 def diff(a: dict[str, dict], b: dict[str, dict]) -> list[str]:

@@ -1,0 +1,69 @@
+{
+  "benchmark": "late_event_test",
+  "context": {
+    "generated_at": "2026-10-03T09:19:49+00:00",
+    "git_sha": "cd7c5d4-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "watermark": "10 minutes",
+  "window": "1 minute",
+  "allowed_lateness_s": 600,
+  "tiers": {
+    "on_time": {
+      "event_time_lag_s": 0,
+      "sent": 50,
+      "in_realtime_aggregate": 50,
+      "in_silver": 50,
+      "in_gold": 50,
+      "policy_expected_in_realtime": true,
+      "policy_ok": true
+    },
+    "late_5m": {
+      "event_time_lag_s": 300,
+      "sent": 50,
+      "in_realtime_aggregate": 50,
+      "in_silver": 50,
+      "in_gold": 50,
+      "policy_expected_in_realtime": true,
+      "policy_ok": true
+    },
+    "late_1h": {
+      "event_time_lag_s": 3600,
+      "sent": 50,
+      "in_realtime_aggregate": 0,
+      "in_silver": 50,
+      "in_gold": 50,
+      "policy_expected_in_realtime": false,
+      "policy_ok": true
+    },
+    "late_1d": {
+      "event_time_lag_s": 86400,
+      "sent": 50,
+      "in_realtime_aggregate": 0,
+      "in_silver": 50,
+      "in_gold": 50,
+      "policy_expected_in_realtime": false,
+      "policy_ok": true
+    }
+  },
+  "rows_dropped_by_watermark": 100,
+  "silver_late_events_counted": 100,
+  "all_policies_hold": true,
+  "policy": "\u2264 watermark: counted in real-time windows; beyond: excluded from real-time aggregate only \u2014 always accepted into Silver and Gold (exact)."
+}

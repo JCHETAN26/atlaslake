@@ -9,4 +9,4 @@ with gold as (
 )
 select coalesce(g.currency, s.currency) as currency, g.revenue as gold, s.revenue as silver
 from gold g full outer join silver s on g.currency = s.currency
-where coalesce(g.revenue, -1) <> coalesce(s.revenue, -1)
+where coalesce(g.revenue, 0) <> coalesce(s.revenue, 0)
