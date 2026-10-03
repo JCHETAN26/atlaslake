@@ -55,8 +55,14 @@ def prepare_source(scale: Scale, seed: int = SEED, days: float | None = None) ->
         totals = apply_stream(conn, sim.stream())
     with connect(autocommit=True) as conn:  # VACUUM cannot run inside a transaction block
         conn.execute("VACUUM ANALYZE")
-    return {"scale": scale.name, "orders": scale.orders, "days": days, "events": sum(totals.values()),
-            "by_topic": totals, "load_s": round(time.time() - t0, 2)}
+    return {
+        "scale": scale.name,
+        "orders": scale.orders,
+        "days": days,
+        "events": sum(totals.values()),
+        "by_topic": totals,
+        "load_s": round(time.time() - t0, 2),
+    }
 
 
 def reset_pipeline(spark=None) -> None:
@@ -79,11 +85,17 @@ def relay_all(**kw) -> dict[str, Any]:
     from ingestion.cdc.outbox_relay import run_relay
 
     r = run_relay(batch_size=50_000, metrics_port=None, **kw)
-    return {"events": r.events, "elapsed_s": r.elapsed_s, "events_per_s": r.events_per_s, "producer": r.producer}
+    return {
+        "events": r.events,
+        "elapsed_s": r.elapsed_s,
+        "events_per_s": r.events_per_s,
+        "producer": r.producer,
+    }
 
 
-def drain(spark, max_offsets: int = 500_000, parallel_writes: bool = True, query: str = "silver_ingest"
-          ) -> dict[str, Any]:
+def drain(
+    spark, max_offsets: int = 500_000, parallel_writes: bool = True, query: str = "silver_ingest"
+) -> dict[str, Any]:
     from spark.streaming.silver_stream import build_query
 
     t0 = time.time()
@@ -99,7 +111,9 @@ def drain(spark, max_offsets: int = 500_000, parallel_writes: bool = True, query
         for k, v in s.stage_s.items():
             stages[k] = round(stages.get(k, 0) + v, 3)
     return {
-        "batches": len(p.history), "received": received, "elapsed_s": round(elapsed, 2),
+        "batches": len(p.history),
+        "received": received,
+        "elapsed_s": round(elapsed, 2),
         "events_per_s": round(received / elapsed, 1) if elapsed else None,
         "accepted_new": sum(s.accepted_new for s in p.history),
         "rejected": sum(s.rejected for s in p.history),

@@ -55,22 +55,53 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
     import subprocess
     import sys
 
-    exporter = subprocess.Popen([sys.executable, "-m", "monitoring.exporter", "--port", "9110", "--interval", "15"],
-                                env=S._penv(), cwd=REPO_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
-                                start_new_session=True)
-    webhook = subprocess.Popen([sys.executable, "-m", "monitoring.exporter", "--webhook-port", "9111"],
-                               env=S._penv(), cwd=REPO_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
-                               start_new_session=True)
+    exporter = subprocess.Popen(
+        [sys.executable, "-m", "monitoring.exporter", "--port", "9110", "--interval", "15"],
+        env=S._penv(),
+        cwd=REPO_ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
+    webhook = subprocess.Popen(
+        [sys.executable, "-m", "monitoring.exporter", "--webhook-port", "9111"],
+        env=S._penv(),
+        cwd=REPO_ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
 
     # 1-3: sustained traffic with injected duplicates, late events and malformed records
-    stream = S._start(["stream", "--trigger-s", "2", "--max-offsets", "400000", "--metrics-port", "9108"], "chaos_stream_1")
+    stream = S._start(
+        ["stream", "--trigger-s", "2", "--max-offsets", "400000", "--metrics-port", "9108"], "chaos_stream_1"
+    )
     S._wait_stream_ready()
-    relay = S._start(["relay", "--follow", "--duplicate-p", "0.02", "--late-p", "0.01", "--late-delay-s", "20",
-                      "--invalid-p", "0.003", "--corrupt-p", "0.001", "--chaos-seed", "45"], "chaos_relay")
+    relay = S._start(
+        [
+            "relay",
+            "--follow",
+            "--duplicate-p",
+            "0.02",
+            "--late-p",
+            "0.01",
+            "--late-delay-s",
+            "20",
+            "--invalid-p",
+            "0.003",
+            "--corrupt-p",
+            "0.001",
+            "--chaos-seed",
+            "45",
+        ],
+        "chaos_relay",
+    )
     load_s = 4 * phase_s
     work = S._start(["workload", "--rate", str(rate), "--duration", str(load_s)], "chaos_workload")
     t_load = datetime.now(UTC).replace(tzinfo=None)
-    _timeline(tl, "traffic_started", orders_per_s=rate, faults="dup 2%, late 1% (+20s), invalid 0.3%, corrupt 0.1%")
+    _timeline(
+        tl, "traffic_started", orders_per_s=rate, faults="dup 2%, late 1% (+20s), invalid 0.3%, corrupt 0.1%"
+    )
     time.sleep(phase_s)
     lag_pre = S._checkpoint_lag()
 
@@ -87,7 +118,9 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
 
     # 5 + 7: restart and recover the backlog
     restart_at = time.time()
-    stream2 = S._start(["stream", "--trigger-s", "2", "--max-offsets", "400000", "--metrics-port", "9108"], "chaos_stream_2")
+    stream2 = S._start(
+        ["stream", "--trigger-s", "2", "--max-offsets", "400000", "--metrics-port", "9108"], "chaos_stream_2"
+    )
     _timeline(tl, "spark_restarted")
     recovered_at = None
     while time.time() - restart_at < 1800:
@@ -110,8 +143,16 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
         time.sleep(3)
     S._stop(relay)
     S._stop(stream2)
-    sustained = json.loads(open(settings().data_dir / "logs" / "chaos_workload.log").read().split("workload done: ")[-1]
-                           .splitlines()[0]) if (settings().data_dir / "logs" / "chaos_workload.log").exists() else {}
+    sustained = (
+        json.loads(
+            open(settings().data_dir / "logs" / "chaos_workload.log")
+            .read()
+            .split("workload done: ")[-1]
+            .splitlines()[0]
+        )
+        if (settings().data_dir / "logs" / "chaos_workload.log").exists()
+        else {}
+    )
     latency = S._latencies_since(spark, t_load)
     _timeline(tl, "traffic_stopped", workload=sustained)
 
@@ -121,26 +162,54 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
     fp0 = silver_fingerprint()
     from datetime import date
 
-    bf = run_backfill(["orders", "payments", "inventory"], date(2026, 1, 1), date(2026, 1, 31), rebuild_gold=False, spark=spark)
+    bf = run_backfill(
+        ["orders", "payments", "inventory"],
+        date(2026, 1, 1),
+        date(2026, 1, 31),
+        rebuild_gold=False,
+        spark=spark,
+    )
     fp_bf = bf.pop("silver_fingerprint")
-    _timeline(tl, "historical_backfill", records=bf["records_read"], accepted_new=bf["accepted_new"],
-              state_unchanged=fp_bf == fp0)
+    _timeline(
+        tl,
+        "historical_backfill",
+        records=bf["records_read"],
+        accepted_new=bf["accepted_new"],
+        state_unchanged=fp_bf == fp0,
+    )
 
     # 9: Iceberg compaction
-    comp = {t: compact_table(spark, t) for t in ("silver.events", "bronze.orders", "bronze.inventory",
-                                                 "silver.inventory_movements")}
-    comp_summary = {t: {"files_before": c["before"]["data_files"], "files_after": c["after"]["data_files"],
-                        "avg_kb_before": c["before"]["avg_file_bytes"] // 1024,
-                        "avg_kb_after": c["after"]["avg_file_bytes"] // 1024} for t, c in comp.items()}
+    comp = {
+        t: compact_table(spark, t)
+        for t in ("silver.events", "bronze.orders", "bronze.inventory", "silver.inventory_movements")
+    }
+    comp_summary = {
+        t: {
+            "files_before": c["before"]["data_files"],
+            "files_after": c["after"]["data_files"],
+            "avg_kb_before": c["before"]["avg_file_bytes"] // 1024,
+            "avg_kb_after": c["after"]["avg_file_bytes"] // 1024,
+        }
+        for t, c in comp.items()
+    }
     _timeline(tl, "compaction", tables=comp_summary)
 
     # DLQ: inspect + replay authoritative copies for semantically invalid/corrupt records
-    dlq_before = {r["error_codes"].split(",")[0]: r["n"] for r in spark.sql(
-        f"SELECT error_codes, count(*) AS n FROM {fq('ops.dlq')} WHERE status='PENDING' GROUP BY 1").collect()}
+    dlq_before = {
+        r["error_codes"].split(",")[0]: r["n"]
+        for r in spark.sql(
+            f"SELECT error_codes, count(*) AS n FROM {fq('ops.dlq')} WHERE status='PENDING' GROUP BY 1"
+        ).collect()
+    }
     rep = replay(recover_from_source=True, spark=spark)
     drain = E.drain(spark)
-    _timeline(tl, "dlq_replayed", pending_before=sum(dlq_before.values()), replayed=rep["replayed"],
-              accepted_after_replay=drain["accepted_new"])
+    _timeline(
+        tl,
+        "dlq_replayed",
+        pending_before=sum(dlq_before.values()),
+        replayed=rep["replayed"],
+        accepted_after_replay=drain["accepted_new"],
+    )
 
     # 10: dbt
     from ingestion.batch.postgres_snapshot import ingest_stores
@@ -160,8 +229,11 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
     delivered = rec["physical_deliveries"]
     report = {
         "parameters": {"orders_per_s": rate, "phase_s": phase_s, "history_scale": scale},
-        "history": {"events": hist["source"]["events"], "relay_events_per_s": hist["relay"]["events_per_s"],
-                    "stream_events_per_s": hist["stream"]["events_per_s"]},
+        "history": {
+            "events": hist["source"]["events"],
+            "relay_events_per_s": hist["relay"]["events_per_s"],
+            "stream_events_per_s": hist["stream"]["events_per_s"],
+        },
         "answers": {
             "did_we_lose_data": rec["summary"]["unexplained"] != 0,
             "records_unexplained": rec["summary"]["unexplained"],
@@ -171,10 +243,14 @@ def run(rate: int = 1400, phase_s: int = 60, scale: str = "1m") -> dict[str, Any
             "recovery_time_s": round(recovered_at - restart_at, 1) if recovered_at else None,
             "peak_backlog_records": peak_backlog,
             "did_late_events_resolve": rec["summary"]["unexplained"] == 0,
-            "did_dlq_work": {"quarantined_by_reason": dlq_before, "replayed": rep["replayed"],
-                             "unresolved": rep["unresolved"]},
+            "did_dlq_work": {
+                "quarantined_by_reason": dlq_before,
+                "replayed": rep["replayed"],
+                "unresolved": rep["unresolved"],
+            },
             "did_schema_protection_work": "see evaluation/schema_evolution.json (breaking change rejected)",
-            "did_source_and_gold_reconcile": rec["summary"]["passed"] and rec["summary"]["gold_vs_silver_mismatches"] == 0,
+            "did_source_and_gold_reconcile": rec["summary"]["passed"]
+            and rec["summary"]["gold_vs_silver_mismatches"] == 0,
             "compaction_effect": comp_summary,
             "incremental_vs_full": "see evaluation/full_vs_incremental.json",
             "sustained_throughput_events_per_s": sustained.get("events_per_s"),

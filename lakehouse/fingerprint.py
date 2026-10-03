@@ -15,16 +15,47 @@ import duckdb
 from lakehouse.duckdb_plugin import configure
 
 PROCESSING_COLUMNS = {
-    "silver_updated_at", "silver_loaded_at", "bronze_loaded_at", "dbt_loaded_at", "max_dbt_loaded_at",
-    "computed_at", "extracted_at", "processed_at", "dlq_timestamp", "resolved_at",
+    "silver_updated_at",
+    "silver_loaded_at",
+    "bronze_loaded_at",
+    "dbt_loaded_at",
+    "max_dbt_loaded_at",
+    "computed_at",
+    "extracted_at",
+    "processed_at",
+    "dlq_timestamp",
+    "resolved_at",
     # which physical delivery won the in-batch dedup race is not logical state:
-    "kafka_partition", "kafka_offset", "ingestion_timestamp", "source",
+    "kafka_partition",
+    "kafka_offset",
+    "ingestion_timestamp",
+    "source",
 }
 
-SILVER_TABLES = ["events", "orders", "order_items", "payments", "customers", "customer_changes", "products",
-                 "product_changes", "inventory", "inventory_movements"]
-GOLD_TABLES = ["dim_customer", "dim_product", "fact_orders", "fact_order_items", "fact_payments", "fact_inventory",
-               "mart_daily_sales", "mart_order_funnel", "mart_payment_metrics", "mart_inventory_health"]
+SILVER_TABLES = [
+    "events",
+    "orders",
+    "order_items",
+    "payments",
+    "customers",
+    "customer_changes",
+    "products",
+    "product_changes",
+    "inventory",
+    "inventory_movements",
+]
+GOLD_TABLES = [
+    "dim_customer",
+    "dim_product",
+    "fact_orders",
+    "fact_order_items",
+    "fact_payments",
+    "fact_inventory",
+    "mart_daily_sales",
+    "mart_order_funnel",
+    "mart_payment_metrics",
+    "mart_inventory_health",
+]
 
 
 def _fp(con: duckdb.DuckDBPyConnection, relation: str) -> dict[str, Any]:

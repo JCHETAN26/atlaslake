@@ -58,7 +58,8 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
     date_filter = f"AND cast(event_timestamp AS date) = DATE '{run_date}'" if run_date else ""
     has_gold = _has(con, "SELECT 1 FROM gold_db.gold.fact_orders LIMIT 1")
     bronze_union = " UNION ALL ".join(
-        f"SELECT topic, kafka_partition, kafka_offset FROM silver_bronze_{d}" for d in ev.DATASETS)
+        f"SELECT topic, kafka_partition, kafka_offset FROM silver_bronze_{d}" for d in ev.DATASETS
+    )
 
     from lakehouse.catalog import catalog
 
@@ -105,26 +106,36 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
         LEFT JOIN (SELECT DISTINCT event_id FROM rej) r USING (event_id)
         LEFT JOIN pending_proc p USING (event_id)""")
 
-    per_topic = _rows(con, """
+    per_topic = _rows(
+        con,
+        """
         SELECT topic, count(*) AS source_events,
                count(*) FILTER (WHERE outcome = 'accepted') AS accepted,
                count(*) FILTER (WHERE outcome = 'rejected') AS rejected,
                count(*) FILTER (WHERE outcome = 'in_flight') AS in_flight,
                count(*) FILTER (WHERE outcome = 'pending_processing') AS pending_processing,
                count(*) FILTER (WHERE outcome = 'unexplained') AS unexplained
-        FROM classified GROUP BY topic ORDER BY topic""")
-    per_date = _rows(con, """
+        FROM classified GROUP BY topic ORDER BY topic""",
+    )
+    per_date = _rows(
+        con,
+        """
         SELECT d AS event_date, count(*) AS source_events,
                count(*) FILTER (WHERE outcome = 'accepted') AS accepted,
                count(*) FILTER (WHERE outcome = 'rejected') AS rejected,
                count(*) FILTER (WHERE outcome NOT IN ('accepted', 'rejected')) AS not_yet_accepted,
                count(*) FILTER (WHERE outcome = 'unexplained') AS unexplained
-        FROM classified GROUP BY d ORDER BY d""")
+        FROM classified GROUP BY d ORDER BY d""",
+    )
     unknown_origin = con.execute("SELECT count(*) FROM acc ANTI JOIN src USING (event_id)").fetchone()[0]
-    unexplained_examples = _rows(con, "SELECT event_id, topic, d FROM classified WHERE outcome='unexplained' LIMIT 10")
+    unexplained_examples = _rows(
+        con, "SELECT event_id, topic, d FROM classified WHERE outcome='unexplained' LIMIT 10"
+    )
 
     # ---------------------------------------------------------------- physical deliveries
-    physical = _rows(con, """
+    physical = _rows(
+        con,
+        """
         SELECT b.topic, b.bronze_rows, coalesce(l.deliveries, 0) AS deliveries_logged,
                coalesce(l.duplicates_injected, 0) AS duplicates_injected,
                coalesce(l.corrupt_injected, 0) AS corrupt_injected,
@@ -135,21 +146,31 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
                           count(*) FILTER (WHERE fault LIKE 'corrupt%') AS corrupt_injected,
                           count(*) FILTER (WHERE fault LIKE 'invalid%') AS invalid_injected
                    FROM dl GROUP BY 1) l USING (topic)
-        ORDER BY 1""")
+        ORDER BY 1""",
+    )
 
     # ---------------------------------------------------------------- logical duplicates
     dupes = {
-        "silver.events": con.execute("SELECT count(*) - count(DISTINCT event_id) FROM silver.events").fetchone()[0],
-        "silver.orders": con.execute("SELECT count(*) - count(DISTINCT order_id) FROM silver.orders").fetchone()[0],
-        "silver.payments": con.execute("SELECT count(*) - count(DISTINCT payment_id) FROM silver.payments").fetchone()[0],
+        "silver.events": con.execute(
+            "SELECT count(*) - count(DISTINCT event_id) FROM silver.events"
+        ).fetchone()[0],
+        "silver.orders": con.execute(
+            "SELECT count(*) - count(DISTINCT order_id) FROM silver.orders"
+        ).fetchone()[0],
+        "silver.payments": con.execute(
+            "SELECT count(*) - count(DISTINCT payment_id) FROM silver.payments"
+        ).fetchone()[0],
         "silver.order_items": con.execute(
-            "SELECT count(*) - count(DISTINCT (order_id, line_number)) FROM silver.order_items").fetchone()[0],
+            "SELECT count(*) - count(DISTINCT (order_id, line_number)) FROM silver.order_items"
+        ).fetchone()[0],
     }
     if has_gold:
         dupes["gold.fact_orders"] = con.execute(
-            "SELECT count(*) - count(DISTINCT order_id) FROM gold_db.gold.fact_orders").fetchone()[0]
+            "SELECT count(*) - count(DISTINCT order_id) FROM gold_db.gold.fact_orders"
+        ).fetchone()[0]
         dupes["gold.fact_order_items"] = con.execute(
-            "SELECT count(*) - count(DISTINCT (order_id, line_number)) FROM gold_db.gold.fact_order_items").fetchone()[0]
+            "SELECT count(*) - count(DISTINCT (order_id, line_number)) FROM gold_db.gold.fact_order_items"
+        ).fetchone()[0]
 
     # ---------------------------------------------------------------- financials (orders)
     con.execute("""
@@ -158,7 +179,9 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
         WHERE outcome <> 'accepted' AND topic IN ('commerce.orders', 'commerce.payments')""")
     order_date_filter = f"AND cast(created_at AS date) = DATE '{run_date}'" if run_date else ""
     silver_date_filter = f"AND cast(order_timestamp AS date) = DATE '{run_date}'" if run_date else ""
-    fin = _rows(con, f"""
+    fin = _rows(
+        con,
+        f"""
         WITH s AS (
             SELECT currency::varchar AS currency, count(*) AS orders, sum(amount_minor) AS revenue_minor
             FROM pg.commerce.orders
@@ -174,13 +197,16 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
         SELECT coalesce(s.currency, sv.currency) AS currency,
                s.orders AS source_orders, sv.orders AS silver_orders,
                s.revenue_minor AS source_revenue_minor, sv.revenue_minor AS silver_revenue_minor
-        FROM s FULL OUTER JOIN sv ON s.currency = sv.currency ORDER BY 1""")
+        FROM s FULL OUTER JOIN sv ON s.currency = sv.currency ORDER BY 1""",
+    )
     excluded_orders = con.execute("SELECT count(*) FROM affected_orders").fetchone()[0]
     incomplete = con.execute("SELECT count(*) FROM silver.orders WHERE order_timestamp IS NULL").fetchone()[0]
     gold_vs_silver: list[dict[str, Any]] = []
     if has_gold:
         gold_date = f"WHERE order_date = DATE '{run_date}'" if run_date else ""
-        gold_vs_silver = _rows(con, f"""
+        gold_vs_silver = _rows(
+            con,
+            f"""
             WITH g AS (SELECT currency, sum(orders_paid) AS orders, sum(gross_revenue_minor) AS revenue_minor
                        FROM gold_db.gold.mart_daily_sales {gold_date} GROUP BY 1),
                  sv AS (SELECT currency, count(*) AS orders, sum(amount_minor) AS revenue_minor
@@ -189,19 +215,38 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
                         {silver_date_filter} GROUP BY 1)
             SELECT coalesce(g.currency, sv.currency) AS currency, sv.orders AS silver_orders, g.orders AS gold_orders,
                    sv.revenue_minor AS silver_revenue_minor, g.revenue_minor AS gold_revenue_minor
-            FROM g FULL OUTER JOIN sv ON g.currency = sv.currency ORDER BY 1""")
+            FROM g FULL OUTER JOIN sv ON g.currency = sv.currency ORDER BY 1""",
+        )
 
-    fin_mismatch = [r for r in fin if (r["source_orders"], r["source_revenue_minor"]) != (r["silver_orders"], r["silver_revenue_minor"])]
-    gold_mismatch = [r for r in gold_vs_silver if (r["silver_orders"], r["silver_revenue_minor"]) != (r["gold_orders"], r["gold_revenue_minor"])]
+    fin_mismatch = [
+        r
+        for r in fin
+        if (r["source_orders"], r["source_revenue_minor"]) != (r["silver_orders"], r["silver_revenue_minor"])
+    ]
+    gold_mismatch = [
+        r
+        for r in gold_vs_silver
+        if (r["silver_orders"], r["silver_revenue_minor"]) != (r["gold_orders"], r["gold_revenue_minor"])
+    ]
     unexplained = sum(r["unexplained"] for r in per_topic)
-    totals = {k: sum(r[k] for r in per_topic) for k in
-              ("source_events", "accepted", "rejected", "in_flight", "pending_processing", "unexplained")}
+    totals = {
+        k: sum(r[k] for r in per_topic)
+        for k in ("source_events", "accepted", "rejected", "in_flight", "pending_processing", "unexplained")
+    }
     logical_dupes = sum(int(v) for v in dupes.values())
-    passed = (unexplained == 0 and unknown_origin == 0 and logical_dupes == 0 and not fin_mismatch
-              and not gold_mismatch)
+    passed = (
+        unexplained == 0
+        and unknown_origin == 0
+        and logical_dupes == 0
+        and not fin_mismatch
+        and not gold_mismatch
+    )
     report = {
-        "scope": {"event_date": str(run_date) if run_date else "all", "gold_checked": has_gold,
-                  "relay_checkpoint_seq": last_seq},
+        "scope": {
+            "event_date": str(run_date) if run_date else "all",
+            "gold_checked": has_gold,
+            "relay_checkpoint_seq": last_seq,
+        },
         "summary": {
             "passed": passed,
             **totals,
@@ -230,9 +275,15 @@ def run_reconciliation(run_date: date | None = None, write: bool = True) -> dict
         try:
             from monitoring.metrics import push_job_metrics
 
-            push_job_metrics("reconcile", {"reconciliation_passed": 1 if passed else 0,
-                                           "reconciliation_unexplained": unexplained + unknown_origin,
-                                           "runtime_seconds": report["summary"]["runtime_s"]}, success=True)
+            push_job_metrics(
+                "reconcile",
+                {
+                    "reconciliation_passed": 1 if passed else 0,
+                    "reconciliation_unexplained": unexplained + unknown_origin,
+                    "runtime_seconds": report["summary"]["runtime_s"],
+                },
+                success=True,
+            )
         except Exception:
             pass
     con.close()

@@ -76,30 +76,68 @@ ENVELOPE_FIELDS: Final = ("event_id", "event_type", "event_timestamp", "producer
 # Payload fields per topic, in Avro field order (latest schema version).
 PAYLOAD_FIELDS: Final[dict[str, tuple[str, ...]]] = {
     TOPIC_ORDERS: (
-        "order_id", "customer_id", "store_id", "status", "amount_minor", "currency", "items",
-        "cancel_reason", "carrier", "tracking_number", "sales_channel",
+        "order_id",
+        "customer_id",
+        "store_id",
+        "status",
+        "amount_minor",
+        "currency",
+        "items",
+        "cancel_reason",
+        "carrier",
+        "tracking_number",
+        "sales_channel",
     ),
     TOPIC_PAYMENTS: (
-        "payment_id", "order_id", "attempt", "status", "amount_minor", "currency", "method",
+        "payment_id",
+        "order_id",
+        "attempt",
+        "status",
+        "amount_minor",
+        "currency",
+        "method",
         "failure_reason",
     ),
     TOPIC_INVENTORY: (
-        "inventory_key", "store_id", "product_id", "reason", "on_hand_delta", "reserved_delta", "order_id",
+        "inventory_key",
+        "store_id",
+        "product_id",
+        "reason",
+        "on_hand_delta",
+        "reserved_delta",
+        "order_id",
     ),
     TOPIC_CUSTOMERS: (
-        "customer_id", "email", "phone", "first_name", "last_name", "city", "state", "country",
-        "segment", "signup_timestamp",
+        "customer_id",
+        "email",
+        "phone",
+        "first_name",
+        "last_name",
+        "city",
+        "state",
+        "country",
+        "segment",
+        "signup_timestamp",
     ),
     TOPIC_PRODUCTS: ("product_id", "sku", "name", "category", "unit_price_minor", "currency", "active"),
 }
 
 # Fields that only exist from a given schema version on (schema evolution, Phase 16).
 VERSIONED_FIELDS: Final[dict[str, dict[str, int]]] = {TOPIC_ORDERS: {"sales_channel": 2}}
-LATEST_SCHEMA_VERSION: Final = {TOPIC_ORDERS: 2, TOPIC_PAYMENTS: 1, TOPIC_INVENTORY: 1,
-                                 TOPIC_CUSTOMERS: 1, TOPIC_PRODUCTS: 1}
+LATEST_SCHEMA_VERSION: Final = {
+    TOPIC_ORDERS: 2,
+    TOPIC_PAYMENTS: 1,
+    TOPIC_INVENTORY: 1,
+    TOPIC_CUSTOMERS: 1,
+    TOPIC_PRODUCTS: 1,
+}
 
-PII_FIELDS: Final = {"email": "restricted", "phone": "restricted", "first_name": "confidential",
-                     "last_name": "confidential"}
+PII_FIELDS: Final = {
+    "email": "restricted",
+    "phone": "restricted",
+    "first_name": "confidential",
+    "last_name": "confidential",
+}
 
 # FX used by the simulator to price non-GBP stores (reference prices are GBP).
 FX_FROM_GBP: Final = {"GBP": 1.0, "EUR": 1.17, "USD": 1.27}

@@ -104,13 +104,15 @@ def build_query(
     cfg = settings()
     create_all(spark)
     processor = SilverProcessor(spark, query=query, write_bronze=True)
-    kafka = (spark.readStream.format("kafka")
-             .option("kafka.bootstrap.servers", cfg.kafka.bootstrap)
-             .option("subscribe", ",".join(topics))
-             .option("startingOffsets", starting_offsets)
-             .option("maxOffsetsPerTrigger", str(max_offsets))
-             .option("failOnDataLoss", "true")
-             .load())
+    kafka = (
+        spark.readStream.format("kafka")
+        .option("kafka.bootstrap.servers", cfg.kafka.bootstrap)
+        .option("subscribe", ",".join(topics))
+        .option("startingOffsets", starting_offsets)
+        .option("maxOffsetsPerTrigger", str(max_offsets))
+        .option("failOnDataLoss", "true")
+        .load()
+    )
     raw = standardize_kafka(kafka)
 
     def handle(batch_df, batch_id: int) -> None:
@@ -126,10 +128,16 @@ def build_query(
                 m.processing_lag.labels(query).set(max(0.0, time.time() - max_ing.timestamp()))
         log.info("batch %s: %s", batch_id, {k: v for k, v in stats.as_dict().items() if k != "by_topic"})
 
-    writer = (raw.writeStream.queryName(query)
-              .foreachBatch(handle)
-              .option("checkpointLocation", str(checkpoint_path(query))))
-    writer = writer.trigger(availableNow=True) if available_now else writer.trigger(processingTime=f"{trigger_s} seconds")
+    writer = (
+        raw.writeStream.queryName(query)
+        .foreachBatch(handle)
+        .option("checkpointLocation", str(checkpoint_path(query)))
+    )
+    writer = (
+        writer.trigger(availableNow=True)
+        if available_now
+        else writer.trigger(processingTime=f"{trigger_s} seconds")
+    )
     return writer.start(), processor
 
 
@@ -150,7 +158,9 @@ def run(
             serve(metrics_port)
         except OSError:
             log.warning("metrics port %s busy; not serving", metrics_port)
-    q, processor = build_query(spark, trigger_s=trigger_s, max_offsets=max_offsets, available_now=available_now)
+    q, processor = build_query(
+        spark, trigger_s=trigger_s, max_offsets=max_offsets, available_now=available_now
+    )
     q.awaitTermination(int(timeout_s) if timeout_s else None)
     if q.isActive:
         q.stop()

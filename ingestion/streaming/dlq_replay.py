@@ -47,23 +47,34 @@ def load_corrections(path: str | None) -> dict[str, dict]:
     return out
 
 
-def _source_event(conn, event_id: str | None, topic: str, partition: int | None, offset: int | None
-                  ) -> dict[str, Any] | None:
+def _source_event(
+    conn, event_id: str | None, topic: str, partition: int | None, offset: int | None
+) -> dict[str, Any] | None:
     if not event_id and partition is not None and offset is not None:
-        row = conn.execute("SELECT event_id::text FROM ops.delivery_log WHERE topic=%s AND kafka_partition=%s "
-                           "AND kafka_offset=%s", (topic, partition, offset)).fetchone()
+        row = conn.execute(
+            "SELECT event_id::text FROM ops.delivery_log WHERE topic=%s AND kafka_partition=%s "
+            "AND kafka_offset=%s",
+            (topic, partition, offset),
+        ).fetchone()
         event_id = row[0] if row else None
     if not event_id:
         return None
     row = conn.execute(
         """SELECT seq, event_id::text, event_type, topic, partition_key,
                   (extract(epoch from event_timestamp) * 1000000)::bigint, payload
-           FROM commerce.outbox WHERE event_id = %s::uuid""", (event_id,)).fetchone()
+           FROM commerce.outbox WHERE event_id = %s::uuid""",
+        (event_id,),
+    ).fetchone()
     return row_to_event(row)[1] if row else None
 
 
-def replay(topic: str | None = None, corrections_path: str | None = None, recover_from_source: bool = True,
-           dry_run: bool = False, spark=None) -> dict[str, Any]:
+def replay(
+    topic: str | None = None,
+    corrections_path: str | None = None,
+    recover_from_source: bool = True,
+    dry_run: bool = False,
+    spark=None,
+) -> dict[str, Any]:
     from pyspark.sql import functions as F
 
     from spark.common.session import get_spark
@@ -86,8 +97,11 @@ def replay(topic: str | None = None, corrections_path: str | None = None, recove
             decoded: dict[str, Any] | None = None
             try:
                 sid = schema_id_of(bytes(r["payload"]) if r["payload"] is not None else None)
-                decoded = deserialize(bytes(r["payload"]), registry.schema_by_id(sid),
-                                      schemas.parsed(t, schemas.latest_version(t)))
+                decoded = deserialize(
+                    bytes(r["payload"]),
+                    registry.schema_by_id(sid),
+                    schemas.parsed(t, schemas.latest_version(t)),
+                )
             except (DecodeError, Exception) as exc:  # undecodable bytes
                 log.debug("dlq %s undecodable: %s", r["dlq_id"], exc)
             event_id = (decoded or {}).get("event_id") or r["event_id"]
@@ -100,7 +114,9 @@ def replay(topic: str | None = None, corrections_path: str | None = None, recove
             if corr and decoded is not None:
                 changes = corr.get("set", {})
                 if any(k in changes for k in IMMUTABLE):
-                    results["unresolved"].append((r["dlq_id"], "correction may not change event_id/event_timestamp"))
+                    results["unresolved"].append(
+                        (r["dlq_id"], "correction may not change event_id/event_timestamp")
+                    )
                     continue
                 fixed = {**decoded, **changes}
                 note = f"corrected fields {sorted(changes)}"
@@ -122,14 +138,20 @@ def replay(topic: str | None = None, corrections_path: str | None = None, recove
             producer.flush()
 
     if not dry_run:
-        updates = ([(i, "REPLAYED", n) for i, n in results["replayed"]]
-                   + [(i, "DISCARDED", n) for i, n in results["discarded"]])
+        updates = [(i, "REPLAYED", n) for i, n in results["replayed"]] + [
+            (i, "DISCARDED", n) for i, n in results["discarded"]
+        ]
         if updates:
             df = spark.createDataFrame(updates, "dlq_id string, new_status string, note string")
             df.createOrReplaceTempView("dlq_updates")
-            spark.sql(f"""MERGE INTO {fq('ops.dlq')} t USING dlq_updates s ON t.dlq_id = s.dlq_id
+            spark.sql(f"""MERGE INTO {fq("ops.dlq")} t USING dlq_updates s ON t.dlq_id = s.dlq_id
                           WHEN MATCHED AND t.status = 'PENDING' THEN UPDATE SET
                             status = s.new_status, resolution_note = s.note, resolved_at = current_timestamp()""")
-    return {"pending_examined": len(rows), "replayed": len(results["replayed"]),
-            "discarded": len(results["discarded"]), "unresolved": len(results["unresolved"]),
-            "unresolved_examples": results["unresolved"][:10], "dry_run": dry_run}
+    return {
+        "pending_examined": len(rows),
+        "replayed": len(results["replayed"]),
+        "discarded": len(results["discarded"]),
+        "unresolved": len(results["unresolved"]),
+        "unresolved_examples": results["unresolved"][:10],
+        "dry_run": dry_run,
+    }

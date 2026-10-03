@@ -25,8 +25,11 @@ def ensure_topics(partitions: int | None = None, topics: tuple[str, ...] = ev.TO
     client = admin()
     existing = set(client.list_topics(timeout=10).topics)
     n = partitions or settings().kafka.partitions
-    new = [NewTopic(t, num_partitions=n, replication_factor=1, config=TOPIC_CONFIG) for t in topics
-           if t not in existing]
+    new = [
+        NewTopic(t, num_partitions=n, replication_factor=1, config=TOPIC_CONFIG)
+        for t in topics
+        if t not in existing
+    ]
     if new:
         for _, fut in client.create_topics(new).items():
             fut.result()
@@ -45,8 +48,13 @@ def delete_topics(topics: tuple[str, ...] = ev.TOPICS) -> None:
 def end_offsets(topic: str) -> dict[int, int]:
     from confluent_kafka import Consumer, TopicPartition
 
-    c = Consumer({"bootstrap.servers": settings().kafka.bootstrap, "group.id": "atlas-offset-probe",
-                  "enable.auto.commit": False})
+    c = Consumer(
+        {
+            "bootstrap.servers": settings().kafka.bootstrap,
+            "group.id": "atlas-offset-probe",
+            "enable.auto.commit": False,
+        }
+    )
     try:
         md = c.list_topics(topic, timeout=10).topics[topic]
         out = {}
@@ -62,7 +70,9 @@ def consumer_group_lag(group: str, topic: str) -> dict[int, int]:
     """Lag per partition = log end offset − committed offset (committed=-1 ⇒ full end offset)."""
     from confluent_kafka import Consumer, TopicPartition
 
-    c = Consumer({"bootstrap.servers": settings().kafka.bootstrap, "group.id": group, "enable.auto.commit": False})
+    c = Consumer(
+        {"bootstrap.servers": settings().kafka.bootstrap, "group.id": group, "enable.auto.commit": False}
+    )
     try:
         ends = end_offsets(topic)
         committed = c.committed([TopicPartition(topic, p) for p in ends], timeout=10)

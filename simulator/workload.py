@@ -28,8 +28,9 @@ log = logging.getLogger(__name__)
 
 
 def _base_config(conn) -> SimulationConfig:
-    row = conn.execute("SELECT config FROM ops.simulator_runs WHERE mode = 'historical' "
-                       "ORDER BY started_at DESC LIMIT 1").fetchone()
+    row = conn.execute(
+        "SELECT config FROM ops.simulator_runs WHERE mode = 'historical' ORDER BY started_at DESC LIMIT 1"
+    ).fetchone()
     if not row:
         return SimulationConfig(orders=1_000, customers=5_000)
     cfg = dict(row[0])
@@ -38,42 +39,79 @@ def _base_config(conn) -> SimulationConfig:
     return SimulationConfig(**cfg)
 
 
-def _customer_moves(conn, rng: np.random.Generator, n: int, now_us: int, sim: CommerceSimulator,
-                    tick: int) -> pd.DataFrame:
+def _customer_moves(
+    conn, rng: np.random.Generator, n: int, now_us: int, sim: CommerceSimulator, tick: int
+) -> pd.DataFrame:
     if n <= 0:
         return pd.DataFrame()
     rows = conn.execute(
         "SELECT customer_id, email, phone, first_name, last_name, city, state, country, segment, "
         "(extract(epoch from created_at) * 1000000)::bigint FROM commerce.customers "
-        "ORDER BY random() LIMIT %s", (n,)).fetchall()
+        "ORDER BY random() LIMIT %s",
+        (n,),
+    ).fetchall()
     from simulator.generator import COUNTRY_CITIES
 
     out = []
     for i, r in enumerate(rows):
         options = [c for c in COUNTRY_CITIES.get(r[7], COUNTRY_CITIES["United States"]) if c[0] != r[5]]
         city, state = options[int(rng.integers(len(options)))]
-        out.append({"event_type": "CUSTOMER_UPDATED", "event_timestamp": now_us + i, "customer_id": r[0],
-                    "email": r[1], "phone": r[2], "first_name": r[3], "last_name": r[4], "city": city,
-                    "state": state, "country": r[7], "segment": r[8], "signup_timestamp": int(r[9])})
+        out.append(
+            {
+                "event_type": "CUSTOMER_UPDATED",
+                "event_timestamp": now_us + i,
+                "customer_id": r[0],
+                "email": r[1],
+                "phone": r[2],
+                "first_name": r[3],
+                "last_name": r[4],
+                "city": city,
+                "state": state,
+                "country": r[7],
+                "segment": r[8],
+                "signup_timestamp": int(r[9]),
+            }
+        )
     df = pd.DataFrame(out)
-    df.insert(0, "event_id", sim.ids.many([f"live-move:{c}:{t}:{tick}" for c, t in
-                                           zip(df["customer_id"], df["event_timestamp"], strict=True)]))
+    df.insert(
+        0,
+        "event_id",
+        sim.ids.many(
+            [
+                f"live-move:{c}:{t}:{tick}"
+                for c, t in zip(df["customer_id"], df["event_timestamp"], strict=True)
+            ]
+        ),
+    )
     return df
 
 
-def run_workload(rate: float = 50.0, duration_s: float | None = 60.0, seed: int = 7,
-                 time_scale: float = 1 / 720, tick_s: float = 1.0, move_rate: float = 0.01) -> dict:
+def run_workload(
+    rate: float = 50.0,
+    duration_s: float | None = 60.0,
+    seed: int = 7,
+    time_scale: float = 1 / 720,
+    tick_s: float = 1.0,
+    move_rate: float = 0.01,
+) -> dict:
     """Run the live workload. ``rate`` = orders/second (~14 events per order over its lifecycle)."""
     conn = connect()
     base = _base_config(conn)
     cfg = replace(base, seed=seed, lifecycle_time_scale=time_scale, truncate_at_end=False)
     sim = CommerceSimulator(cfg)
     load_stores(conn, sim.world.stores)
-    next_index = int(conn.execute(
-        "SELECT coalesce(max(substr(order_id, 2)::bigint), -1) + 1 FROM commerce.orders "
-        "WHERE order_id ~ '^o[0-9]+$'").fetchone()[0])
-    avail = {f"{s}:{p}": int(oh - rs) for s, p, oh, rs in conn.execute(
-        "SELECT store_id, product_id, quantity_on_hand, quantity_reserved FROM commerce.inventory").fetchall()}
+    next_index = int(
+        conn.execute(
+            "SELECT coalesce(max(substr(order_id, 2)::bigint), -1) + 1 FROM commerce.orders "
+            "WHERE order_id ~ '^o[0-9]+$'"
+        ).fetchone()[0]
+    )
+    avail = {
+        f"{s}:{p}": int(oh - rs)
+        for s, p, oh, rs in conn.execute(
+            "SELECT store_id, product_id, quantity_on_hand, quantity_reserved FROM commerce.inventory"
+        ).fetchall()
+    }
     tracker = InventoryTracker(sim.ids, available=avail)
     run_id = f"live-{seed}-{int(time.time())}"
     record_run(conn, run_id, "live", {**cfg.to_json(), "rate": rate, "tick_s": tick_s})
@@ -94,7 +132,9 @@ def run_workload(rate: float = 50.0, duration_s: float | None = 60.0, seed: int 
                     pending[topic].append(df)
                 next_index += n
                 orders_created += n
-            moves = _customer_moves(conn, rng, int(rng.poisson(rate * tick_s * move_rate)), now_us, sim, ticks)
+            moves = _customer_moves(
+                conn, rng, int(rng.poisson(rate * tick_s * move_rate)), now_us, sim, ticks
+            )
             if not moves.empty:
                 pending[ev.TOPIC_CUSTOMERS].append(moves)
             horizon = now_us + int(tick_s * MICROS)
@@ -119,15 +159,24 @@ def run_workload(rate: float = 50.0, duration_s: float | None = 60.0, seed: int 
             if sleep > 0:
                 time.sleep(sleep)
             elif ticks % 10 == 0:
-                log.warning("workload falling behind: tick took %.2fs (> %.2fs)", time.time() - tick_start, tick_s)
+                log.warning(
+                    "workload falling behind: tick took %.2fs (> %.2fs)", time.time() - tick_start, tick_s
+                )
     except KeyboardInterrupt:
         log.info("workload interrupted")
     elapsed = time.time() - started
     events = sum(totals.values())
-    stats = {"run_id": run_id, "orders_created": orders_created, "events": events, "by_topic": totals,
-             "elapsed_s": round(elapsed, 2), "events_per_s": round(events / elapsed, 1),
-             "ticks": ticks, "commit_p95_s": round(float(np.percentile(commit_latency, 95)), 3) if commit_latency else None,
-             "pending_future_events": sum(len(x) for v in pending.values() for x in v)}
+    stats = {
+        "run_id": run_id,
+        "orders_created": orders_created,
+        "events": events,
+        "by_topic": totals,
+        "elapsed_s": round(elapsed, 2),
+        "events_per_s": round(events / elapsed, 1),
+        "ticks": ticks,
+        "commit_p95_s": round(float(np.percentile(commit_latency, 95)), 3) if commit_latency else None,
+        "pending_future_events": sum(len(x) for v in pending.values() for x in v),
+    }
     record_run(conn, run_id, "live", {**cfg.to_json(), "rate": rate}, stats, finished=True)
     conn.close()
     log.info("workload done: %s", json.dumps(stats))

@@ -18,8 +18,9 @@ def catalog() -> SqlCatalog:
         props.update({"s3.endpoint": cfg.s3.endpoint, "s3.path-style-access": "true"})
     if cfg.s3.access_key:  # empty in AWS => default credential chain
         props.update({"s3.access-key-id": cfg.s3.access_key, "s3.secret-access-key": cfg.s3.secret_key})
-    return SqlCatalog(cfg.catalog_name, uri=cfg.pg.sqlalchemy_url(cfg.pg.catalog_db),
-                      warehouse=cfg.s3.warehouse, **props)
+    return SqlCatalog(
+        cfg.catalog_name, uri=cfg.pg.sqlalchemy_url(cfg.pg.catalog_db), warehouse=cfg.s3.warehouse, **props
+    )
 
 
 def load_table(name: str) -> Table:
@@ -34,7 +35,9 @@ def metadata_location(name: str) -> str:
 def scan_stats(name: str, row_filter=None) -> dict:
     """Files/bytes an engine would read for a filter, from Iceberg planning (partition + stats pruning)."""
     tbl = load_table(name)
-    tasks = list(tbl.scan(row_filter=row_filter).plan_files() if row_filter is not None else tbl.scan().plan_files())
+    tasks = list(
+        tbl.scan(row_filter=row_filter).plan_files() if row_filter is not None else tbl.scan().plan_files()
+    )
     total = list(tbl.scan().plan_files())
     return {
         "files_scanned": len(tasks),

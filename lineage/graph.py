@@ -21,8 +21,10 @@ def _local_edges() -> dict[tuple[str, str], list[tuple[str, tuple[str, str]]]]:
         jobs.update({f"dbt.{m}": v for m, v in ol.dbt_model_edges(manifest()).items()})
     except Exception:
         pass
-    jobs["publish"] = ([(ol.DS_GOLD, f"gold.{t}") for t in ol.GOLD_PUBLISHED],
-                       [(ol.DS_SNOWFLAKE, f"ATLASLAKE.GOLD.{t}") for t in ol.GOLD_PUBLISHED])
+    jobs["publish"] = (
+        [(ol.DS_GOLD, f"gold.{t}") for t in ol.GOLD_PUBLISHED],
+        [(ol.DS_SNOWFLAKE, f"ATLASLAKE.GOLD.{t}") for t in ol.GOLD_PUBLISHED],
+    )
     for job, (ins, outs) in jobs.items():
         for o in outs:
             edges.setdefault(o, []).extend((job, i) for i in ins)
@@ -50,7 +52,14 @@ def upstream(table: str, depth: int = 10) -> dict[str, Any]:
         if d >= depth:
             continue
         for job, up in edges.get(node, []):
-            out.append({"dataset": f"{node[0]}/{node[1]}", "via_job": job, "upstream": f"{up[0]}/{up[1]}", "depth": d + 1})
+            out.append(
+                {
+                    "dataset": f"{node[0]}/{node[1]}",
+                    "via_job": job,
+                    "upstream": f"{up[0]}/{up[1]}",
+                    "depth": d + 1,
+                }
+            )
             if up not in seen:
                 seen.add(up)
                 q.append((up, d + 1))
@@ -61,14 +70,20 @@ def upstream(table: str, depth: int = 10) -> dict[str, Any]:
 def _marquez_upstream(table: str, depth: int) -> dict[str, Any] | None:
     base = settings().openlineage_url.rstrip("/")
     try:
-        found = httpx.get(f"{base}/api/v1/search", params={"q": table, "filter": "DATASET", "limit": 10}, timeout=3)
-        hits = [r for r in found.json().get("results", []) if r["name"].split(".")[-1] == table.split(".")[-1]]
+        found = httpx.get(
+            f"{base}/api/v1/search", params={"q": table, "filter": "DATASET", "limit": 10}, timeout=3
+        )
+        hits = [
+            r for r in found.json().get("results", []) if r["name"].split(".")[-1] == table.split(".")[-1]
+        ]
         if not hits:
             return None
-        hits.sort(key=lambda r: (r['namespace'] != ol.DS_GOLD, r['namespace'] != ol.DS_ICEBERG))
+        hits.sort(key=lambda r: (r["namespace"] != ol.DS_GOLD, r["namespace"] != ol.DS_ICEBERG))
         hit = hits[0]
         node_id = f"dataset:{hit['namespace']}:{hit['name']}"
-        lin = httpx.get(f"{base}/api/v1/lineage", params={"nodeId": node_id, "depth": depth}, timeout=5).json()
+        lin = httpx.get(
+            f"{base}/api/v1/lineage", params={"nodeId": node_id, "depth": depth}, timeout=5
+        ).json()
     except Exception:
         return None
     graph = {n["id"]: n for n in lin.get("graph", [])}
@@ -78,5 +93,11 @@ def _marquez_upstream(table: str, depth: int) -> dict[str, Any] | None:
             edges.append({"node": nid, "from": e["origin"]})
     datasets = sorted(n for n in graph if n.startswith("dataset:"))
     jobs = sorted(n for n in graph if n.startswith("job:"))
-    return {"table": node_id, "source": "marquez", "datasets": datasets, "jobs": jobs, "edges": len(edges),
-            "ui": f"http://localhost:3001/lineage/dataset/{hit['namespace']}/{hit['name']}"}
+    return {
+        "table": node_id,
+        "source": "marquez",
+        "datasets": datasets,
+        "jobs": jobs,
+        "edges": len(edges),
+        "ui": f"http://localhost:3001/lineage/dataset/{hit['namespace']}/{hit['name']}",
+    }

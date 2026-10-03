@@ -28,7 +28,7 @@ def test_relay_crash_after_flush_resends_but_nothing_duplicates(clean_platform):
     assert res.events == source_events
 
     t = totals(drain(spark))
-    assert t["received"] == source_events + 1_000           # physical duplicates arrived...
+    assert t["received"] == source_events + 1_000  # physical duplicates arrived...
     assert t["duplicates_in_batch"] + t["duplicates_known"] == 1_000  # ...and were all detected
     assert t["accepted_new"] == source_events
     assert len(table(spark, "silver.events")) == source_events

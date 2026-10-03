@@ -30,8 +30,11 @@ DATE_FMT = ["%Y-%m-%d"]
 
 
 def _setup_logging(verbose: bool = False) -> None:
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO,
-                        format="%(asctime)s %(levelname)s %(name)s: %(message)s", stream=sys.stderr)
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        stream=sys.stderr,
+    )
     for noisy in ("py4j", "httpx", "urllib3", "great_expectations"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
@@ -112,8 +115,9 @@ def simulate(
     from simulator.postgres_sink import apply_stream, connect, init_schema, load_stores, record_run
     from simulator.postgres_sink import reset_source as _reset
 
-    cfg = SimulationConfig(seed=seed, orders=orders, days=days, start=start.replace(tzinfo=UTC),
-                           stores=stores, products=products)
+    cfg = SimulationConfig(
+        seed=seed, orders=orders, days=days, start=start.replace(tzinfo=UTC), stores=stores, products=products
+    )
     run_id = f"sim-{seed}-{orders}-{int(time.time())}"
     t0 = time.time()
     with connect() as conn:
@@ -125,8 +129,13 @@ def simulate(
         load_stores(conn, sim.world.stores)
         totals = apply_stream(conn, sim.stream())
         elapsed = time.time() - t0
-        stats = {"events": sum(totals.values()), "by_topic": totals, "elapsed_s": round(elapsed, 2),
-                 "events_per_s": round(sum(totals.values()) / elapsed, 1), "reference": sim.ref.source}
+        stats = {
+            "events": sum(totals.values()),
+            "by_topic": totals,
+            "elapsed_s": round(elapsed, 2),
+            "events_per_s": round(sum(totals.values()) / elapsed, 1),
+            "reference": sim.ref.source,
+        }
         record_run(conn, run_id, "historical", cfg.to_json(), stats, finished=True)
     _print({"run_id": run_id, **stats})
 
@@ -174,8 +183,13 @@ def relay(
     follow: bool = typer.Option(False, help="Keep tailing the outbox"),
     batch_size: int = 20_000,
     orders_schema_version: int = typer.Option(2, help="OrderEvent version to produce (1 or 2)"),
-    duplicate_p: float = 0.0, late_p: float = 0.0, late_delay_s: float = 30.0,
-    invalid_p: float = 0.0, corrupt_p: float = 0.0, reorder_window: int = 0, chaos_seed: int = 1234,
+    duplicate_p: float = 0.0,
+    late_p: float = 0.0,
+    late_delay_s: float = 30.0,
+    invalid_p: float = 0.0,
+    corrupt_p: float = 0.0,
+    reorder_window: int = 0,
+    chaos_seed: int = 1234,
     idle_exit_s: float = typer.Option(None, help="With --follow: exit after this many idle seconds"),
 ) -> None:
     """Publish outbox events to Kafka (at-least-once), optionally injecting faults."""
@@ -183,13 +197,31 @@ def relay(
     from ingestion.cdc.outbox_relay import run_relay
     from producers.chaos import ChaosConfig
 
-    chaos = ChaosConfig(duplicate_probability=duplicate_p, late_probability=late_p, late_delay_s=late_delay_s,
-                        invalid_probability=invalid_p, corrupt_probability=corrupt_p,
-                        reorder_window=reorder_window, seed=chaos_seed)
-    res = run_relay(batch_size=batch_size, follow=follow, chaos=chaos,
-                    schema_versions={"commerce.orders": orders_schema_version}, idle_exit_s=idle_exit_s)
-    _print({"events": res.events, "last_seq": res.last_seq, "elapsed_s": res.elapsed_s,
-            "events_per_s": res.events_per_s, "producer": res.producer})
+    chaos = ChaosConfig(
+        duplicate_probability=duplicate_p,
+        late_probability=late_p,
+        late_delay_s=late_delay_s,
+        invalid_probability=invalid_p,
+        corrupt_probability=corrupt_p,
+        reorder_window=reorder_window,
+        seed=chaos_seed,
+    )
+    res = run_relay(
+        batch_size=batch_size,
+        follow=follow,
+        chaos=chaos,
+        schema_versions={"commerce.orders": orders_schema_version},
+        idle_exit_s=idle_exit_s,
+    )
+    _print(
+        {
+            "events": res.events,
+            "last_seq": res.last_seq,
+            "elapsed_s": res.elapsed_s,
+            "events_per_s": res.events_per_s,
+            "producer": res.producer,
+        }
+    )
 
 
 # --------------------------------------------------------------------------- silver
@@ -205,11 +237,23 @@ def stream(
     _setup_logging()
     from spark.streaming.silver_stream import run
 
-    p = run(available_now=available_now, trigger_s=trigger_s, max_offsets=max_offsets,
-            metrics_port=metrics_port, timeout_s=timeout_s)
+    p = run(
+        available_now=available_now,
+        trigger_s=trigger_s,
+        max_offsets=max_offsets,
+        metrics_port=metrics_port,
+        timeout_s=timeout_s,
+    )
     totals: dict[str, int] = {}
     for s in p.history:
-        for k in ("received", "rejected", "duplicates_in_batch", "duplicates_known", "accepted_new", "late_events"):
+        for k in (
+            "received",
+            "rejected",
+            "duplicates_in_batch",
+            "duplicates_known",
+            "accepted_new",
+            "late_events",
+        ):
             totals[k] = totals.get(k, 0) + getattr(s, k)
     _print({"batches": len(p.history), **totals})
 
@@ -264,7 +308,9 @@ def replay_dlq(
     _setup_logging()
     from ingestion.streaming.dlq_replay import replay
 
-    _print(replay(topic=topic, corrections_path=corrections, recover_from_source=from_source, dry_run=dry_run))
+    _print(
+        replay(topic=topic, corrections_path=corrections, recover_from_source=from_source, dry_run=dry_run)
+    )
 
 
 # --------------------------------------------------------------------------- gold / ops
@@ -279,7 +325,9 @@ def gold_build(full_refresh: bool = False, select: str = typer.Option(None)) -> 
 
 @app.command()
 def reconcile(
-    run_date: datetime | None = typer.Option(None, "--date", formats=DATE_FMT, help="Restrict to one event date"),
+    run_date: datetime | None = typer.Option(
+        None, "--date", formats=DATE_FMT, help="Restrict to one event date"
+    ),
     write: bool = typer.Option(True, help="Write evaluation/reconciliation.json"),
 ) -> None:
     """Source → Bronze → Silver → Gold reconciliation (exit 1 on unexplained differences)."""

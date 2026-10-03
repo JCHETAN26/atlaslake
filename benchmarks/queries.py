@@ -47,7 +47,9 @@ def _time(fn, repeats: int) -> tuple[float, list[float], Any]:
     return cold, warm, result
 
 
-def run_postgres(schema: str = "baseline", repeats: int = 15, first_day: date = date(2026, 1, 1)) -> dict[str, Any]:
+def run_postgres(
+    schema: str = "baseline", repeats: int = 15, first_day: date = date(2026, 1, 1)
+) -> dict[str, Any]:
     from core.config import settings
     from simulator.postgres_sink import connect
 
@@ -60,20 +62,31 @@ def run_postgres(schema: str = "baseline", repeats: int = 15, first_day: date = 
             plan = conn.execute(f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {q}").fetchone()[0][0]
             top = plan["Plan"]
             blocks = top.get("Shared Hit Blocks", 0) + top.get("Shared Read Blocks", 0)
-            out[name] = {"cold_s": round(cold, 4), "warm": percentiles(warm), "rows_returned": len(rows),
-                         "bytes_touched": blocks * 8192, "result_digest": _digest(rows)}
+            out[name] = {
+                "cold_s": round(cold, 4),
+                "warm": percentiles(warm),
+                "rows_returned": len(rows),
+                "bytes_touched": blocks * 8192,
+                "result_digest": _digest(rows),
+            }
     return out
 
 
-def run_duckdb(con, schema: str = "gold_db.gold", repeats: int = 15, first_day: date = date(2026, 1, 1)
-               ) -> dict[str, Any]:
+def run_duckdb(
+    con, schema: str = "gold_db.gold", repeats: int = 15, first_day: date = date(2026, 1, 1)
+) -> dict[str, Any]:
     params = {"s": schema, **date_params(first_day)}
     out = {}
     for name, sql in QUERIES.items():
         q = sql.format(**params)
         cold, warm, rows = _time(lambda q=q: con.execute(q).fetchall(), repeats)
-        out[name] = {"cold_s": round(cold, 4), "warm": percentiles(warm), "rows_returned": len(rows),
-                     "rows_scanned": _duckdb_rows_scanned(con, q), "result_digest": _digest(rows)}
+        out[name] = {
+            "cold_s": round(cold, 4),
+            "warm": percentiles(warm),
+            "rows_returned": len(rows),
+            "rows_scanned": _duckdb_rows_scanned(con, q),
+            "result_digest": _digest(rows),
+        }
     return out
 
 
@@ -96,7 +109,9 @@ def _digest(rows: list) -> str:
     from decimal import Decimal
 
     def n(x):
-        return round(float(x), 2) if isinstance(x, (int, float, Decimal)) and not isinstance(x, bool) else str(x)
+        return (
+            round(float(x), 2) if isinstance(x, (int, float, Decimal)) and not isinstance(x, bool) else str(x)
+        )
 
     norm = sorted(json.dumps([n(x) for x in r]) for r in rows)
     return hashlib.sha1("\n".join(norm).encode()).hexdigest()[:12]

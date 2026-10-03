@@ -23,16 +23,28 @@ log = logging.getLogger(__name__)
 
 # table -> merge key columns (None = full replace)
 GOLD_TABLES: dict[str, list[str] | None] = {
-    "dim_customer": None, "dim_product": None, "dim_store": None, "dim_date": None,
-    "fact_orders": ["order_id"], "fact_order_items": ["order_id", "line_number"],
-    "fact_payments": ["payment_id"], "fact_inventory": ["event_id"],
-    "mart_daily_sales": ["order_date", "store_id", "currency"], "mart_order_funnel": ["order_date"],
-    "mart_payment_metrics": ["payment_date", "method", "currency"], "mart_inventory_health": None,
+    "dim_customer": None,
+    "dim_product": None,
+    "dim_store": None,
+    "dim_date": None,
+    "fact_orders": ["order_id"],
+    "fact_order_items": ["order_id", "line_number"],
+    "fact_payments": ["payment_id"],
+    "fact_inventory": ["event_id"],
+    "mart_daily_sales": ["order_date", "store_id", "currency"],
+    "mart_order_funnel": ["order_date"],
+    "mart_payment_metrics": ["payment_date", "method", "currency"],
+    "mart_inventory_health": None,
 }
-WATERMARK_COL = {"fact_orders": "dbt_loaded_at", "fact_order_items": "dbt_loaded_at",
-                 "fact_payments": "dbt_loaded_at", "fact_inventory": "dbt_loaded_at",
-                 "mart_daily_sales": "max_dbt_loaded_at", "mart_order_funnel": "max_dbt_loaded_at",
-                 "mart_payment_metrics": "max_dbt_loaded_at"}
+WATERMARK_COL = {
+    "fact_orders": "dbt_loaded_at",
+    "fact_order_items": "dbt_loaded_at",
+    "fact_payments": "dbt_loaded_at",
+    "fact_inventory": "dbt_loaded_at",
+    "mart_daily_sales": "max_dbt_loaded_at",
+    "mart_order_funnel": "max_dbt_loaded_at",
+    "mart_payment_metrics": "max_dbt_loaded_at",
+}
 
 
 def _gold() -> duckdb.DuckDBPyConnection:
@@ -82,8 +94,11 @@ def publish_iceberg() -> dict[str, Any]:
                 cat.drop_table(f"gold.{table}")
                 raise NoSuchTableError(table)
         except NoSuchTableError:
-            tbl = cat.create_table(f"gold.{table}", schema=arrow.schema,
-                                   properties={"format-version": "2", "write.parquet.compression-codec": "zstd"})
+            tbl = cat.create_table(
+                f"gold.{table}",
+                schema=arrow.schema,
+                properties={"format-version": "2", "write.parquet.compression-codec": "zstd"},
+            )
         tbl.overwrite(arrow)
         rows[table] = arrow.num_rows
     con.close()
@@ -95,7 +110,8 @@ def snowflake_config() -> dict[str, str] | None:
     if not all(os.environ.get(f"ATLAS_SNOWFLAKE_{k}") for k in keys):
         return None
     return {
-        "account": os.environ["ATLAS_SNOWFLAKE_ACCOUNT"], "user": os.environ["ATLAS_SNOWFLAKE_USER"],
+        "account": os.environ["ATLAS_SNOWFLAKE_ACCOUNT"],
+        "user": os.environ["ATLAS_SNOWFLAKE_USER"],
         "password": os.environ["ATLAS_SNOWFLAKE_PASSWORD"],
         "role": os.environ.get("ATLAS_SNOWFLAKE_ROLE", "ATLAS_LOADER"),
         "warehouse": os.environ.get("ATLAS_SNOWFLAKE_WAREHOUSE", "ATLAS_WH"),
@@ -109,15 +125,20 @@ def merge_sql(table: str, keys: list[str], columns: list[str]) -> str:
     upd = ", ".join(f't."{c.upper()}" = s."{c.upper()}"' for c in columns if c not in keys)
     cols = ", ".join(f'"{c.upper()}"' for c in columns)
     vals = ", ".join(f's."{c.upper()}"' for c in columns)
-    return (f"MERGE INTO {t} t USING {s} s ON {on} WHEN MATCHED THEN UPDATE SET {upd} "
-            f"WHEN NOT MATCHED THEN INSERT ({cols}) VALUES ({vals})")
+    return (
+        f"MERGE INTO {t} t USING {s} s ON {on} WHEN MATCHED THEN UPDATE SET {upd} "
+        f"WHEN NOT MATCHED THEN INSERT ({cols}) VALUES ({vals})"
+    )
 
 
 def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
     cfg = snowflake_config()
     if cfg is None and connector is None:
-        return {"target": "snowflake", "skipped": True,
-                "reason": "ATLAS_SNOWFLAKE_ACCOUNT/USER/PASSWORD not set (see snowflake/*.sql and docs)"}
+        return {
+            "target": "snowflake",
+            "skipped": True,
+            "reason": "ATLAS_SNOWFLAKE_ACCOUNT/USER/PASSWORD not set (see snowflake/*.sql and docs)",
+        }
     if connector is None:
         import snowflake.connector as connector  # type: ignore[no-redef]
     if write_pandas is None:
@@ -128,13 +149,19 @@ def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
     t0 = time.time()
     sf = connector.connect(**(cfg or {}))
     cur = sf.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS STAGING.PUBLISH_WATERMARKS (TABLE_NAME STRING, WATERMARK TIMESTAMP_NTZ)")
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS STAGING.PUBLISH_WATERMARKS (TABLE_NAME STRING, WATERMARK TIMESTAMP_NTZ)"
+    )
     marks = dict(cur.execute("SELECT TABLE_NAME, WATERMARK FROM STAGING.PUBLISH_WATERMARKS").fetchall())
     con = _gold()
     out: dict[str, Any] = {}
     for table, keys in GOLD_TABLES.items():
         wm_col = WATERMARK_COL.get(table)
-        where = f"WHERE {wm_col} > TIMESTAMP '{marks[table.upper()]}'" if (keys and wm_col and table.upper() in marks) else ""
+        where = (
+            f"WHERE {wm_col} > TIMESTAMP '{marks[table.upper()]}'"
+            if (keys and wm_col and table.upper() in marks)
+            else ""
+        )
         df = con.execute(f"SELECT * FROM gold_db.gold.{table} {where}").df()
         df.columns = [c.upper() for c in df.columns]
         if keys is None:
@@ -147,7 +174,9 @@ def publish_snowflake(connector=None, write_pandas=None) -> dict[str, Any]:
         if df.empty:
             out[table] = {"mode": "incremental", "rows": 0}
             continue
-        cur.execute(f"CREATE OR REPLACE TRANSIENT TABLE STAGING.{table.upper()}_LOAD LIKE GOLD.{table.upper()}")
+        cur.execute(
+            f"CREATE OR REPLACE TRANSIENT TABLE STAGING.{table.upper()}_LOAD LIKE GOLD.{table.upper()}"
+        )
         write_pandas(sf, df, f"{table.upper()}_LOAD", schema="STAGING", quote_identifiers=True)
         cur.execute("BEGIN")
         cur.execute(merge_sql(table, keys, [c.lower() for c in df.columns]))

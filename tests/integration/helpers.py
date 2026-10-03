@@ -21,7 +21,14 @@ def drain(spark: SparkSession, query: str = "silver_ingest") -> SilverProcessor:
 def totals(p: SilverProcessor) -> dict[str, int]:
     out: dict[str, int] = {}
     for s in p.history:
-        for k in ("received", "rejected", "duplicates_in_batch", "duplicates_known", "accepted_new", "late_events"):
+        for k in (
+            "received",
+            "rejected",
+            "duplicates_in_batch",
+            "duplicates_known",
+            "accepted_new",
+            "late_events",
+        ):
             out[k] = out.get(k, 0) + getattr(s, k)
     return out
 

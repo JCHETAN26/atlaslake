@@ -21,9 +21,15 @@ def _up(hostport: str) -> bool:
         return False
 
 
-STACK_UP = all(_up(hp) for hp in (settings().kafka.bootstrap, f"{settings().pg.host}:{settings().pg.port}",
-                                  settings().s3.endpoint_host,
-                                  settings().kafka.schema_registry_url.split("://")[1]))
+STACK_UP = all(
+    _up(hp)
+    for hp in (
+        settings().kafka.bootstrap,
+        f"{settings().pg.host}:{settings().pg.port}",
+        settings().s3.endpoint_host,
+        settings().kafka.schema_registry_url.split("://")[1],
+    )
+)
 
 
 def pytest_collection_modifyitems(config, items):

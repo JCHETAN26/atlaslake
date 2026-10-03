@@ -26,16 +26,22 @@ def test_schema_parses_and_has_envelope(topic, version):
 @pytest.mark.parametrize("topic", ev.TOPICS)
 def test_latest_schema_matches_domain_payload_fields(topic):
     latest = schemas.latest_version(topic)
-    payload = schemas.field_names(topic, latest)[len(ev.ENVELOPE_FIELDS):]
+    payload = schemas.field_names(topic, latest)[len(ev.ENVELOPE_FIELDS) :]
     assert tuple(payload) == ev.PAYLOAD_FIELDS[topic]
     assert latest == ev.LATEST_SCHEMA_VERSION[topic]
 
 
 def _order_event(**over):
     base = {
-        "event_id": "6700b6ed-7016-5462-ae82-79418ce901b4", "event_type": "ORDER_CREATED",
-        "event_timestamp": 1_767_259_606_285_228, "order_id": "o0000000001", "customer_id": "c00000001",
-        "store_id": "s0001", "status": "CREATED", "amount_minor": 990, "currency": "GBP",
+        "event_id": "6700b6ed-7016-5462-ae82-79418ce901b4",
+        "event_type": "ORDER_CREATED",
+        "event_timestamp": 1_767_259_606_285_228,
+        "order_id": "o0000000001",
+        "customer_id": "c00000001",
+        "store_id": "s0001",
+        "status": "CREATED",
+        "amount_minor": 990,
+        "currency": "GBP",
         "items": [{"line_number": 1, "product_id": "p00001", "quantity": 2, "unit_price_minor": 495}],
         "sales_channel": "WEB",
     }
@@ -63,8 +69,12 @@ def test_v2_data_readable_by_v1_reader_forward_compatible():
 
 
 def test_breaking_schema_cannot_read_existing_data():
-    bad = fastavro.parse_schema(json.loads((schemas.AVRO_DIR / "incompatible" / "order_event.v3_breaking.avsc").read_text()))
-    payload = serde.serialize(schemas.to_record(_order_event(), ev.TOPIC_ORDERS, 2), schemas.parsed(ev.TOPIC_ORDERS, 2), 1)
+    bad = fastavro.parse_schema(
+        json.loads((schemas.AVRO_DIR / "incompatible" / "order_event.v3_breaking.avsc").read_text())
+    )
+    payload = serde.serialize(
+        schemas.to_record(_order_event(), ev.TOPIC_ORDERS, 2), schemas.parsed(ev.TOPIC_ORDERS, 2), 1
+    )
     with pytest.raises(serde.DecodeError):
         serde.deserialize(payload, schemas.parsed(ev.TOPIC_ORDERS, 2), bad)
 
@@ -122,13 +132,29 @@ def test_future_event_time_is_flagged_relative_to_ingestion():
 
 
 def test_payment_and_inventory_rules():
-    pay = {"event_id": "6700b6ed-7016-5462-ae82-79418ce901b4", "event_type": "PAYMENT_COMPLETED",
-           "event_timestamp": 1_767_259_606_285_228, "payment_id": "pay1", "order_id": "o1", "attempt": 1,
-           "status": "FAILED", "amount_minor": 10, "currency": "GBP"}
+    pay = {
+        "event_id": "6700b6ed-7016-5462-ae82-79418ce901b4",
+        "event_type": "PAYMENT_COMPLETED",
+        "event_timestamp": 1_767_259_606_285_228,
+        "payment_id": "pay1",
+        "order_id": "o1",
+        "attempt": 1,
+        "status": "FAILED",
+        "amount_minor": 10,
+        "currency": "GBP",
+    }
     assert "STATUS_EVENT_MISMATCH" in validate(pay, ev.TOPIC_PAYMENTS)
-    inv = {"event_id": "6700b6ed-7016-5462-ae82-79418ce901b4", "event_type": "INVENTORY_RESERVED",
-           "event_timestamp": 1_767_259_606_285_228, "inventory_key": "s1:p2", "store_id": "s1",
-           "product_id": "p1", "reason": "SHIPMENT", "on_hand_delta": 0, "reserved_delta": 1}
+    inv = {
+        "event_id": "6700b6ed-7016-5462-ae82-79418ce901b4",
+        "event_type": "INVENTORY_RESERVED",
+        "event_timestamp": 1_767_259_606_285_228,
+        "inventory_key": "s1:p2",
+        "store_id": "s1",
+        "product_id": "p1",
+        "reason": "SHIPMENT",
+        "on_hand_delta": 0,
+        "reserved_delta": 1,
+    }
     errs = validate(inv, ev.TOPIC_INVENTORY)
     assert "REASON_EVENT_MISMATCH" in errs and "INVALID_INVENTORY_KEY" in errs
 

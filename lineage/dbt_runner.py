@@ -35,19 +35,36 @@ def dbt(args: list[str]) -> dict[str, Any]:
     if results_path.exists() and results_path.stat().st_mtime >= t0 - 1:
         for r in json.loads(results_path.read_text()).get("results", []):
             resp = r.get("adapter_response") or {}
-            name = r["unique_id"].split(".")[-1] if not r["unique_id"].startswith("test.") else r["unique_id"].split(".")[2]
-            nodes.append({
-                "node": name, "resource_type": r["unique_id"].split(".")[0], "status": r["status"],
-                "execution_time_s": round(r.get("execution_time") or 0, 3),
-                "rows_affected": resp.get("rows_affected"), "failures": r.get("failures"),
-                "message": (r.get("message") or "")[:300],
-            })
+            name = (
+                r["unique_id"].split(".")[-1]
+                if not r["unique_id"].startswith("test.")
+                else r["unique_id"].split(".")[2]
+            )
+            nodes.append(
+                {
+                    "node": name,
+                    "resource_type": r["unique_id"].split(".")[0],
+                    "status": r["status"],
+                    "execution_time_s": round(r.get("execution_time") or 0, 3),
+                    "rows_affected": resp.get("rows_affected"),
+                    "failures": r.get("failures"),
+                    "message": (r.get("message") or "")[:300],
+                }
+            )
     ok = proc.returncode == 0
-    return {"args": args, "success": ok, "returncode": proc.returncode, "elapsed_s": round(elapsed, 3),
-            "nodes": nodes, "exception": None if ok else proc.stdout[-3000:] + proc.stderr[-2000:]}
+    return {
+        "args": args,
+        "success": ok,
+        "returncode": proc.returncode,
+        "elapsed_s": round(elapsed, 3),
+        "nodes": nodes,
+        "exception": None if ok else proc.stdout[-3000:] + proc.stderr[-2000:],
+    }
 
 
-def dbt_build(full_refresh: bool = False, select: str | None = None, emit_lineage: bool = True) -> dict[str, Any]:
+def dbt_build(
+    full_refresh: bool = False, select: str | None = None, emit_lineage: bool = True
+) -> dict[str, Any]:
     args = ["build"]
     if full_refresh:
         args.append("--full-refresh")

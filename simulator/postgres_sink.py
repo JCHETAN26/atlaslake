@@ -66,16 +66,22 @@ def outbox_rows(batch: dict[str, pd.DataFrame]) -> pd.DataFrame:
             continue
         fields = [f for f in ev.PAYLOAD_FIELDS[topic] if f in df.columns]
         payload = df[fields].to_json(orient="records", lines=True, force_ascii=False).splitlines()
-        parts.append(pd.DataFrame({
-            "event_id": df["event_id"].to_numpy(),
-            "event_type": df["event_type"].to_numpy(),
-            "topic": topic,
-            "partition_key": df[ev.PARTITION_KEY[topic]].astype(str).to_numpy(),
-            "event_timestamp": df["event_timestamp"].to_numpy(),
-            "payload": payload,
-        }))
+        parts.append(
+            pd.DataFrame(
+                {
+                    "event_id": df["event_id"].to_numpy(),
+                    "event_type": df["event_type"].to_numpy(),
+                    "topic": topic,
+                    "partition_key": df[ev.PARTITION_KEY[topic]].astype(str).to_numpy(),
+                    "event_timestamp": df["event_timestamp"].to_numpy(),
+                    "payload": payload,
+                }
+            )
+        )
     if not parts:
-        return pd.DataFrame(columns=["event_id", "event_type", "topic", "partition_key", "event_timestamp", "payload"])
+        return pd.DataFrame(
+            columns=["event_id", "event_type", "topic", "partition_key", "event_timestamp", "payload"]
+        )
     out = pd.concat(parts, ignore_index=True).sort_values(["event_timestamp", "event_id"], kind="stable")
     out["event_timestamp"] = _ts(out["event_timestamp"].to_numpy()).to_numpy()
     return out
@@ -98,8 +104,12 @@ def reduce_orders(orders: pd.DataFrame) -> pd.DataFrame:
     for col in ("customer_id", "store_id", "sales_channel", "amount_minor", "currency"):
         out[col] = created[col].reindex(out.index)
     out["created_at"] = created["event_timestamp"].reindex(out.index)
-    for et, col in (("ORDER_UPDATED", "paid_at"), ("ORDER_CANCELLED", "cancelled_at"),
-                    ("ORDER_SHIPPED", "shipped_at"), ("ORDER_DELIVERED", "delivered_at")):
+    for et, col in (
+        ("ORDER_UPDATED", "paid_at"),
+        ("ORDER_CANCELLED", "cancelled_at"),
+        ("ORDER_SHIPPED", "shipped_at"),
+        ("ORDER_DELIVERED", "delivered_at"),
+    ):
         out[col] = ts[et].reindex(out.index) if et in ts.columns else np.nan
     out["cancel_reason"] = cancel["cancel_reason"].reindex(out.index) if not cancel.empty else None
     return out.reset_index()
@@ -113,8 +123,19 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
             c = _last_per_key(cust, "customer_id").copy()
             c["created_at"] = _ts(c["signup_timestamp"].to_numpy()).to_numpy()
             c["updated_at"] = _ts(c["event_timestamp"].to_numpy()).to_numpy()
-            cols = ["customer_id", "email", "phone", "first_name", "last_name", "city", "state", "country",
-                    "segment", "created_at", "updated_at"]
+            cols = [
+                "customer_id",
+                "email",
+                "phone",
+                "first_name",
+                "last_name",
+                "city",
+                "state",
+                "country",
+                "segment",
+                "created_at",
+                "updated_at",
+            ]
             cur.execute("CREATE TEMP TABLE s_customers (LIKE commerce.customers) ON COMMIT DROP")
             _copy_df(cur, "s_customers", c[cols])
             cur.execute(f"""
@@ -128,8 +149,17 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
             p = _last_per_key(prod, "product_id").copy()
             p["created_at"] = _ts(p["event_timestamp"].to_numpy()).to_numpy()
             p["updated_at"] = p["created_at"]
-            cols = ["product_id", "sku", "name", "category", "unit_price_minor", "currency", "active",
-                    "created_at", "updated_at"]
+            cols = [
+                "product_id",
+                "sku",
+                "name",
+                "category",
+                "unit_price_minor",
+                "currency",
+                "active",
+                "created_at",
+                "updated_at",
+            ]
             cur.execute("CREATE TEMP TABLE s_products (LIKE commerce.products) ON COMMIT DROP")
             _copy_df(cur, "s_products", p[cols])
             cur.execute("""
@@ -146,9 +176,22 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
             for col in ("updated_at", "created_at", "paid_at", "cancelled_at", "shipped_at", "delivered_at"):
                 red[col] = pd.to_datetime(red[col], unit="us", utc=True)
             red["amount_minor"] = red["amount_minor"].astype("Int64")
-            cols = ["order_id", "customer_id", "store_id", "status", "sales_channel", "amount_minor",
-                    "currency", "created_at", "updated_at", "paid_at", "cancelled_at", "cancel_reason",
-                    "shipped_at", "delivered_at"]
+            cols = [
+                "order_id",
+                "customer_id",
+                "store_id",
+                "status",
+                "sales_channel",
+                "amount_minor",
+                "currency",
+                "created_at",
+                "updated_at",
+                "paid_at",
+                "cancelled_at",
+                "cancel_reason",
+                "shipped_at",
+                "delivered_at",
+            ]
             cur.execute("""CREATE TEMP TABLE s_orders (
                 order_id text, customer_id text, store_id text, status text, sales_channel text,
                 amount_minor bigint, currency text, created_at timestamptz, updated_at timestamptz,
@@ -176,8 +219,11 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
                 items = created[["order_id", "items"]].explode("items", ignore_index=True)
                 items_df = pd.DataFrame(items["items"].tolist())
                 items_df.insert(0, "order_id", items["order_id"].to_numpy())
-                _copy_df(cur, "commerce.order_items",
-                         items_df[["order_id", "line_number", "product_id", "quantity", "unit_price_minor"]])
+                _copy_df(
+                    cur,
+                    "commerce.order_items",
+                    items_df[["order_id", "line_number", "product_id", "quantity", "unit_price_minor"]],
+                )
 
         pays = batch.get(ev.TOPIC_PAYMENTS, pd.DataFrame())
         if not pays.empty:
@@ -187,8 +233,18 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
             last["created_at"] = last["created_at"].fillna(last["event_timestamp"])
             last["created_at"] = _ts(last["created_at"].astype("int64").to_numpy()).to_numpy()
             last["updated_at"] = _ts(last["event_timestamp"].to_numpy()).to_numpy()
-            cols = ["payment_id", "order_id", "attempt", "status", "method", "amount_minor", "currency",
-                    "failure_reason", "created_at", "updated_at"]
+            cols = [
+                "payment_id",
+                "order_id",
+                "attempt",
+                "status",
+                "method",
+                "amount_minor",
+                "currency",
+                "failure_reason",
+                "created_at",
+                "updated_at",
+            ]
             cur.execute("""CREATE TEMP TABLE s_payments (payment_id text, order_id text, attempt int,
                 status text, method text, amount_minor bigint, currency text, failure_reason text,
                 created_at timestamptz, updated_at timestamptz) ON COMMIT DROP""")
@@ -205,8 +261,10 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
         inv = batch.get(ev.TOPIC_INVENTORY, pd.DataFrame())
         if not inv.empty:
             agg = inv.groupby(["store_id", "product_id"], as_index=False).agg(
-                quantity_on_hand=("on_hand_delta", "sum"), quantity_reserved=("reserved_delta", "sum"),
-                updated_at=("event_timestamp", "max"))
+                quantity_on_hand=("on_hand_delta", "sum"),
+                quantity_reserved=("reserved_delta", "sum"),
+                updated_at=("event_timestamp", "max"),
+            )
             agg["updated_at"] = _ts(agg["updated_at"].to_numpy()).to_numpy()
             cur.execute("CREATE TEMP TABLE s_inventory (LIKE commerce.inventory) ON COMMIT DROP")
             _copy_df(cur, "s_inventory", agg)
@@ -218,8 +276,11 @@ def apply_batch(conn: psycopg.Connection, batch: dict[str, pd.DataFrame]) -> int
                   updated_at = greatest(commerce.inventory.updated_at, excluded.updated_at)""")
 
         ob = outbox_rows(batch)
-        _copy_df(cur, "commerce.outbox",
-                 ob[["event_id", "event_type", "topic", "partition_key", "event_timestamp", "payload"]])
+        _copy_df(
+            cur,
+            "commerce.outbox",
+            ob[["event_id", "event_type", "topic", "partition_key", "event_timestamp", "payload"]],
+        )
     conn.commit()
     return len(ob)
 
@@ -230,13 +291,21 @@ def load_stores(conn: psycopg.Connection, stores: pd.DataFrame) -> None:
     s["updated_at"] = s["opened_at"]
     with conn.cursor() as cur:
         cur.execute("CREATE TEMP TABLE s_stores (LIKE commerce.stores) ON COMMIT DROP")
-        _copy_df(cur, "s_stores", s[["store_id", "name", "city", "country", "currency", "opened_at", "updated_at"]])
+        _copy_df(
+            cur, "s_stores", s[["store_id", "name", "city", "country", "currency", "opened_at", "updated_at"]]
+        )
         cur.execute("INSERT INTO commerce.stores SELECT * FROM s_stores ON CONFLICT (store_id) DO NOTHING")
     conn.commit()
 
 
-def record_run(conn: psycopg.Connection, run_id: str, mode: str, config: dict, stats: dict | None = None,
-               finished: bool = False) -> None:
+def record_run(
+    conn: psycopg.Connection,
+    run_id: str,
+    mode: str,
+    config: dict,
+    stats: dict | None = None,
+    finished: bool = False,
+) -> None:
     conn.execute(
         """INSERT INTO ops.simulator_runs (run_id, mode, config, stats, finished_at)
            VALUES (%s, %s, %s, %s, CASE WHEN %s THEN now() END)

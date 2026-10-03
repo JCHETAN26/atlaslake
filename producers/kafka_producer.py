@@ -28,8 +28,13 @@ class ProducerStats:
 
     def as_dict(self) -> dict[str, Any]:
         elapsed = max(time.time() - self.started, 1e-9)
-        return {"deliveries": self.delivered, "failed": self.failed, "by_fault": dict(self.sent),
-                "elapsed_s": round(elapsed, 3), "deliveries_per_s": round(self.delivered / elapsed, 1)}
+        return {
+            "deliveries": self.delivered,
+            "failed": self.failed,
+            "by_fault": dict(self.sent),
+            "elapsed_s": round(elapsed, 3),
+            "deliveries_per_s": round(self.delivered / elapsed, 1),
+        }
 
 
 class EventProducer:
@@ -56,7 +61,9 @@ class EventProducer:
         for topic, version in self.versions.items():
             found = self.registry.lookup(schemas.subject(topic), schemas.schema_text(topic, version))
             if found is None:
-                raise RuntimeError(f"schema {topic} v{version} not registered; run `atlas contracts register`")
+                raise RuntimeError(
+                    f"schema {topic} v{version} not registered; run `atlas contracts register`"
+                )
             self.schema_ids[topic] = int(found["id"])
         self.chaos = Chaos(chaos) if chaos and chaos.enabled else None
         self.chaos_cfg = chaos or ChaosConfig()
@@ -89,13 +96,15 @@ class EventProducer:
                 return
             self.stats.delivered += 1
             self._log.append((msg.topic(), msg.partition(), msg.offset(), event_id, fault, self.run_id))
+
         return cb
 
     def _produce(self, topic: str, key: str, value: bytes, event_id: str | None, fault: str) -> None:
         while True:
             try:
-                self._producer.produce(topic, key=key.encode(), value=value,
-                                       on_delivery=self._on_delivery(event_id, fault))
+                self._producer.produce(
+                    topic, key=key.encode(), value=value, on_delivery=self._on_delivery(event_id, fault)
+                )
                 break
             except BufferError:
                 self._producer.poll(0.05)
@@ -133,7 +142,9 @@ class EventProducer:
                 value, fault = chaos.corrupt(value)
             elif chaos.roll(self.chaos_cfg.invalid_probability):
                 bad, fault = chaos.mutate_invalid(rec, topic)
-                value = serde.serialize(bad, schemas.parsed(topic, self.versions[topic]), self.schema_ids[topic])
+                value = serde.serialize(
+                    bad, schemas.parsed(topic, self.versions[topic]), self.schema_ids[topic]
+                )
             if chaos.roll(self.chaos_cfg.late_probability):
                 self._seq += 1
                 release = time.time() + self.chaos_cfg.late_delay_s
@@ -182,9 +193,12 @@ class EventProducer:
         buf = io.StringIO()
         for r in rows:
             buf.write("\t".join("\\N" if v is None else str(v) for v in r) + "\n")
-        with self.delivery_sink.cursor() as cur, cur.copy(
-            "COPY ops.delivery_log (topic, kafka_partition, kafka_offset, event_id, fault, run_id) FROM STDIN"
-        ) as cp:
+        with (
+            self.delivery_sink.cursor() as cur,
+            cur.copy(
+                "COPY ops.delivery_log (topic, kafka_partition, kafka_offset, event_id, fault, run_id) FROM STDIN"
+            ) as cp,
+        ):
             cp.write(buf.getvalue())
         self.delivery_sink.commit()
         return len(rows)

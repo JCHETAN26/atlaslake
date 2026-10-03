@@ -41,38 +41,109 @@ def test_test_001_flows_from_source_to_gold(clean_platform):
         load_stores(conn, sim.world.stores)
         apply_stream(conn, sim.stream())  # customers/products exist before TEST_001 references them
         customer = conn.execute("SELECT customer_id FROM commerce.customers LIMIT 1").fetchone()[0]
-        product = conn.execute("SELECT product_id, unit_price_minor FROM commerce.products LIMIT 1").fetchone()
+        product = conn.execute(
+            "SELECT product_id, unit_price_minor FROM commerce.products LIMIT 1"
+        ).fetchone()
         price = int(product[1])
-        created = sc.order_event("TEST_001", "ORDER_CREATED", t0, amount_minor=2 * price, customer_id=customer,
-                                 store_id=store.store_id, currency=store.currency)
-        created["items"] = [{"line_number": 1, "product_id": product[0], "quantity": 2, "unit_price_minor": price}]
+        created = sc.order_event(
+            "TEST_001",
+            "ORDER_CREATED",
+            t0,
+            amount_minor=2 * price,
+            customer_id=customer,
+            store_id=store.store_id,
+            currency=store.currency,
+        )
+        created["items"] = [
+            {"line_number": 1, "product_id": product[0], "quantity": 2, "unit_price_minor": price}
+        ]
         events = [
             (ev.TOPIC_ORDERS, created),
-            (ev.TOPIC_INVENTORY, {"event_id": sc.eid("TEST_001:inv"), "event_type": "INVENTORY_RESERVED",
-                                  "event_timestamp": sc.us(t0) + 1, "inventory_key": f"{store.store_id}:{product[0]}",
-                                  "store_id": store.store_id, "product_id": product[0], "reason": "RESERVATION",
-                                  "on_hand_delta": 0, "reserved_delta": 2, "order_id": "TEST_001", "line_number": 1}),
-            (ev.TOPIC_PAYMENTS, {**sc.payment_event("TEST_001", "PAYMENT_STARTED", t0 + timedelta(seconds=30),
-                                                    amount_minor=2 * price, currency=store.currency),
-                                 "payment_id": "pay_TEST_001_1"}),
-            (ev.TOPIC_PAYMENTS, {**sc.payment_event("TEST_001", "PAYMENT_COMPLETED", t0 + timedelta(seconds=40),
-                                                    amount_minor=2 * price, currency=store.currency),
-                                 "payment_id": "pay_TEST_001_1"}),
-            (ev.TOPIC_ORDERS, sc.order_event("TEST_001", "ORDER_UPDATED", t0 + timedelta(seconds=41), status="PAID",
-                                             amount_minor=2 * price, customer_id=customer, store_id=store.store_id,
-                                             currency=store.currency)),
-            (ev.TOPIC_ORDERS, sc.order_event("TEST_001", "ORDER_SHIPPED", t0 + timedelta(hours=5),
-                                             amount_minor=2 * price, customer_id=customer, store_id=store.store_id,
-                                             currency=store.currency)),
+            (
+                ev.TOPIC_INVENTORY,
+                {
+                    "event_id": sc.eid("TEST_001:inv"),
+                    "event_type": "INVENTORY_RESERVED",
+                    "event_timestamp": sc.us(t0) + 1,
+                    "inventory_key": f"{store.store_id}:{product[0]}",
+                    "store_id": store.store_id,
+                    "product_id": product[0],
+                    "reason": "RESERVATION",
+                    "on_hand_delta": 0,
+                    "reserved_delta": 2,
+                    "order_id": "TEST_001",
+                    "line_number": 1,
+                },
+            ),
+            (
+                ev.TOPIC_PAYMENTS,
+                {
+                    **sc.payment_event(
+                        "TEST_001",
+                        "PAYMENT_STARTED",
+                        t0 + timedelta(seconds=30),
+                        amount_minor=2 * price,
+                        currency=store.currency,
+                    ),
+                    "payment_id": "pay_TEST_001_1",
+                },
+            ),
+            (
+                ev.TOPIC_PAYMENTS,
+                {
+                    **sc.payment_event(
+                        "TEST_001",
+                        "PAYMENT_COMPLETED",
+                        t0 + timedelta(seconds=40),
+                        amount_minor=2 * price,
+                        currency=store.currency,
+                    ),
+                    "payment_id": "pay_TEST_001_1",
+                },
+            ),
+            (
+                ev.TOPIC_ORDERS,
+                sc.order_event(
+                    "TEST_001",
+                    "ORDER_UPDATED",
+                    t0 + timedelta(seconds=41),
+                    status="PAID",
+                    amount_minor=2 * price,
+                    customer_id=customer,
+                    store_id=store.store_id,
+                    currency=store.currency,
+                ),
+            ),
+            (
+                ev.TOPIC_ORDERS,
+                sc.order_event(
+                    "TEST_001",
+                    "ORDER_SHIPPED",
+                    t0 + timedelta(hours=5),
+                    amount_minor=2 * price,
+                    customer_id=customer,
+                    store_id=store.store_id,
+                    currency=store.currency,
+                ),
+            ),
         ]
         apply_batch(conn, _batch(events))
-        assert conn.execute("SELECT status FROM commerce.orders WHERE order_id='TEST_001'").fetchone()[0] == "SHIPPED"
+        assert (
+            conn.execute("SELECT status FROM commerce.orders WHERE order_id='TEST_001'").fetchone()[0]
+            == "SHIPPED"
+        )
 
     run_relay(batch_size=5_000, metrics_port=None)
 
     # ✓ Kafka: the TEST_001 events are on commerce.orders, keyed by order_id
-    c = Consumer({"bootstrap.servers": settings().kafka.bootstrap, "group.id": "e2e-probe",
-                  "auto.offset.reset": "earliest", "enable.auto.commit": False})
+    c = Consumer(
+        {
+            "bootstrap.servers": settings().kafka.bootstrap,
+            "group.id": "e2e-probe",
+            "auto.offset.reset": "earliest",
+            "enable.auto.commit": False,
+        }
+    )
     parts = c.list_topics(ev.TOPIC_ORDERS).topics[ev.TOPIC_ORDERS].partitions
     c.assign([TopicPartition(ev.TOPIC_ORDERS, p, 0) for p in parts])
     keys, deadline = [], datetime.now().timestamp() + 20
@@ -98,16 +169,26 @@ def test_test_001_flows_from_source_to_gold(clean_platform):
     assert dbt_build()["success"]
     # ✓ Gold star schema
     g = connect_gold()
-    fo = g.execute("SELECT status, is_revenue, customer_sk <> '-1', store_sk <> '-1' FROM gold.fact_orders "
-                   "WHERE order_id = 'TEST_001'").fetchone()
+    fo = g.execute(
+        "SELECT status, is_revenue, customer_sk <> '-1', store_sk <> '-1' FROM gold.fact_orders "
+        "WHERE order_id = 'TEST_001'"
+    ).fetchone()
     assert fo == ("SHIPPED", True, True, True)
-    assert g.execute("SELECT count(*) FROM gold.fact_order_items WHERE order_id='TEST_001' AND product_sk <> '-1'").fetchone()[0] == 1
+    assert (
+        g.execute(
+            "SELECT count(*) FROM gold.fact_order_items WHERE order_id='TEST_001' AND product_sk <> '-1'"
+        ).fetchone()[0]
+        == 1
+    )
     g.close()
 
     # ✓ serving copies
     publish_postgres()
     with connect(settings().pg.analytics_db) as conn:
-        assert conn.execute("SELECT status FROM gold.fact_orders WHERE order_id='TEST_001'").fetchone()[0] == "SHIPPED"
+        assert (
+            conn.execute("SELECT status FROM gold.fact_orders WHERE order_id='TEST_001'").fetchone()[0]
+            == "SHIPPED"
+        )
     if snowflake_config():
         assert not publish_snowflake().get("skipped")
     elif os.environ.get("CI_REQUIRE_SNOWFLAKE"):

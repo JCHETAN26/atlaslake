@@ -44,27 +44,32 @@ ENTITY_KEY = {
     ev.TOPIC_PRODUCTS: "product_id",
 }
 
-RAW_SCHEMA = StructType([
-    StructField("source", StringType()),
-    StructField("topic", StringType()),
-    StructField("kafka_partition", IntegerType()),
-    StructField("kafka_offset", LongType()),
-    StructField("kafka_key", StringType()),
-    StructField("payload", BinaryType()),
-    StructField("ingestion_timestamp", TimestampType()),
-])
+RAW_SCHEMA = StructType(
+    [
+        StructField("source", StringType()),
+        StructField("topic", StringType()),
+        StructField("kafka_partition", IntegerType()),
+        StructField("kafka_offset", LongType()),
+        StructField("kafka_key", StringType()),
+        StructField("payload", BinaryType()),
+        StructField("ingestion_timestamp", TimestampType()),
+    ]
+)
 
-DECODED_SCHEMA = StructType(RAW_SCHEMA.fields + [
-    StructField("schema_id", IntegerType()),
-    StructField("schema_version", IntegerType()),
-    StructField("event_id", StringType()),
-    StructField("event_type", StringType()),
-    StructField("event_timestamp", TimestampType()),
-    StructField("entity_key", StringType()),
-    StructField("record_json", StringType()),
-    StructField("error_codes", StringType()),
-    StructField("error_message", StringType()),
-])
+DECODED_SCHEMA = StructType(
+    RAW_SCHEMA.fields
+    + [
+        StructField("schema_id", IntegerType()),
+        StructField("schema_version", IntegerType()),
+        StructField("event_id", StringType()),
+        StructField("event_type", StringType()),
+        StructField("event_timestamp", TimestampType()),
+        StructField("entity_key", StringType()),
+        StructField("record_json", StringType()),
+        StructField("error_codes", StringType()),
+        StructField("error_message", StringType()),
+    ]
+)
 
 _REGISTRY: SchemaRegistry | None = None
 
@@ -76,12 +81,21 @@ def _registry(url: str) -> SchemaRegistry:
     return _REGISTRY
 
 
-def decode_record(payload: bytes | None, topic: str, ingestion_us: int | None, registry: SchemaRegistry
-                  ) -> dict[str, Any]:
+def decode_record(
+    payload: bytes | None, topic: str, ingestion_us: int | None, registry: SchemaRegistry
+) -> dict[str, Any]:
     """Pure-Python decode+validate of one record. Returns the decoded-columns dict."""
-    out: dict[str, Any] = {"schema_id": None, "schema_version": None, "event_id": None, "event_type": None,
-                           "event_timestamp": None, "entity_key": None, "record_json": None,
-                           "error_codes": None, "error_message": None}
+    out: dict[str, Any] = {
+        "schema_id": None,
+        "schema_version": None,
+        "event_id": None,
+        "event_type": None,
+        "event_timestamp": None,
+        "entity_key": None,
+        "record_json": None,
+        "error_codes": None,
+        "error_message": None,
+    }
     if topic not in ev.TOPICS:
         out.update(error_codes="UNKNOWN_TOPIC", error_message=f"unexpected topic {topic}")
         return out
@@ -119,13 +133,16 @@ def _decode_batches(registry_url: str):
             ingest = pd.to_datetime(pdf["ingestion_timestamp"])
             # unit-safe: Arrow may hand us ns or us resolution depending on versions
             ingest_us = ingest.astype("datetime64[us]").astype("int64").where(ingest.notna(), None)
-            rows = [decode_record(p, t, None if pd.isna(i) else int(i), reg)
-                    for p, t, i in zip(pdf["payload"], pdf["topic"], ingest_us, strict=True)]
+            rows = [
+                decode_record(p, t, None if pd.isna(i) else int(i), reg)
+                for p, t, i in zip(pdf["payload"], pdf["topic"], ingest_us, strict=True)
+            ]
             dec = pd.DataFrame(rows, index=pdf.index)
             dec["event_timestamp"] = pd.to_datetime(dec["event_timestamp"], unit="us")
             for c in ("schema_id", "schema_version"):
                 dec[c] = dec[c].astype("Int32")
             yield pd.concat([pdf, dec], axis=1)
+
     return fn
 
 

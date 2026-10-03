@@ -26,9 +26,15 @@ REQUIRED: dict[str, dict[str, tuple[str, ...]]] = {
     ev.TOPIC_PRODUCTS: {"*": ("product_id", "sku", "name", "category", "currency")},
 }
 
-PAYMENT_EVENT_STATUS = {"PAYMENT_STARTED": "STARTED", "PAYMENT_COMPLETED": "COMPLETED", "PAYMENT_FAILED": "FAILED"}
-INVENTORY_REASONS_BY_TYPE = {"INVENTORY_RESERVED": {"RESERVATION"},
-                             "INVENTORY_UPDATED": {"SHIPMENT", "RELEASE", "RESTOCK"}}
+PAYMENT_EVENT_STATUS = {
+    "PAYMENT_STARTED": "STARTED",
+    "PAYMENT_COMPLETED": "COMPLETED",
+    "PAYMENT_FAILED": "FAILED",
+}
+INVENTORY_REASONS_BY_TYPE = {
+    "INVENTORY_RESERVED": {"RESERVATION"},
+    "INVENTORY_UPDATED": {"SHIPMENT", "RELEASE", "RESTOCK"},
+}
 
 
 def _blank(v: Any) -> bool:
@@ -71,8 +77,10 @@ def validate(rec: dict[str, Any], topic: str, ingestion_us: int | None = None) -
             errors.append("INVALID_SALES_CHANNEL")
         items = rec.get("items")
         if et == "ORDER_CREATED" and items:
-            if any(i.get("quantity", 0) <= 0 or i.get("unit_price_minor", -1) < 0 or _blank(i.get("product_id"))
-                   for i in items):
+            if any(
+                i.get("quantity", 0) <= 0 or i.get("unit_price_minor", -1) < 0 or _blank(i.get("product_id"))
+                for i in items
+            ):
                 errors.append("INVALID_ORDER_ITEM")
             elif amount is not None and amount != sum(i["quantity"] * i["unit_price_minor"] for i in items):
                 errors.append("AMOUNT_MISMATCH")

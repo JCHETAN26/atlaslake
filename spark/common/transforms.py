@@ -62,11 +62,27 @@ def micros_to_ts(col: Column) -> Column:
 def typed(events: DataFrame, topic: str) -> DataFrame:
     """Accepted events of one topic → typed columns (envelope + payload)."""
     rec = F.from_json("record_json", record_schema(topic))
-    return (events.filter(F.col("topic") == topic)
-            .select("event_id", "event_type", "event_timestamp", "ingestion_timestamp", "schema_version",
-                    "source", rec.alias("r"))
-            .select("event_id", "event_type", "event_timestamp", "ingestion_timestamp", "schema_version",
-                    "source", *[F.col(f"r.{f}").alias(f) for f in ev.PAYLOAD_FIELDS[topic]]))
+    return (
+        events.filter(F.col("topic") == topic)
+        .select(
+            "event_id",
+            "event_type",
+            "event_timestamp",
+            "ingestion_timestamp",
+            "schema_version",
+            "source",
+            rec.alias("r"),
+        )
+        .select(
+            "event_id",
+            "event_type",
+            "event_timestamp",
+            "ingestion_timestamp",
+            "schema_version",
+            "source",
+            *[F.col(f"r.{f}").alias(f) for f in ev.PAYLOAD_FIELDS[topic]],
+        )
+    )
 
 
 def _ts_of(event_type: str) -> Column:
@@ -80,82 +96,153 @@ def _first_of(event_type: str, col: str) -> Column:
 def reduce_orders(orders: DataFrame) -> DataFrame:
     """Order events (typed) → one patch row per order_id."""
     o = orders.withColumn("status_rank", _rank(ev.ORDER_STATUS_RANK, "status"))
-    latest = F.max_by(F.struct("status", "status_rank", "event_timestamp", "event_id"),
-                      F.struct("event_timestamp", "status_rank", "event_id"))
-    return (o.groupBy("order_id").agg(
-        _first_of("ORDER_CREATED", "customer_id").alias("customer_id"),
-        _first_of("ORDER_CREATED", "store_id").alias("store_id"),
-        _ts_of("ORDER_CREATED").alias("order_timestamp"),
-        latest.alias("latest"),
-        _first_of("ORDER_CREATED", "amount_minor").alias("amount_minor"),
-        _first_of("ORDER_CREATED", "currency").alias("currency"),
-        _first_of("ORDER_CREATED", "sales_channel").alias("sales_channel"),
-        _first_of("ORDER_CREATED", "items").alias("items"),
-        _ts_of("ORDER_UPDATED").alias("paid_at"),
-        _ts_of("ORDER_CANCELLED").alias("cancelled_at"),
-        _first_of("ORDER_CANCELLED", "cancel_reason").alias("cancel_reason"),
-        _ts_of("ORDER_SHIPPED").alias("shipped_at"),
-        _first_of("ORDER_SHIPPED", "carrier").alias("carrier"),
-        _ts_of("ORDER_DELIVERED").alias("delivered_at"),
-        F.max("event_timestamp").alias("updated_at"),
-        F.first("source", ignorenulls=True).alias("source"),
-    ).select(
-        "order_id", "customer_id", "store_id", "order_timestamp",
-        F.col("latest.status").alias("status"), F.col("latest.status_rank").alias("status_rank"),
-        F.col("latest.event_timestamp").alias("status_timestamp"),
-        "amount_minor", "currency", "sales_channel",
-        F.aggregate("items", F.lit(0), lambda acc, i: acc + i["quantity"]).cast("int").alias("item_count"),
-        F.size("items").cast("int").alias("line_count"),
-        "paid_at", "cancelled_at", "cancel_reason", "shipped_at", "carrier", "delivered_at", "source",
-        F.col("latest.event_id").alias("last_event_id"), "updated_at",
-        F.current_timestamp().alias("silver_updated_at"),
-    ).withColumn("line_count", F.when(F.col("line_count") >= 0, F.col("line_count"))))
+    latest = F.max_by(
+        F.struct("status", "status_rank", "event_timestamp", "event_id"),
+        F.struct("event_timestamp", "status_rank", "event_id"),
+    )
+    return (
+        o.groupBy("order_id")
+        .agg(
+            _first_of("ORDER_CREATED", "customer_id").alias("customer_id"),
+            _first_of("ORDER_CREATED", "store_id").alias("store_id"),
+            _ts_of("ORDER_CREATED").alias("order_timestamp"),
+            latest.alias("latest"),
+            _first_of("ORDER_CREATED", "amount_minor").alias("amount_minor"),
+            _first_of("ORDER_CREATED", "currency").alias("currency"),
+            _first_of("ORDER_CREATED", "sales_channel").alias("sales_channel"),
+            _first_of("ORDER_CREATED", "items").alias("items"),
+            _ts_of("ORDER_UPDATED").alias("paid_at"),
+            _ts_of("ORDER_CANCELLED").alias("cancelled_at"),
+            _first_of("ORDER_CANCELLED", "cancel_reason").alias("cancel_reason"),
+            _ts_of("ORDER_SHIPPED").alias("shipped_at"),
+            _first_of("ORDER_SHIPPED", "carrier").alias("carrier"),
+            _ts_of("ORDER_DELIVERED").alias("delivered_at"),
+            F.max("event_timestamp").alias("updated_at"),
+            F.first("source", ignorenulls=True).alias("source"),
+        )
+        .select(
+            "order_id",
+            "customer_id",
+            "store_id",
+            "order_timestamp",
+            F.col("latest.status").alias("status"),
+            F.col("latest.status_rank").alias("status_rank"),
+            F.col("latest.event_timestamp").alias("status_timestamp"),
+            "amount_minor",
+            "currency",
+            "sales_channel",
+            F.aggregate("items", F.lit(0), lambda acc, i: acc + i["quantity"])
+            .cast("int")
+            .alias("item_count"),
+            F.size("items").cast("int").alias("line_count"),
+            "paid_at",
+            "cancelled_at",
+            "cancel_reason",
+            "shipped_at",
+            "carrier",
+            "delivered_at",
+            "source",
+            F.col("latest.event_id").alias("last_event_id"),
+            "updated_at",
+            F.current_timestamp().alias("silver_updated_at"),
+        )
+        .withColumn("line_count", F.when(F.col("line_count") >= 0, F.col("line_count")))
+    )
 
 
 def order_items(orders: DataFrame) -> DataFrame:
     created = orders.filter(F.col("event_type") == "ORDER_CREATED")
-    return (created.select("order_id", "currency", F.col("event_timestamp").alias("order_timestamp"), "event_id",
-                           F.explode("items").alias("i"))
-            .select("order_id", F.col("i.line_number").alias("line_number"), F.col("i.product_id").alias("product_id"),
-                    F.col("i.quantity").alias("quantity"), F.col("i.unit_price_minor").alias("unit_price_minor"),
-                    (F.col("i.quantity") * F.col("i.unit_price_minor")).alias("line_amount_minor"),
-                    "currency", "order_timestamp", "event_id", F.current_timestamp().alias("silver_loaded_at"))
-            .dropDuplicates(["order_id", "line_number"]))
+    return (
+        created.select(
+            "order_id",
+            "currency",
+            F.col("event_timestamp").alias("order_timestamp"),
+            "event_id",
+            F.explode("items").alias("i"),
+        )
+        .select(
+            "order_id",
+            F.col("i.line_number").alias("line_number"),
+            F.col("i.product_id").alias("product_id"),
+            F.col("i.quantity").alias("quantity"),
+            F.col("i.unit_price_minor").alias("unit_price_minor"),
+            (F.col("i.quantity") * F.col("i.unit_price_minor")).alias("line_amount_minor"),
+            "currency",
+            "order_timestamp",
+            "event_id",
+            F.current_timestamp().alias("silver_loaded_at"),
+        )
+        .dropDuplicates(["order_id", "line_number"])
+    )
 
 
 def reduce_payments(payments: DataFrame) -> DataFrame:
     p = payments.withColumn("status_rank", _rank(PAYMENT_STATUS_RANK, "status"))
-    latest = F.max_by(F.struct("status", "status_rank", "event_timestamp", "failure_reason"),
-                      F.struct("event_timestamp", "status_rank", "event_id"))
-    return p.groupBy("payment_id").agg(
-        F.first("order_id", ignorenulls=True).alias("order_id"),
-        F.first("attempt", ignorenulls=True).alias("attempt"),
-        latest.alias("latest"),
-        F.first("method", ignorenulls=True).alias("method"),
-        F.first("amount_minor", ignorenulls=True).alias("amount_minor"),
-        F.first("currency", ignorenulls=True).alias("currency"),
-        _ts_of("PAYMENT_STARTED").alias("started_at"),
-        _ts_of("PAYMENT_COMPLETED").alias("completed_at"),
-        _ts_of("PAYMENT_FAILED").alias("failed_at"),
-        F.max("event_timestamp").alias("updated_at"),
-    ).select("payment_id", "order_id", "attempt", F.col("latest.status").alias("status"),
-             F.col("latest.status_rank").alias("status_rank"),
-             F.col("latest.event_timestamp").alias("status_timestamp"), "method", "amount_minor", "currency",
-             F.col("latest.failure_reason").alias("failure_reason"), "started_at", "completed_at", "failed_at",
-             "updated_at", F.current_timestamp().alias("silver_updated_at"))
+    latest = F.max_by(
+        F.struct("status", "status_rank", "event_timestamp", "failure_reason"),
+        F.struct("event_timestamp", "status_rank", "event_id"),
+    )
+    return (
+        p.groupBy("payment_id")
+        .agg(
+            F.first("order_id", ignorenulls=True).alias("order_id"),
+            F.first("attempt", ignorenulls=True).alias("attempt"),
+            latest.alias("latest"),
+            F.first("method", ignorenulls=True).alias("method"),
+            F.first("amount_minor", ignorenulls=True).alias("amount_minor"),
+            F.first("currency", ignorenulls=True).alias("currency"),
+            _ts_of("PAYMENT_STARTED").alias("started_at"),
+            _ts_of("PAYMENT_COMPLETED").alias("completed_at"),
+            _ts_of("PAYMENT_FAILED").alias("failed_at"),
+            F.max("event_timestamp").alias("updated_at"),
+        )
+        .select(
+            "payment_id",
+            "order_id",
+            "attempt",
+            F.col("latest.status").alias("status"),
+            F.col("latest.status_rank").alias("status_rank"),
+            F.col("latest.event_timestamp").alias("status_timestamp"),
+            "method",
+            "amount_minor",
+            "currency",
+            F.col("latest.failure_reason").alias("failure_reason"),
+            "started_at",
+            "completed_at",
+            "failed_at",
+            "updated_at",
+            F.current_timestamp().alias("silver_updated_at"),
+        )
+    )
 
 
 def latest_snapshot(df: DataFrame, key: str, cols: list[str]) -> DataFrame:
     """Last-writer-wins snapshot per key (ties broken by event_id)."""
     latest = F.max_by(F.struct(*cols, "event_timestamp", "event_id"), F.struct("event_timestamp", "event_id"))
-    return (df.groupBy(key).agg(latest.alias("l"))
-            .select(key, *[F.col(f"l.{c}").alias(c) for c in cols],
-                    F.col("l.event_timestamp").alias("updated_at"), F.col("l.event_id").alias("last_event_id"),
-                    F.current_timestamp().alias("silver_updated_at")))
+    return (
+        df.groupBy(key)
+        .agg(latest.alias("l"))
+        .select(
+            key,
+            *[F.col(f"l.{c}").alias(c) for c in cols],
+            F.col("l.event_timestamp").alias("updated_at"),
+            F.col("l.event_id").alias("last_event_id"),
+            F.current_timestamp().alias("silver_updated_at"),
+        )
+    )
 
 
-CUSTOMER_COLS = ["email", "phone", "first_name", "last_name", "city", "state", "country", "segment",
-                 "signup_timestamp"]
+CUSTOMER_COLS = [
+    "email",
+    "phone",
+    "first_name",
+    "last_name",
+    "city",
+    "state",
+    "country",
+    "segment",
+    "signup_timestamp",
+]
 PRODUCT_COLS = ["sku", "name", "category", "unit_price_minor", "currency", "active"]
 
 
@@ -165,9 +252,15 @@ def customers_state(customers: DataFrame) -> DataFrame:
 
 
 def customer_changes(customers: DataFrame) -> DataFrame:
-    return customers.select("event_id", "customer_id", "event_type", *CUSTOMER_COLS[:-1],
-                            micros_to_ts(F.col("signup_timestamp")).alias("signup_timestamp"), "event_timestamp",
-                            F.current_timestamp().alias("silver_loaded_at"))
+    return customers.select(
+        "event_id",
+        "customer_id",
+        "event_type",
+        *CUSTOMER_COLS[:-1],
+        micros_to_ts(F.col("signup_timestamp")).alias("signup_timestamp"),
+        "event_timestamp",
+        F.current_timestamp().alias("silver_loaded_at"),
+    )
 
 
 def products_state(products: DataFrame) -> DataFrame:
@@ -175,22 +268,40 @@ def products_state(products: DataFrame) -> DataFrame:
 
 
 def product_changes(products: DataFrame) -> DataFrame:
-    return products.select("event_id", "product_id", "event_type", *PRODUCT_COLS, "event_timestamp",
-                           F.current_timestamp().alias("silver_loaded_at"))
+    return products.select(
+        "event_id",
+        "product_id",
+        "event_type",
+        *PRODUCT_COLS,
+        "event_timestamp",
+        F.current_timestamp().alias("silver_loaded_at"),
+    )
 
 
 def inventory_movements(inv: DataFrame) -> DataFrame:
-    return inv.select("event_id", "inventory_key", "store_id", "product_id", "reason", "on_hand_delta",
-                      "reserved_delta", "order_id", "event_timestamp", F.current_timestamp().alias("silver_loaded_at"))
+    return inv.select(
+        "event_id",
+        "inventory_key",
+        "store_id",
+        "product_id",
+        "reason",
+        "on_hand_delta",
+        "reserved_delta",
+        "order_id",
+        "event_timestamp",
+        F.current_timestamp().alias("silver_loaded_at"),
+    )
 
 
 def inventory_deltas(movements: DataFrame) -> DataFrame:
     return movements.groupBy("inventory_key").agg(
-        F.first("store_id").alias("store_id"), F.first("product_id").alias("product_id"),
+        F.first("store_id").alias("store_id"),
+        F.first("product_id").alias("product_id"),
         F.sum("on_hand_delta").cast("long").alias("quantity_on_hand"),
         F.sum("reserved_delta").cast("long").alias("quantity_reserved"),
         F.count("*").alias("movement_count"),
-        F.max("event_timestamp").alias("updated_at"))
+        F.max("event_timestamp").alias("updated_at"),
+    )
 
 
 # ----------------------------------------------------------------------------- MERGE statements

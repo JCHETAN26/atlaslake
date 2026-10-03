@@ -31,25 +31,49 @@ DS_GOLD = "duckdb://gold"
 DS_SNOWFLAKE = "snowflake://atlaslake"
 
 BRONZE = [f"bronze.{d}" for d in ev.DATASETS]
-SILVER = ["silver.events", "silver.orders", "silver.order_items", "silver.payments", "silver.customers",
-          "silver.customer_changes", "silver.products", "silver.product_changes", "silver.inventory",
-          "silver.inventory_movements"]
+SILVER = [
+    "silver.events",
+    "silver.orders",
+    "silver.order_items",
+    "silver.payments",
+    "silver.customers",
+    "silver.customer_changes",
+    "silver.products",
+    "silver.product_changes",
+    "silver.inventory",
+    "silver.inventory_movements",
+]
 
 # Static (non-dbt) jobs: name -> (inputs, outputs) as (namespace, dataset) pairs
 STATIC_JOBS: dict[str, tuple[list[tuple[str, str]], list[tuple[str, str]]]] = {
     "relay": ([(DS_POSTGRES, "commerce.commerce.outbox")], [(DS_KAFKA, t) for t in ev.TOPICS]),
-    "silver_ingest": ([(DS_KAFKA, t) for t in ev.TOPICS],
-                      [(DS_ICEBERG, t) for t in [*BRONZE, *SILVER, "ops.dlq", "ops.stream_batches"]]),
+    "silver_ingest": (
+        [(DS_KAFKA, t) for t in ev.TOPICS],
+        [(DS_ICEBERG, t) for t in [*BRONZE, *SILVER, "ops.dlq", "ops.stream_batches"]],
+    ),
     "realtime_sales": ([(DS_KAFKA, ev.TOPIC_ORDERS)], [(DS_ICEBERG, "silver.realtime_sales_1m")]),
     "silver_rebuild": ([(DS_ICEBERG, t) for t in BRONZE], [(DS_ICEBERG, t) for t in SILVER]),
     "stores_ingest": ([(DS_POSTGRES, "commerce.commerce.stores")], [(DS_ICEBERG, "silver.stores")]),
-    "dlq_replay": ([(DS_ICEBERG, "ops.dlq"), (DS_POSTGRES, "commerce.commerce.outbox")],
-                   [(DS_KAFKA, t) for t in ev.TOPICS]),
+    "dlq_replay": (
+        [(DS_ICEBERG, "ops.dlq"), (DS_POSTGRES, "commerce.commerce.outbox")],
+        [(DS_KAFKA, t) for t in ev.TOPICS],
+    ),
 }
 
-GOLD_PUBLISHED = ["dim_customer", "dim_product", "dim_store", "dim_date", "fact_orders", "fact_order_items",
-                  "fact_payments", "fact_inventory", "mart_daily_sales", "mart_order_funnel",
-                  "mart_payment_metrics", "mart_inventory_health"]
+GOLD_PUBLISHED = [
+    "dim_customer",
+    "dim_product",
+    "dim_store",
+    "dim_date",
+    "fact_orders",
+    "fact_order_items",
+    "fact_payments",
+    "fact_inventory",
+    "mart_daily_sales",
+    "mart_order_funnel",
+    "mart_payment_metrics",
+    "mart_inventory_health",
+]
 
 
 def _client():
@@ -66,8 +90,15 @@ def _datasets(pairs: list[tuple[str, str]], output: bool) -> list[Any]:
     return [cls(namespace=ns, name=name) for ns, name in pairs]
 
 
-def emit(job: str, inputs: list[tuple[str, str]], outputs: list[tuple[str, str]], success: bool = True,
-         started: datetime | None = None, run_id: str | None = None, facets: dict[str, Any] | None = None) -> bool:
+def emit(
+    job: str,
+    inputs: list[tuple[str, str]],
+    outputs: list[tuple[str, str]],
+    success: bool = True,
+    started: datetime | None = None,
+    run_id: str | None = None,
+    facets: dict[str, Any] | None = None,
+) -> bool:
     """Emit START + COMPLETE/FAIL for one job run."""
     try:
         from openlineage.client.event_v2 import Job, Run, RunEvent, RunState
@@ -78,11 +109,28 @@ def emit(job: str, inputs: list[tuple[str, str]], outputs: list[tuple[str, str]]
         job_obj = Job(namespace=NAMESPACE, name=job)
         run = Run(runId=rid)
         ins, outs = _datasets(inputs, False), _datasets(outputs, True)
-        client.emit(RunEvent(eventType=RunState.START, eventTime=t0, run=run, job=job_obj, inputs=ins,
-                             outputs=outs, producer=PRODUCER))
-        client.emit(RunEvent(eventType=RunState.COMPLETE if success else RunState.FAIL,
-                             eventTime=datetime.now(UTC).isoformat(), run=run, job=job_obj, inputs=ins,
-                             outputs=outs, producer=PRODUCER))
+        client.emit(
+            RunEvent(
+                eventType=RunState.START,
+                eventTime=t0,
+                run=run,
+                job=job_obj,
+                inputs=ins,
+                outputs=outs,
+                producer=PRODUCER,
+            )
+        )
+        client.emit(
+            RunEvent(
+                eventType=RunState.COMPLETE if success else RunState.FAIL,
+                eventTime=datetime.now(UTC).isoformat(),
+                run=run,
+                job=job_obj,
+                inputs=ins,
+                outputs=outs,
+                producer=PRODUCER,
+            )
+        )
         return True
     except Exception as exc:
         log.debug("openlineage emit failed for %s: %s", job, exc)
@@ -94,7 +142,9 @@ def emit_static(job: str, success: bool = True) -> bool:
     return emit(job, ins, outs, success)
 
 
-def dbt_model_edges(manifest: dict[str, Any]) -> dict[str, tuple[list[tuple[str, str]], list[tuple[str, str]]]]:
+def dbt_model_edges(
+    manifest: dict[str, Any],
+) -> dict[str, tuple[list[tuple[str, str]], list[tuple[str, str]]]]:
     """model name -> (inputs, outputs), resolving dbt sources to the Iceberg tables they read."""
     nodes = manifest["nodes"]
     out = {}

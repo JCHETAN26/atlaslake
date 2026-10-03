@@ -53,8 +53,9 @@ class BatchStats:
 
 def content_key(df: DataFrame, cols: list[str], scope: str) -> str:
     """Order-independent fingerprint of a row set (count + sum of 64-bit hashes)."""
-    row = df.agg(F.count("*").alias("n"),
-                 F.sum(F.xxhash64(*cols).cast("decimal(38,0)")).alias("h")).collect()[0]
+    row = df.agg(
+        F.count("*").alias("n"), F.sum(F.xxhash64(*cols).cast("decimal(38,0)")).alias("h")
+    ).collect()[0]
     return f"{scope}:{row['n']}:{row['h']}"
 
 
@@ -91,8 +92,14 @@ class _Lap:
 
 
 class SilverProcessor:
-    def __init__(self, spark: SparkSession, query: str, write_bronze: bool = True,
-                 allowed_lateness_s: int = ALLOWED_LATENESS_S, parallel_writes: bool = True) -> None:
+    def __init__(
+        self,
+        spark: SparkSession,
+        query: str,
+        write_bronze: bool = True,
+        allowed_lateness_s: int = ALLOWED_LATENESS_S,
+        parallel_writes: bool = True,
+    ) -> None:
         self.spark = spark
         # Writes to *different* Iceberg tables are independent commits: run them concurrently.
         self.parallel_writes = parallel_writes
@@ -122,19 +129,38 @@ class SilverProcessor:
             now = F.current_timestamp()
 
             if self.write_bronze:
+
                 def bronze_task(topic: str):
                     def run() -> None:
                         rows = decoded.filter(F.col("topic") == topic)
                         bronze = rows.select(
-                            "source", "topic", "kafka_partition", "kafka_offset", "kafka_key", "payload",
-                            "ingestion_timestamp", "schema_id", "schema_version", "event_id", "event_type",
+                            "source",
+                            "topic",
+                            "kafka_partition",
+                            "kafka_offset",
+                            "kafka_key",
+                            "payload",
+                            "ingestion_timestamp",
+                            "schema_id",
+                            "schema_version",
+                            "event_id",
+                            "event_type",
                             "event_timestamp",
-                            F.when(F.col("error_codes").isin("CORRUPT_PAYLOAD", "AVRO_DECODE_ERROR", "UNKNOWN_SCHEMA_ID"),
-                                   F.col("error_codes")).alias("decode_error"),
-                            now.alias("bronze_loaded_at"))
-                        key = content_key(rows, ["topic", "kafka_partition", "kafka_offset"], f"bronze:{topic}")
+                            F.when(
+                                F.col("error_codes").isin(
+                                    "CORRUPT_PAYLOAD", "AVRO_DECODE_ERROR", "UNKNOWN_SCHEMA_ID"
+                                ),
+                                F.col("error_codes"),
+                            ).alias("decode_error"),
+                            now.alias("bronze_loaded_at"),
+                        )
+                        key = content_key(
+                            rows, ["topic", "kafka_partition", "kafka_offset"], f"bronze:{topic}"
+                        )
                         append_once(spark, bronze, f"bronze.{ev.TOPIC_TO_DATASET[topic]}", key, stats)
+
                     return run
+
                 self._run_all([bronze_task(t) for t in topics])
             lap("bronze_append")
             invalid = decoded.filter(F.col("error_codes").isNotNull())
@@ -142,34 +168,65 @@ class SilverProcessor:
             self._write_dlq(invalid)
 
             lap("dlq_merge")
-            ranked = valid.withColumn("_rn", F.row_number().over(
-                Window.partitionBy("event_id").orderBy("ingestion_timestamp", "kafka_partition", "kafka_offset")))
+            ranked = valid.withColumn(
+                "_rn",
+                F.row_number().over(
+                    Window.partitionBy("event_id").orderBy(
+                        "ingestion_timestamp", "kafka_partition", "kafka_offset"
+                    )
+                ),
+            )
             deduped = ranked.filter("_rn = 1").drop("_rn")
-            bounds = deduped.agg(F.min("event_timestamp").alias("lo"), F.max("event_timestamp").alias("hi")).collect()[0]
+            bounds = deduped.agg(
+                F.min("event_timestamp").alias("lo"), F.max("event_timestamp").alias("hi")
+            ).collect()[0]
             ledger = spark.table(fq("silver.events")).select("event_id", "event_timestamp", "topic")
             if bounds["lo"] is not None:
-                ledger = ledger.filter(F.col("topic").isin(topics)
-                                       & F.col("event_timestamp").between(bounds["lo"], bounds["hi"]))
+                ledger = ledger.filter(
+                    F.col("topic").isin(topics) & F.col("event_timestamp").between(bounds["lo"], bounds["hi"])
+                )
             new = deduped.join(ledger.select("event_id"), "event_id", "left_anti").persist()
 
             new.count()
             lap("dedup_ledger_antijoin")
-            per_topic = {r["topic"]: r.asDict() for r in decoded.groupBy("topic").agg(
-                F.count("*").alias("received"),
-                F.sum(F.col("error_codes").isNotNull().cast("int")).alias("rejected")).collect()}
-            for r in valid.groupBy("topic").agg(
-                    (F.count("*") - F.countDistinct("event_id")).alias("dup_in_batch")).collect():
+            per_topic = {
+                r["topic"]: r.asDict()
+                for r in decoded.groupBy("topic")
+                .agg(
+                    F.count("*").alias("received"),
+                    F.sum(F.col("error_codes").isNotNull().cast("int")).alias("rejected"),
+                )
+                .collect()
+            }
+            for r in (
+                valid.groupBy("topic")
+                .agg((F.count("*") - F.countDistinct("event_id")).alias("dup_in_batch"))
+                .collect()
+            ):
                 per_topic[r["topic"]]["duplicates_in_batch"] = int(r["dup_in_batch"])
             for r in deduped.groupBy("topic").count().collect():
                 per_topic[r["topic"]]["deduped"] = int(r["count"])
-            late_expr = (F.unix_timestamp("ingestion_timestamp") - F.unix_timestamp("event_timestamp")) > self.allowed_lateness_s
-            for r in new.groupBy("topic").agg(F.count("*").alias("n"),
-                                               F.sum(late_expr.cast("int")).alias("late"),
-                                               F.min("event_timestamp").alias("min_ts"),
-                                               F.max("event_timestamp").alias("max_ts"),
-                                               F.max("ingestion_timestamp").alias("max_ing")).collect():
-                per_topic[r["topic"]].update(accepted_new=int(r["n"]), late=int(r["late"] or 0),
-                                             min_ts=r["min_ts"], max_ts=r["max_ts"], max_ing=r["max_ing"])
+            late_expr = (
+                F.unix_timestamp("ingestion_timestamp") - F.unix_timestamp("event_timestamp")
+            ) > self.allowed_lateness_s
+            for r in (
+                new.groupBy("topic")
+                .agg(
+                    F.count("*").alias("n"),
+                    F.sum(late_expr.cast("int")).alias("late"),
+                    F.min("event_timestamp").alias("min_ts"),
+                    F.max("event_timestamp").alias("max_ts"),
+                    F.max("ingestion_timestamp").alias("max_ing"),
+                )
+                .collect()
+            ):
+                per_topic[r["topic"]].update(
+                    accepted_new=int(r["n"]),
+                    late=int(r["late"] or 0),
+                    min_ts=r["min_ts"],
+                    max_ts=r["max_ts"],
+                    max_ing=r["max_ing"],
+                )
             for t, d in per_topic.items():
                 d.setdefault("duplicates_in_batch", 0)
                 d.setdefault("accepted_new", 0)
@@ -187,9 +244,20 @@ class SilverProcessor:
             if stats.accepted_new:
                 self._apply_entities(new, topics, stats)
                 lap("entity_merges")
-                ledger_rows = new.select("event_id", "event_type", "topic", "entity_key", "event_timestamp",
-                                         "ingestion_timestamp", "schema_version", "kafka_partition",
-                                         "kafka_offset", "source", "record_json", now.alias("silver_loaded_at"))
+                ledger_rows = new.select(
+                    "event_id",
+                    "event_type",
+                    "topic",
+                    "entity_key",
+                    "event_timestamp",
+                    "ingestion_timestamp",
+                    "schema_version",
+                    "kafka_partition",
+                    "kafka_offset",
+                    "source",
+                    "record_json",
+                    now.alias("silver_loaded_at"),
+                )
                 ledger_rows.writeTo(fq("silver.events")).append()
                 lap("ledger_append")
             new.unpersist()
@@ -204,14 +272,35 @@ class SilverProcessor:
     def _write_dlq(self, invalid: DataFrame) -> None:
         dlq = invalid.select(
             F.concat_ws("/", "topic", "kafka_partition", "kafka_offset").alias("dlq_id"),
-            "source", "topic", "kafka_partition", "kafka_offset", "kafka_key", "payload", "schema_id",
-            "schema_version", "event_id", "event_type", "event_timestamp", "error_codes", "error_message",
-            "ingestion_timestamp", F.current_timestamp().alias("dlq_timestamp"), F.lit("PENDING").alias("status"),
-            F.lit(None).cast("string").alias("resolution_note"), F.lit(None).cast("timestamp").alias("resolved_at"))
+            "source",
+            "topic",
+            "kafka_partition",
+            "kafka_offset",
+            "kafka_key",
+            "payload",
+            "schema_id",
+            "schema_version",
+            "event_id",
+            "event_type",
+            "event_timestamp",
+            "error_codes",
+            "error_message",
+            "ingestion_timestamp",
+            F.current_timestamp().alias("dlq_timestamp"),
+            F.lit("PENDING").alias("status"),
+            F.lit(None).cast("string").alias("resolution_note"),
+            F.lit(None).cast("timestamp").alias("resolved_at"),
+        )
         if dlq.isEmpty():
             return
-        _merge(self.spark, dlq, T.MERGE_INSERT_ONLY, "dlq_batch", target=fq("ops.dlq"),
-               on="t.dlq_id = s.dlq_id AND t.topic = s.topic")
+        _merge(
+            self.spark,
+            dlq,
+            T.MERGE_INSERT_ONLY,
+            "dlq_batch",
+            target=fq("ops.dlq"),
+            on="t.dlq_id = s.dlq_id AND t.topic = s.topic",
+        )
 
     def _run_all(self, tasks: list) -> None:
         if not self.parallel_writes or len(tasks) <= 1:
@@ -231,26 +320,62 @@ class SilverProcessor:
         def orders_task() -> None:
             orders = T.typed(new, ev.TOPIC_ORDERS)
             _merge(spark, T.reduce_orders(orders), T.MERGE_ORDERS, "orders_patch", target=fq("silver.orders"))
-            _merge(spark, T.order_items(orders), T.MERGE_INSERT_ONLY, "items_patch", target=fq("silver.order_items"),
-                   on="t.order_id = s.order_id AND t.line_number = s.line_number")
+            _merge(
+                spark,
+                T.order_items(orders),
+                T.MERGE_INSERT_ONLY,
+                "items_patch",
+                target=fq("silver.order_items"),
+                on="t.order_id = s.order_id AND t.line_number = s.line_number",
+            )
 
         def payments_task() -> None:
             pays = T.typed(new, ev.TOPIC_PAYMENTS)
-            _merge(spark, T.reduce_payments(pays), T.MERGE_PAYMENTS, "payments_patch", target=fq("silver.payments"))
+            _merge(
+                spark,
+                T.reduce_payments(pays),
+                T.MERGE_PAYMENTS,
+                "payments_patch",
+                target=fq("silver.payments"),
+            )
 
         def customers_task() -> None:
             cust = T.typed(new, ev.TOPIC_CUSTOMERS)
-            _merge(spark, T.customers_state(cust), T.MERGE_LWW, "customers_patch", target=fq("silver.customers"),
-                   key="customer_id")
-            _merge(spark, T.customer_changes(cust), T.MERGE_INSERT_ONLY, "customer_changes_patch",
-                   target=fq("silver.customer_changes"), on="t.event_id = s.event_id")
+            _merge(
+                spark,
+                T.customers_state(cust),
+                T.MERGE_LWW,
+                "customers_patch",
+                target=fq("silver.customers"),
+                key="customer_id",
+            )
+            _merge(
+                spark,
+                T.customer_changes(cust),
+                T.MERGE_INSERT_ONLY,
+                "customer_changes_patch",
+                target=fq("silver.customer_changes"),
+                on="t.event_id = s.event_id",
+            )
 
         def products_task() -> None:
             prod = T.typed(new, ev.TOPIC_PRODUCTS)
-            _merge(spark, T.products_state(prod), T.MERGE_LWW, "products_patch", target=fq("silver.products"),
-                   key="product_id")
-            _merge(spark, T.product_changes(prod), T.MERGE_INSERT_ONLY, "product_changes_patch",
-                   target=fq("silver.product_changes"), on="t.event_id = s.event_id")
+            _merge(
+                spark,
+                T.products_state(prod),
+                T.MERGE_LWW,
+                "products_patch",
+                target=fq("silver.products"),
+                key="product_id",
+            )
+            _merge(
+                spark,
+                T.product_changes(prod),
+                T.MERGE_INSERT_ONLY,
+                "product_changes_patch",
+                target=fq("silver.product_changes"),
+                on="t.event_id = s.event_id",
+            )
 
         def inventory_task() -> None:
             mov = T.inventory_movements(T.typed(new, ev.TOPIC_INVENTORY)).persist()
@@ -261,39 +386,79 @@ class SilverProcessor:
                 else:
                     deltas = T.inventory_deltas(mov)
                     cur = spark.table(fq("silver.inventory"))
-                    merged = (cur.alias("c").join(deltas.alias("d"), "inventory_key", "full_outer").select(
-                        "inventory_key",
-                        F.coalesce("c.store_id", "d.store_id").alias("store_id"),
-                        F.coalesce("c.product_id", "d.product_id").alias("product_id"),
-                        (F.coalesce("c.quantity_on_hand", F.lit(0)) + F.coalesce("d.quantity_on_hand", F.lit(0))).alias("quantity_on_hand"),
-                        (F.coalesce("c.quantity_reserved", F.lit(0)) + F.coalesce("d.quantity_reserved", F.lit(0))).alias("quantity_reserved"),
-                        (F.coalesce("c.movement_count", F.lit(0)) + F.coalesce("d.movement_count", F.lit(0))).alias("movement_count"),
-                        F.greatest("c.updated_at", "d.updated_at").alias("updated_at"),
-                        F.when(F.col("d.inventory_key").isNotNull(), F.current_timestamp())
-                         .otherwise(F.col("c.silver_updated_at")).alias("silver_updated_at"),
-                    )).localCheckpoint(eager=True)
-                    (merged.writeTo(fq("silver.inventory"))
-                     .option(f"snapshot-property.{BATCH_KEY_PROP}", key).overwrite(F.lit(True)))
-                append_once(spark, mov, "silver.inventory_movements", key.replace("inventory", "movements", 1), stats)
+                    merged = (
+                        cur.alias("c")
+                        .join(deltas.alias("d"), "inventory_key", "full_outer")
+                        .select(
+                            "inventory_key",
+                            F.coalesce("c.store_id", "d.store_id").alias("store_id"),
+                            F.coalesce("c.product_id", "d.product_id").alias("product_id"),
+                            (
+                                F.coalesce("c.quantity_on_hand", F.lit(0))
+                                + F.coalesce("d.quantity_on_hand", F.lit(0))
+                            ).alias("quantity_on_hand"),
+                            (
+                                F.coalesce("c.quantity_reserved", F.lit(0))
+                                + F.coalesce("d.quantity_reserved", F.lit(0))
+                            ).alias("quantity_reserved"),
+                            (
+                                F.coalesce("c.movement_count", F.lit(0))
+                                + F.coalesce("d.movement_count", F.lit(0))
+                            ).alias("movement_count"),
+                            F.greatest("c.updated_at", "d.updated_at").alias("updated_at"),
+                            F.when(F.col("d.inventory_key").isNotNull(), F.current_timestamp())
+                            .otherwise(F.col("c.silver_updated_at"))
+                            .alias("silver_updated_at"),
+                        )
+                    ).localCheckpoint(eager=True)
+                    (
+                        merged.writeTo(fq("silver.inventory"))
+                        .option(f"snapshot-property.{BATCH_KEY_PROP}", key)
+                        .overwrite(F.lit(True))
+                    )
+                append_once(
+                    spark, mov, "silver.inventory_movements", key.replace("inventory", "movements", 1), stats
+                )
             mov.unpersist()
 
-        for topic, task in ((ev.TOPIC_ORDERS, orders_task), (ev.TOPIC_PAYMENTS, payments_task),
-                            (ev.TOPIC_CUSTOMERS, customers_task), (ev.TOPIC_PRODUCTS, products_task),
-                            (ev.TOPIC_INVENTORY, inventory_task)):
+        for topic, task in (
+            (ev.TOPIC_ORDERS, orders_task),
+            (ev.TOPIC_PAYMENTS, payments_task),
+            (ev.TOPIC_CUSTOMERS, customers_task),
+            (ev.TOPIC_PRODUCTS, products_task),
+            (ev.TOPIC_INVENTORY, inventory_task),
+        ):
             if topic in topics:
                 tasks.append(task)
         self._run_all(tasks)
 
     def _write_batch_stats(self, batch_id: int, stats: BatchStats) -> None:
-        rows = [(self.query, int(batch_id), t, int(d.get("received", 0)), int(d.get("received", 0)) - int(d["rejected"]),
-                 int(d["rejected"]), int(d["duplicates_in_batch"]), int(d["duplicates_known"]),
-                 int(d["accepted_new"]), int(d["late"]), d.get("min_ts"), d.get("max_ts"), d.get("max_ing"),
-                 int(stats.duration_s * 1000)) for t, d in stats.by_topic.items()]
+        rows = [
+            (
+                self.query,
+                int(batch_id),
+                t,
+                int(d.get("received", 0)),
+                int(d.get("received", 0)) - int(d["rejected"]),
+                int(d["rejected"]),
+                int(d["duplicates_in_batch"]),
+                int(d["duplicates_known"]),
+                int(d["accepted_new"]),
+                int(d["late"]),
+                d.get("min_ts"),
+                d.get("max_ts"),
+                d.get("max_ing"),
+                int(stats.duration_s * 1000),
+            )
+            for t, d in stats.by_topic.items()
+        ]
         if not rows:
             return
-        schema = ("query string, batch_id bigint, topic string, received bigint, decoded bigint, rejected bigint, "
-                  "duplicates_in_batch bigint, duplicates_known bigint, accepted_new bigint, late_events bigint, "
-                  "min_event_timestamp timestamp, max_event_timestamp timestamp, max_ingestion_timestamp timestamp, "
-                  "duration_ms bigint")
+        schema = (
+            "query string, batch_id bigint, topic string, received bigint, decoded bigint, rejected bigint, "
+            "duplicates_in_batch bigint, duplicates_known bigint, accepted_new bigint, late_events bigint, "
+            "min_event_timestamp timestamp, max_event_timestamp timestamp, max_ingestion_timestamp timestamp, "
+            "duration_ms bigint"
+        )
         df = self.spark.createDataFrame(rows, schema).withColumn("processed_at", F.current_timestamp())
         append_once(self.spark, df, "ops.stream_batches", f"stats:{self.query}:{batch_id}", stats)

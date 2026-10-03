@@ -56,7 +56,9 @@ def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = N
     os.environ["PYSPARK_PYTHON"] = sys.executable
     os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
     # Scratch space must support hard links (RocksDB state store) => not the exFAT data drive.
-    local_dir = Path(os.environ.get("ATLAS_SPARK_LOCAL_DIR", Path.home() / ".cache" / "atlaslake" / "spark-local"))
+    local_dir = Path(
+        os.environ.get("ATLAS_SPARK_LOCAL_DIR", Path.home() / ".cache" / "atlaslake" / "spark-local")
+    )
     local_dir.mkdir(parents=True, exist_ok=True)
     builder = (
         SparkSession.builder.appName(app_name)
@@ -74,8 +76,10 @@ def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = N
         .config("spark.sql.execution.arrow.pyspark.enabled", "true")
         .config("spark.ui.showConsoleProgress", "false")
         .config("spark.sql.defaultCatalog", cfg.catalog_name)
-        .config("spark.sql.streaming.stateStore.providerClass",
-                "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider")
+        .config(
+            "spark.sql.streaming.stateStore.providerClass",
+            "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider",
+        )
     )
     for key, value in {**iceberg_catalog_conf(cfg), **(extra_conf or {})}.items():
         builder = builder.config(key, value)

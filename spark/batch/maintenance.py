@@ -36,8 +36,8 @@ class Retention:
 
 
 RETENTION: dict[str, Retention] = {
-    "bronze": Retention(snapshot_days=30, retain_last=50),   # raw history: generous replay window
-    "silver": Retention(snapshot_days=7, retain_last=20),    # time travel for a week of audits
+    "bronze": Retention(snapshot_days=30, retain_last=50),  # raw history: generous replay window
+    "silver": Retention(snapshot_days=7, retain_last=20),  # time travel for a week of audits
     "ops": Retention(snapshot_days=14, retain_last=20),
 }
 
@@ -68,29 +68,52 @@ def _cat() -> str:
     return settings().catalog_name
 
 
-def compact_table(spark: SparkSession, table: str, target_file_mb: int = 128, strategy: str = "binpack",
-                  sort_order: str | None = None) -> dict[str, Any]:
+def compact_table(
+    spark: SparkSession,
+    table: str,
+    target_file_mb: int = 128,
+    strategy: str = "binpack",
+    sort_order: str | None = None,
+) -> dict[str, Any]:
     before = file_stats(table)
     t0 = time.time()
     opts = f"map('target-file-size-bytes', '{target_file_mb * MB}', 'min-input-files', '2', 'partial-progress.enabled', 'true')"
     sort = f", sort_order => '{sort_order}'" if sort_order else ""
-    row = spark.sql(
-        f"CALL {_cat()}.system.rewrite_data_files(table => '{table}', strategy => '{strategy}'{sort}, options => {opts})"
-    ).collect()[0].asDict()
+    row = (
+        spark.sql(
+            f"CALL {_cat()}.system.rewrite_data_files(table => '{table}', strategy => '{strategy}'{sort}, options => {opts})"
+        )
+        .collect()[0]
+        .asDict()
+    )
     spark.sql(f"CALL {_cat()}.system.rewrite_manifests('{table}')").collect()
     after = file_stats(table)
-    return {"table": table, "runtime_s": round(time.time() - t0, 3), "result": row, "before": before, "after": after}
+    return {
+        "table": table,
+        "runtime_s": round(time.time() - t0, 3),
+        "result": row,
+        "before": before,
+        "after": after,
+    }
 
 
-def expire_snapshots(spark: SparkSession, table: str, older_than: datetime, retain_last: int) -> dict[str, Any]:
-    row = spark.sql(
-        f"CALL {_cat()}.system.expire_snapshots(table => '{table}', "
-        f"older_than => TIMESTAMP '{older_than.strftime('%Y-%m-%d %H:%M:%S')}', retain_last => {retain_last})"
-    ).collect()[0].asDict()
+def expire_snapshots(
+    spark: SparkSession, table: str, older_than: datetime, retain_last: int
+) -> dict[str, Any]:
+    row = (
+        spark.sql(
+            f"CALL {_cat()}.system.expire_snapshots(table => '{table}', "
+            f"older_than => TIMESTAMP '{older_than.strftime('%Y-%m-%d %H:%M:%S')}', retain_last => {retain_last})"
+        )
+        .collect()[0]
+        .asDict()
+    )
     return {k: int(v) for k, v in row.items()}
 
 
-def remove_orphans(spark: SparkSession, table: str, older_than: datetime, dry_run: bool = False) -> dict[str, Any]:
+def remove_orphans(
+    spark: SparkSession, table: str, older_than: datetime, dry_run: bool = False
+) -> dict[str, Any]:
     try:
         rows = spark.sql(
             f"CALL {_cat()}.system.remove_orphan_files(table => '{table}', "
@@ -106,11 +129,15 @@ def needs_compaction(stats: dict[str, Any], policy: Retention) -> bool:
     return stats["data_files"] > policy.min_files and stats["avg_file_bytes"] < policy.small_file_mb * MB
 
 
-def run_maintenance(spark: SparkSession, tables: list[str] | None = None, dry_run: bool = False,
-                    now: datetime | None = None) -> dict[str, Any]:
+def run_maintenance(
+    spark: SparkSession, tables: list[str] | None = None, dry_run: bool = False, now: datetime | None = None
+) -> dict[str, Any]:
     now = now or datetime.now(UTC).replace(tzinfo=None)
-    report: dict[str, Any] = {"started_at": now.isoformat(), "policy": {k: asdict(v) for k, v in RETENTION.items()},
-                              "tables": {}}
+    report: dict[str, Any] = {
+        "started_at": now.isoformat(),
+        "policy": {k: asdict(v) for k, v in RETENTION.items()},
+        "tables": {},
+    }
     for table in tables or list(TABLES):
         layer = table.split(".")[0]
         policy = RETENTION.get(layer)
@@ -120,19 +147,32 @@ def run_maintenance(spark: SparkSession, tables: list[str] | None = None, dry_ru
         if needs_compaction(entry["before"], policy) and not dry_run:
             entry["compaction"] = compact_table(spark, table, policy.target_file_mb)["result"]
         if not dry_run:
-            entry["expire"] = expire_snapshots(spark, table, now - timedelta(days=policy.snapshot_days), policy.retain_last)
-        entry["orphans"] = remove_orphans(spark, table, now - timedelta(days=policy.orphan_days), dry_run=dry_run)
+            entry["expire"] = expire_snapshots(
+                spark, table, now - timedelta(days=policy.snapshot_days), policy.retain_last
+            )
+        entry["orphans"] = remove_orphans(
+            spark, table, now - timedelta(days=policy.orphan_days), dry_run=dry_run
+        )
         entry["after"] = file_stats(table)
         report["tables"][table] = entry
-        log.info("maintained %s: files %s -> %s, snapshots %s -> %s", table, entry["before"]["data_files"],
-                 entry["after"]["data_files"], entry["before"]["snapshots"], entry["after"]["snapshots"])
+        log.info(
+            "maintained %s: files %s -> %s, snapshots %s -> %s",
+            table,
+            entry["before"]["data_files"],
+            entry["after"]["data_files"],
+            entry["before"]["snapshots"],
+            entry["after"]["snapshots"],
+        )
     try:
         from monitoring.metrics import push_job_metrics
 
-        push_job_metrics("iceberg_maintenance", {
-            "tables": len(report["tables"]),
-            "files_after": sum(t["after"]["data_files"] for t in report["tables"].values()),
-        })
+        push_job_metrics(
+            "iceberg_maintenance",
+            {
+                "tables": len(report["tables"]),
+                "files_after": sum(t["after"]["data_files"] for t in report["tables"].values()),
+            },
+        )
     except Exception:
         pass
     return report

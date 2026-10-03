@@ -22,7 +22,9 @@ from core.config import REPO_ROOT, settings
 
 def git_sha() -> str:
     try:
-        sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_ROOT, text=True).strip()
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=REPO_ROOT, text=True
+        ).strip()
         dirty = subprocess.call(["git", "diff", "--quiet"], cwd=REPO_ROOT) != 0
         return f"{sha}{'-dirty' if dirty else ''}"
     except Exception:
@@ -40,7 +42,16 @@ def _mem_gb() -> float | None:
 
 def run_context() -> dict[str, Any]:
     versions = {}
-    for pkg in ("pyspark", "pyiceberg", "duckdb", "dbt-core", "dbt-duckdb", "confluent-kafka", "pandas", "pyarrow"):
+    for pkg in (
+        "pyspark",
+        "pyiceberg",
+        "duckdb",
+        "dbt-core",
+        "dbt-duckdb",
+        "confluent-kafka",
+        "pandas",
+        "pyarrow",
+    ):
         try:
             versions[pkg] = metadata.version(pkg)
         except metadata.PackageNotFoundError:
@@ -51,8 +62,12 @@ def run_context() -> dict[str, Any]:
     return {
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "git_sha": git_sha(),
-        "host": {"cpus": os.cpu_count(), "memory_gb": _mem_gb(), "platform": platform.platform(),
-                 "python": platform.python_version()},
+        "host": {
+            "cpus": os.cpu_count(),
+            "memory_gb": _mem_gb(),
+            "platform": platform.platform(),
+            "python": platform.python_version(),
+        },
         "versions": versions,
     }
 
@@ -76,8 +91,15 @@ def percentiles(samples: list[float]) -> dict[str, float]:
         lo, hi = int(k), min(int(k) + 1, len(s) - 1)
         return s[lo] + (s[hi] - s[lo]) * (k - lo)
 
-    return {"n": len(s), "p50": round(pct(0.5), 4), "p95": round(pct(0.95), 4), "p99": round(pct(0.99), 4),
-            "min": round(s[0], 4), "max": round(s[-1], 4), "mean": round(statistics.fmean(s), 4)}
+    return {
+        "n": len(s),
+        "p50": round(pct(0.5), 4),
+        "p95": round(pct(0.95), 4),
+        "p99": round(pct(0.99), 4),
+        "min": round(s[0], 4),
+        "max": round(s[-1], 4),
+        "mean": round(statistics.fmean(s), 4),
+    }
 
 
 class Stopwatch:

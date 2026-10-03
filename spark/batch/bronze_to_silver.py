@@ -20,8 +20,13 @@ from spark.common.pipeline import BatchStats, SilverProcessor
 from spark.common.tables import create_all, fq
 
 
-def bronze_raw(spark: SparkSession, datasets: list[str], date_from: date | None = None,
-               date_to: date | None = None, by: str = "event") -> DataFrame:
+def bronze_raw(
+    spark: SparkSession,
+    datasets: list[str],
+    date_from: date | None = None,
+    date_to: date | None = None,
+    by: str = "event",
+) -> DataFrame:
     """Union selected Bronze tables, optionally restricted to a date range (inclusive)."""
     frames = []
     for d in datasets:
@@ -30,7 +35,9 @@ def bronze_raw(spark: SparkSession, datasets: list[str], date_from: date | None 
         if date_from:
             df = df.filter(F.col(col) >= F.lit(datetime.combine(date_from, datetime.min.time())))
         if date_to:
-            df = df.filter(F.col(col) < F.lit(datetime.combine(date_to + timedelta(days=1), datetime.min.time())))
+            df = df.filter(
+                F.col(col) < F.lit(datetime.combine(date_to + timedelta(days=1), datetime.min.time()))
+            )
         frames.append(df.select(*RAW_SCHEMA.fieldNames()))
     out = frames[0]
     for f in frames[1:]:
@@ -43,24 +50,32 @@ def resolve_dlq(spark: SparkSession, processed: DataFrame) -> int:
     from core.config import settings
     from spark.common.decode import decode
 
-    ok = (decode(processed, settings().kafka.schema_registry_url)
-          .filter(F.col("error_codes").isNull())
-          .select(F.concat_ws("/", "topic", "kafka_partition", "kafka_offset").alias("dlq_id")))
+    ok = (
+        decode(processed, settings().kafka.schema_registry_url)
+        .filter(F.col("error_codes").isNull())
+        .select(F.concat_ws("/", "topic", "kafka_partition", "kafka_offset").alias("dlq_id"))
+    )
     pending = spark.table(fq("ops.dlq")).filter("status = 'PENDING'").select("dlq_id")
     hits = ok.join(pending, "dlq_id").distinct()
     n = hits.count()
     if n:
         hits.createOrReplaceTempView("dlq_resolved")
-        spark.sql(f"""MERGE INTO {fq('ops.dlq')} t USING dlq_resolved s ON t.dlq_id = s.dlq_id
+        spark.sql(f"""MERGE INTO {fq("ops.dlq")} t USING dlq_resolved s ON t.dlq_id = s.dlq_id
                       WHEN MATCHED AND t.status = 'PENDING' THEN UPDATE SET
                         status = 'REPROCESSED', resolved_at = current_timestamp(),
                         resolution_note = 'record passes current validation on re-processing'""")
     return n
 
 
-def run(spark: SparkSession, datasets: list[str] | None = None, date_from: date | None = None,
-        date_to: date | None = None, by: str = "event", query: str | None = None,
-        reprocess_dlq: bool = True) -> dict:
+def run(
+    spark: SparkSession,
+    datasets: list[str] | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    by: str = "event",
+    query: str | None = None,
+    reprocess_dlq: bool = True,
+) -> dict:
     create_all(spark)
     datasets = datasets or list(ev.DATASETS)
     t0 = time.time()
@@ -69,6 +84,12 @@ def run(spark: SparkSession, datasets: list[str] | None = None, date_from: date 
     stats: BatchStats = processor.process_raw(raw, 0)
     resolved = resolve_dlq(spark, raw) if reprocess_dlq else 0
     raw.unpersist()
-    return {"datasets": datasets, "from": str(date_from) if date_from else None,
-            "to": str(date_to) if date_to else None, "by": by, "dlq_reprocessed": resolved,
-            "runtime_s": round(time.time() - t0, 3), **stats.as_dict()}
+    return {
+        "datasets": datasets,
+        "from": str(date_from) if date_from else None,
+        "to": str(date_to) if date_to else None,
+        "by": by,
+        "dlq_reprocessed": resolved,
+        "runtime_s": round(time.time() - t0, 3),
+        **stats.as_dict(),
+    }

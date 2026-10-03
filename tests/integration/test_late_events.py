@@ -29,9 +29,14 @@ def test_watermark_policy_on_time_slightly_late_very_late(clean_platform, produc
     send_all(producer, [created("o_late_on_time", now, 100)])
     progress = _run_rt(spark)
     # 2) arrivals after the watermark moved: 5 min late (inside), 1 h late and 1 day late (beyond)
-    send_all(producer, [created("o_late_5m", now - timedelta(minutes=5), 200),
-                        created("o_late_1h", now - timedelta(hours=1), 400),
-                        created("o_late_1d", now - timedelta(days=1), 800)])
+    send_all(
+        producer,
+        [
+            created("o_late_5m", now - timedelta(minutes=5), 200),
+            created("o_late_1h", now - timedelta(hours=1), 400),
+            created("o_late_1d", now - timedelta(days=1), 800),
+        ],
+    )
     progress += _run_rt(spark)
     # 3) a later event pushes the watermark past those windows so append-mode emits them
     send_all(producer, [created("o_late_flush", now + timedelta(minutes=30), 1)])
@@ -39,9 +44,9 @@ def test_watermark_policy_on_time_slightly_late_very_late(clean_platform, produc
 
     windows = {(r["window_start"], r["currency"]): r for r in table(spark, "silver.realtime_sales_1m")}
     starts = {k[0].replace(tzinfo=None) for k in windows}
-    assert now.replace(tzinfo=None) in starts                              # on time
-    assert (now - timedelta(minutes=5)).replace(tzinfo=None) in starts     # slightly late: counted
-    assert (now - timedelta(hours=1)).replace(tzinfo=None) not in starts   # very late: excluded
+    assert now.replace(tzinfo=None) in starts  # on time
+    assert (now - timedelta(minutes=5)).replace(tzinfo=None) in starts  # slightly late: counted
+    assert (now - timedelta(hours=1)).replace(tzinfo=None) not in starts  # very late: excluded
     assert (now - timedelta(days=1)).replace(tzinfo=None) not in starts
     assert rt.dropped_by_watermark(progress) == 2
 

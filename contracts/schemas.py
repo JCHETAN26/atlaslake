@@ -74,8 +74,15 @@ def to_record(event: dict[str, Any], topic: str, version: int, producer: str = e
             rec[name] = version
         else:
             rec[name] = _clean(event.get(name))
-    for int_field in ("amount_minor", "attempt", "on_hand_delta", "reserved_delta", "unit_price_minor",
-                      "event_timestamp", "signup_timestamp"):
+    for int_field in (
+        "amount_minor",
+        "attempt",
+        "on_hand_delta",
+        "reserved_delta",
+        "unit_price_minor",
+        "event_timestamp",
+        "signup_timestamp",
+    ):
         if rec.get(int_field) is not None and not isinstance(rec[int_field], int):
             rec[int_field] = int(rec[int_field])
     return rec

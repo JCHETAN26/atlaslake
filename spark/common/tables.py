@@ -22,8 +22,12 @@ COMMON_PROPS = {
 # Row-level changes on Silver state tables: copy-on-write keeps every reader (DuckDB, PyIceberg,
 # Snowflake) simple; the write amplification it causes is one of the things compaction/partitioning
 # experiments measure.
-STATE_PROPS = {**COMMON_PROPS, "write.merge.mode": "copy-on-write", "write.update.mode": "copy-on-write",
-               "write.delete.mode": "copy-on-write"}
+STATE_PROPS = {
+    **COMMON_PROPS,
+    "write.merge.mode": "copy-on-write",
+    "write.update.mode": "copy-on-write",
+    "write.delete.mode": "copy-on-write",
+}
 
 BRONZE_COLUMNS = """
     source               string    COMMENT 'kafka | replay | batch',
@@ -48,7 +52,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         f"bronze.{d}": (BRONZE_COLUMNS, "days(ingestion_timestamp)", COMMON_PROPS)
         for d in ("orders", "payments", "inventory", "customers", "products")
     },
-    "silver.events": ("""
+    "silver.events": (
+        """
         event_id             string NOT NULL,
         event_type           string NOT NULL,
         topic                string NOT NULL,
@@ -61,8 +66,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         source               string,
         record_json          string    COMMENT 'decoded record (reader schema), JSON',
         silver_loaded_at     timestamp
-    """, "topic", COMMON_PROPS),
-    "silver.orders": ("""
+    """,
+        "topic",
+        COMMON_PROPS,
+    ),
+    "silver.orders": (
+        """
         order_id         string NOT NULL,
         customer_id      string,
         store_id         string,
@@ -85,8 +94,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         last_event_id    string,
         updated_at       timestamp,
         silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
-    """, "bucket(8, order_id)", STATE_PROPS),
-    "silver.order_items": ("""
+    """,
+        "bucket(8, order_id)",
+        STATE_PROPS,
+    ),
+    "silver.order_items": (
+        """
         order_id          string NOT NULL,
         line_number       int NOT NULL,
         product_id        string,
@@ -97,8 +110,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         order_timestamp   timestamp,
         event_id          string,
         silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
-    """, "bucket(8, order_id)", STATE_PROPS),
-    "silver.payments": ("""
+    """,
+        "bucket(8, order_id)",
+        STATE_PROPS,
+    ),
+    "silver.payments": (
+        """
         payment_id      string NOT NULL,
         order_id        string,
         attempt         int,
@@ -114,8 +131,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         failed_at       timestamp,
         updated_at      timestamp,
         silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
-    """, "bucket(8, payment_id)", STATE_PROPS),
-    "silver.customers": ("""
+    """,
+        "bucket(8, payment_id)",
+        STATE_PROPS,
+    ),
+    "silver.customers": (
+        """
         customer_id      string NOT NULL,
         email            string COMMENT 'PII: restricted',
         phone            string COMMENT 'PII: restricted',
@@ -129,8 +150,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         updated_at       timestamp,
         last_event_id    string,
         silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
-    """, "", STATE_PROPS),
-    "silver.customer_changes": ("""
+    """,
+        "",
+        STATE_PROPS,
+    ),
+    "silver.customer_changes": (
+        """
         event_id         string NOT NULL,
         customer_id      string NOT NULL,
         event_type       string,
@@ -145,8 +170,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         signup_timestamp timestamp,
         event_timestamp  timestamp,
         silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
-    """, "", COMMON_PROPS),
-    "silver.products": ("""
+    """,
+        "",
+        COMMON_PROPS,
+    ),
+    "silver.products": (
+        """
         product_id        string NOT NULL,
         sku               string,
         name              string,
@@ -157,8 +186,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         updated_at        timestamp,
         last_event_id     string,
         silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
-    """, "", STATE_PROPS),
-    "silver.product_changes": ("""
+    """,
+        "",
+        STATE_PROPS,
+    ),
+    "silver.product_changes": (
+        """
         event_id          string NOT NULL,
         product_id        string NOT NULL,
         event_type        string,
@@ -170,8 +203,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         active            boolean,
         event_timestamp   timestamp,
         silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
-    """, "", COMMON_PROPS),
-    "silver.inventory_movements": ("""
+    """,
+        "",
+        COMMON_PROPS,
+    ),
+    "silver.inventory_movements": (
+        """
         event_id         string NOT NULL,
         inventory_key    string NOT NULL,
         store_id         string,
@@ -182,8 +219,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         order_id         string,
         event_timestamp  timestamp,
         silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
-    """, "days(event_timestamp)", COMMON_PROPS),
-    "silver.inventory": ("""
+    """,
+        "days(event_timestamp)",
+        COMMON_PROPS,
+    ),
+    "silver.inventory": (
+        """
         inventory_key      string NOT NULL,
         store_id           string,
         product_id         string,
@@ -192,8 +233,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         movement_count     bigint,
         updated_at         timestamp,
         silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
-    """, "", STATE_PROPS),
-    "silver.stores": ("""
+    """,
+        "",
+        STATE_PROPS,
+    ),
+    "silver.stores": (
+        """
         store_id    string NOT NULL,
         name        string,
         city        string,
@@ -202,16 +247,24 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         opened_at   timestamp,
         updated_at  timestamp,
         extracted_at timestamp
-    """, "", STATE_PROPS),
-    "silver.realtime_sales_1m": ("""
+    """,
+        "",
+        STATE_PROPS,
+    ),
+    "silver.realtime_sales_1m": (
+        """
         window_start     timestamp NOT NULL,
         window_end       timestamp NOT NULL,
         currency         string NOT NULL,
         orders           bigint,
         revenue_minor    bigint,
         computed_at      timestamp
-    """, "days(window_start)", STATE_PROPS),
-    "ops.dlq": ("""
+    """,
+        "days(window_start)",
+        STATE_PROPS,
+    ),
+    "ops.dlq": (
+        """
         dlq_id               string NOT NULL COMMENT 'topic/partition/offset (or replay id)',
         source               string,
         topic                string,
@@ -231,8 +284,12 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         status               string COMMENT 'PENDING | REPLAYED | DISCARDED',
         resolution_note      string,
         resolved_at          timestamp
-    """, "topic", STATE_PROPS),
-    "ops.stream_batches": ("""
+    """,
+        "topic",
+        STATE_PROPS,
+    ),
+    "ops.stream_batches": (
+        """
         query               string,
         batch_id            bigint,
         topic               string,
@@ -248,7 +305,10 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         max_ingestion_timestamp timestamp,
         duration_ms         bigint,
         processed_at        timestamp
-    """, "", COMMON_PROPS),
+    """,
+        "",
+        COMMON_PROPS,
+    ),
 }
 
 
@@ -265,7 +325,9 @@ def create_all(spark: SparkSession, only: list[str] | None = None) -> list[str]:
             continue
         part = f"PARTITIONED BY ({partition})" if partition else ""
         tblprops = ", ".join(f"'{k}'='{v}'" for k, v in props.items())
-        spark.sql(f"CREATE TABLE IF NOT EXISTS {fq(name)} ({cols}) USING iceberg {part} TBLPROPERTIES ({tblprops})")
+        spark.sql(
+            f"CREATE TABLE IF NOT EXISTS {fq(name)} ({cols}) USING iceberg {part} TBLPROPERTIES ({tblprops})"
+        )
         created.append(name)
     return created
 

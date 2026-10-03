@@ -53,15 +53,23 @@ def _run_suite(ctx, con: duckdb.DuckDBPyConnection, suite: Suite) -> list[dict[s
         expectation = getattr(gxe, check.expectation)(**check.kwargs)
         res = batch.validate(expectation)
         r = res.result or {}
-        out.append({
-            "suite": suite.name, "layer": suite.layer, "expectation": check.expectation,
-            "kwargs": {k: v for k, v in check.kwargs.items() if k != "value_set"},
-            "severity": check.severity, "category": check.category, "description": check.description,
-            "success": bool(res.success), "rows_checked": len(df),
-            "unexpected_count": r.get("unexpected_count"), "unexpected_percent": r.get("unexpected_percent"),
-            "observed_value": r.get("observed_value"),
-            "partial_unexpected": [str(x) for x in (r.get("partial_unexpected_list") or [])[:5]],
-        })
+        out.append(
+            {
+                "suite": suite.name,
+                "layer": suite.layer,
+                "expectation": check.expectation,
+                "kwargs": {k: v for k, v in check.kwargs.items() if k != "value_set"},
+                "severity": check.severity,
+                "category": check.category,
+                "description": check.description,
+                "success": bool(res.success),
+                "rows_checked": len(df),
+                "unexpected_count": r.get("unexpected_count"),
+                "unexpected_percent": r.get("unexpected_percent"),
+                "observed_value": r.get("observed_value"),
+                "partial_unexpected": [str(x) for x in (r.get("partial_unexpected_list") or [])[:5]],
+            }
+        )
     return out
 
 
@@ -82,7 +90,9 @@ def run_suite(layers: list[str] | None = None, write: bool = True) -> dict[str, 
             errors.append({"suite": suite.name, "error": f"{type(exc).__name__}: {exc}"[:500]})
     failed = [r for r in results if not r["success"]]
     summary = {
-        "checks": len(results), "passed": len(results) - len(failed), "failed": len(failed),
+        "checks": len(results),
+        "passed": len(results) - len(failed),
+        "failed": len(failed),
         "failed_blocking": sum(r["severity"] == "blocking" for r in failed) + len(errors),
         "failed_warning": sum(r["severity"] == "warning" for r in failed),
         "suites_errored": len(errors),
@@ -97,9 +107,14 @@ def run_suite(layers: list[str] | None = None, write: bool = True) -> dict[str, 
         from monitoring.metrics import push_job_metrics
 
         write_result("data_quality", report)
-        push_job_metrics("quality", {"quality_failed": summary["failed"],
-                                     "quality_failed_blocking": summary["failed_blocking"],
-                                     "runtime_seconds": summary["runtime_s"]},
-                         success=summary["failed_blocking"] == 0)
+        push_job_metrics(
+            "quality",
+            {
+                "quality_failed": summary["failed"],
+                "quality_failed_blocking": summary["failed_blocking"],
+                "runtime_seconds": summary["runtime_s"],
+            },
+            success=summary["failed_blocking"] == 0,
+        )
     con.close()
     return report

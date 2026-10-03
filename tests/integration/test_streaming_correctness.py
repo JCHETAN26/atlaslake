@@ -82,8 +82,13 @@ def test_invalid_and_corrupt_records_go_to_dlq_and_replay_safely(clean_platform,
     send_all(producer, [(ev.TOPIC_ORDERS, x) for x in (good, negative, bad_currency)])
     key, payload, _ = producer.serialize(sc.order_event("o_dlq_4", "ORDER_CREATED", T0), ev.TOPIC_ORDERS)
     producer.send_raw(ev.TOPIC_ORDERS, key, payload[: len(payload) // 2], None, "corrupt:TRUNCATED_AVRO")
-    producer.send_raw(ev.TOPIC_ORDERS, key, b"\x00" + (424242).to_bytes(4, "big") + payload[5:], None,
-                      "corrupt:UNKNOWN_SCHEMA_ID")
+    producer.send_raw(
+        ev.TOPIC_ORDERS,
+        key,
+        b"\x00" + (424242).to_bytes(4, "big") + payload[5:],
+        None,
+        "corrupt:UNKNOWN_SCHEMA_ID",
+    )
     producer.flush()
 
     t = totals(drain(spark))
@@ -100,8 +105,12 @@ def test_invalid_and_corrupt_records_go_to_dlq_and_replay_safely(clean_platform,
 
     with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as fh:
         fh.write(json.dumps({"event_id": bad_currency["event_id"], "set": {"currency": "GBP"}}) + "\n")
-        fh.write(json.dumps({"event_id": negative["event_id"], "action": "discard",
-                             "reason": "test order, never real"}) + "\n")
+        fh.write(
+            json.dumps(
+                {"event_id": negative["event_id"], "action": "discard", "reason": "test order, never real"}
+            )
+            + "\n"
+        )
     res = replay(topic="orders", corrections_path=fh.name, recover_from_source=False, spark=spark)
     assert res["replayed"] == 1 and res["discarded"] == 1 and res["unresolved"] == 2
 

@@ -63,24 +63,51 @@ def streaming_metrics() -> StreamingMetrics:
     lbl = ["query"]
     return StreamingMetrics(
         input_rows=Counter("atlas_stream_input_rows", "Rows read per micro-batch", lbl, registry=REGISTRY),
-        rows_per_second=Gauge("atlas_stream_processed_rows_per_second", "Processed rows/sec", lbl, registry=REGISTRY),
-        batch_duration=Histogram("atlas_stream_batch_duration_seconds", "Micro-batch duration", lbl,
-                                 buckets=(0.5, 1, 2, 5, 10, 20, 30, 60, 120, 300), registry=REGISTRY),
+        rows_per_second=Gauge(
+            "atlas_stream_processed_rows_per_second", "Processed rows/sec", lbl, registry=REGISTRY
+        ),
+        batch_duration=Histogram(
+            "atlas_stream_batch_duration_seconds",
+            "Micro-batch duration",
+            lbl,
+            buckets=(0.5, 1, 2, 5, 10, 20, 30, 60, 120, 300),
+            registry=REGISTRY,
+        ),
         batch_id=Gauge("atlas_stream_batch_id", "Last completed batch id", lbl, registry=REGISTRY),
         failed_batches=Counter("atlas_stream_failed_batches", "Failed micro-batches", lbl, registry=REGISTRY),
-        accepted=Counter("atlas_stream_accepted_events", "Events accepted into Silver", ["topic"], registry=REGISTRY),
-        rejected=Counter("atlas_stream_rejected_events", "Events routed to DLQ", ["topic", "reason"], registry=REGISTRY),
-        duplicates=Counter("atlas_stream_duplicate_events", "Duplicate deliveries detected", ["topic"], registry=REGISTRY),
-        late_dropped=Counter("atlas_stream_late_events", "Events beyond the watermark (excluded from real-time aggregates)",
-                             ["topic"], registry=REGISTRY),
-        processing_lag=Gauge("atlas_stream_processing_lag_seconds", "now - max(ingestion_timestamp) processed",
-                             lbl, registry=REGISTRY),
-        watermark_lag=Gauge("atlas_stream_watermark_lag_seconds", "now - current event-time watermark", lbl,
-                            registry=REGISTRY),
-        last_progress=Gauge("atlas_stream_last_progress_timestamp", "Unix time of last progress", lbl,
-                            registry=REGISTRY),
-        consumer_lag=Gauge("atlas_stream_consumer_lag", "Kafka records not yet processed (latest - end offset)",
-                           lbl, registry=REGISTRY),
+        accepted=Counter(
+            "atlas_stream_accepted_events", "Events accepted into Silver", ["topic"], registry=REGISTRY
+        ),
+        rejected=Counter(
+            "atlas_stream_rejected_events", "Events routed to DLQ", ["topic", "reason"], registry=REGISTRY
+        ),
+        duplicates=Counter(
+            "atlas_stream_duplicate_events", "Duplicate deliveries detected", ["topic"], registry=REGISTRY
+        ),
+        late_dropped=Counter(
+            "atlas_stream_late_events",
+            "Events beyond the watermark (excluded from real-time aggregates)",
+            ["topic"],
+            registry=REGISTRY,
+        ),
+        processing_lag=Gauge(
+            "atlas_stream_processing_lag_seconds",
+            "now - max(ingestion_timestamp) processed",
+            lbl,
+            registry=REGISTRY,
+        ),
+        watermark_lag=Gauge(
+            "atlas_stream_watermark_lag_seconds", "now - current event-time watermark", lbl, registry=REGISTRY
+        ),
+        last_progress=Gauge(
+            "atlas_stream_last_progress_timestamp", "Unix time of last progress", lbl, registry=REGISTRY
+        ),
+        consumer_lag=Gauge(
+            "atlas_stream_consumer_lag",
+            "Kafka records not yet processed (latest - end offset)",
+            lbl,
+            registry=REGISTRY,
+        ),
     )
 
 
@@ -89,8 +116,9 @@ def serve(port: int) -> None:
     log.info("metrics on :%s/metrics", port)
 
 
-def push_job_metrics(job: str, values: dict[str, float], labels: dict[str, str] | None = None,
-                     success: bool = True) -> bool:
+def push_job_metrics(
+    job: str, values: dict[str, float], labels: dict[str, str] | None = None, success: bool = True
+) -> bool:
     """Push a batch job's final metrics to the Pushgateway. Never fails the job if it is down."""
     reg = CollectorRegistry()
     label_names = sorted((labels or {}).keys())

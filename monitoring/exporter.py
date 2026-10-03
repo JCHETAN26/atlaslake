@@ -100,19 +100,31 @@ class DataExporter:
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
         self.registry = registry or CollectorRegistry()
         r = self.registry
-        self.dlq_pending = Gauge("atlas_data_dlq_pending", "DLQ records awaiting correction", ["topic"], registry=r)
-        self.dlq_total = Gauge("atlas_data_dlq_total", "DLQ records by status", ["topic", "status"], registry=r)
+        self.dlq_pending = Gauge(
+            "atlas_data_dlq_pending", "DLQ records awaiting correction", ["topic"], registry=r
+        )
+        self.dlq_total = Gauge(
+            "atlas_data_dlq_total", "DLQ records by status", ["topic", "status"], registry=r
+        )
         self.silver_rows = Gauge("atlas_data_silver_rows", "Rows per Silver table", ["table"], registry=r)
-        self.silver_fresh = Gauge("atlas_data_silver_freshness_seconds",
-                                  "now - last processing-time change per Silver table", ["table"], registry=r)
-        self.duplicates = Gauge("atlas_data_logical_duplicates", "Business keys present more than once",
-                                ["table"], registry=r)
+        self.silver_fresh = Gauge(
+            "atlas_data_silver_freshness_seconds",
+            "now - last processing-time change per Silver table",
+            ["table"],
+            registry=r,
+        )
+        self.duplicates = Gauge(
+            "atlas_data_logical_duplicates", "Business keys present more than once", ["table"], registry=r
+        )
         # Label-less gauges are created lazily: an unset gauge would export 0, and e.g.
         # reconciliation_passed=0 before any report exists would fire a false alert.
         self._lazy: dict[str, Gauge] = {}
-        self.errors = Gauge("atlas_exporter_source_up", "1 if the source was collected successfully",
-                            ["source"], registry=r)
-        self.last = Gauge("atlas_exporter_last_collect_timestamp", "Unix time of the last collection", registry=r)
+        self.errors = Gauge(
+            "atlas_exporter_source_up", "1 if the source was collected successfully", ["source"], registry=r
+        )
+        self.last = Gauge(
+            "atlas_exporter_last_collect_timestamp", "Unix time of the last collection", registry=r
+        )
 
     _LAZY_HELP = {
         "atlas_data_gold_freshness_seconds": "now - last dbt load of fact_orders",
@@ -166,7 +178,9 @@ class DataExporter:
 
             def dups() -> None:
                 for table, key in DUPLICATE_KEYS.items():
-                    self.duplicates.labels(table).set(con.execute(duplicate_count_sql(table, key)).fetchone()[0])
+                    self.duplicates.labels(table).set(
+                        con.execute(duplicate_count_sql(table, key)).fetchone()[0]
+                    )
 
             self._safe("dlq", dlq)
             self._safe("silver", silver)
@@ -179,7 +193,9 @@ class DataExporter:
 
         con = connect_gold(read_only=True, with_lake=False)
         try:
-            catalog = con.execute("SELECT current_database()").fetchone()[0]  # file gold.duckdb ⇒ catalog "gold"
+            catalog = con.execute("SELECT current_database()").fetchone()[
+                0
+            ]  # file gold.duckdb ⇒ catalog "gold"
             ts = con.execute(f'SELECT max(dbt_loaded_at) FROM "{catalog}".gold.fact_orders').fetchone()[0]
             age = seconds_since(ts)
             if age is not None:

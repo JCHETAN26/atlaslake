@@ -31,16 +31,19 @@ def spark(tmp_path_factory):
 
     os.environ["PYSPARK_PYTHON"] = sys.executable
     wh = tmp_path_factory.mktemp("warehouse")
-    s = (SparkSession.builder.master("local[2]").appName("atlas-unit")
-         .config("spark.jars.packages", f"org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:{ICEBERG_VERSION}")
-         .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-         .config("spark.sql.catalog.t", "org.apache.iceberg.spark.SparkCatalog")
-         .config("spark.sql.catalog.t.type", "hadoop")
-         .config("spark.sql.catalog.t.warehouse", str(wh))
-         .config("spark.sql.session.timeZone", "UTC")
-         .config("spark.sql.shuffle.partitions", "2")
-         .config("spark.ui.enabled", "false")
-         .getOrCreate())
+    s = (
+        SparkSession.builder.master("local[2]")
+        .appName("atlas-unit")
+        .config("spark.jars.packages", f"org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:{ICEBERG_VERSION}")
+        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+        .config("spark.sql.catalog.t", "org.apache.iceberg.spark.SparkCatalog")
+        .config("spark.sql.catalog.t.type", "hadoop")
+        .config("spark.sql.catalog.t.warehouse", str(wh))
+        .config("spark.sql.session.timeZone", "UTC")
+        .config("spark.sql.shuffle.partitions", "2")
+        .config("spark.ui.enabled", "false")
+        .getOrCreate()
+    )
     yield s
     s.stop()
 
@@ -51,7 +54,9 @@ def _events() -> list[tuple[str, dict]]:
         out += sc.lifecycle(f"o_unit_{i}", T0.replace(minute=i), amount_minor=100 * (i + 1))
     out.append((ev.TOPIC_ORDERS, sc.order_event("o_unit_0", "ORDER_DELIVERED", T0.replace(hour=20))))
     out.append((ev.TOPIC_ORDERS, sc.order_event("o_unit_1", "ORDER_CANCELLED", T0.replace(hour=11))))
-    out.append((ev.TOPIC_PAYMENTS, sc.payment_event("o_unit_2", "PAYMENT_STARTED", T0.replace(minute=2, second=30))))
+    out.append(
+        (ev.TOPIC_PAYMENTS, sc.payment_event("o_unit_2", "PAYMENT_STARTED", T0.replace(minute=2, second=30)))
+    )
     return out
 
 
@@ -61,11 +66,23 @@ def _decoded_df(spark, events: list[tuple[str, dict]]):
     rows = []
     for topic, e in events:
         rec = schemas.to_record(e, topic, schemas.latest_version(topic))
-        rows.append((rec["event_id"], rec["event_type"], topic,
-                     datetime.fromtimestamp(rec["event_timestamp"] / 1e6, UTC).replace(tzinfo=None),
-                     datetime(2026, 1, 2), rec["schema_version"], "kafka", json.dumps(rec)))
-    return spark.createDataFrame(rows, "event_id string, event_type string, topic string, event_timestamp timestamp, "
-                                       "ingestion_timestamp timestamp, schema_version int, source string, record_json string")
+        rows.append(
+            (
+                rec["event_id"],
+                rec["event_type"],
+                topic,
+                datetime.fromtimestamp(rec["event_timestamp"] / 1e6, UTC).replace(tzinfo=None),
+                datetime(2026, 1, 2),
+                rec["schema_version"],
+                "kafka",
+                json.dumps(rec),
+            )
+        )
+    return spark.createDataFrame(
+        rows,
+        "event_id string, event_type string, topic string, event_timestamp timestamp, "
+        "ingestion_timestamp timestamp, schema_version int, source string, record_json string",
+    )
 
 
 def _apply(spark, table_suffix: str, batches: list[list[tuple[str, dict]]]) -> list[tuple]:
@@ -74,7 +91,9 @@ def _apply(spark, table_suffix: str, batches: list[list[tuple[str, dict]]]) -> l
 
     for name in ("silver.orders", "silver.payments"):
         cols = TABLES[name][0]
-        spark.sql(f"CREATE TABLE IF NOT EXISTS t.db.{name.split('.')[1]}_{table_suffix} ({cols}) USING iceberg")
+        spark.sql(
+            f"CREATE TABLE IF NOT EXISTS t.db.{name.split('.')[1]}_{table_suffix} ({cols}) USING iceberg"
+        )
     for batch in batches:
         df = _decoded_df(spark, batch)
         orders = T.typed(df, ev.TOPIC_ORDERS)
@@ -84,7 +103,9 @@ def _apply(spark, table_suffix: str, batches: list[list[tuple[str, dict]]]) -> l
         spark.sql(T.MERGE_PAYMENTS.format(target=f"t.db.payments_{table_suffix}", source="p_patch"))
     o = spark.sql(f"""SELECT order_id, customer_id, status, amount_minor, order_timestamp, paid_at, shipped_at,
                              delivered_at, cancelled_at FROM t.db.orders_{table_suffix} ORDER BY order_id""").collect()
-    p = spark.sql(f"SELECT payment_id, status, started_at, completed_at FROM t.db.payments_{table_suffix} ORDER BY 1").collect()
+    p = spark.sql(
+        f"SELECT payment_id, status, started_at, completed_at FROM t.db.payments_{table_suffix} ORDER BY 1"
+    ).collect()
     return [tuple(r) for r in o] + [tuple(r) for r in p]
 
 
@@ -95,7 +116,7 @@ def test_merge_is_order_independent_and_idempotent(spark):
     rng = random.Random(7)
     shuffled = events[:]
     rng.shuffle(shuffled)
-    micro = [shuffled[i:i + 3] for i in range(0, len(shuffled), 3)]
+    micro = [shuffled[i : i + 3] for i in range(0, len(shuffled), 3)]
     assert _apply(spark, "micro", micro) == one_batch
 
     reversed_with_replays = list(reversed(events))

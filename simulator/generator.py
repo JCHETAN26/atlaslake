@@ -31,8 +31,16 @@ HOUR = 3600 * MICROS
 DAY = 24 * HOUR
 
 COUNTRY_CITIES: dict[str, list[tuple[str, str | None]]] = {
-    "United Kingdom": [("London", None), ("Manchester", None), ("Birmingham", None), ("Leeds", None),
-                       ("Glasgow", None), ("Bristol", None), ("Liverpool", None), ("Edinburgh", None)],
+    "United Kingdom": [
+        ("London", None),
+        ("Manchester", None),
+        ("Birmingham", None),
+        ("Leeds", None),
+        ("Glasgow", None),
+        ("Bristol", None),
+        ("Liverpool", None),
+        ("Edinburgh", None),
+    ],
     "Germany": [("Berlin", None), ("Munich", None), ("Hamburg", None), ("Cologne", None)],
     "France": [("Paris", None), ("Lyon", None), ("Marseille", None)],
     "Spain": [("Madrid", None), ("Barcelona", None), ("Valencia", None)],
@@ -44,17 +52,81 @@ COUNTRY_CITIES: dict[str, list[tuple[str, str | None]]] = {
     "Italy": [("Rome", None), ("Milan", None), ("Turin", None)],
     "Australia": [("Sydney", None), ("Melbourne", None), ("Brisbane", None)],
     "Finland": [("Helsinki", None), ("Espoo", None)],
-    "United States": [("Phoenix", "AZ"), ("Tempe", "AZ"), ("San Jose", "CA"), ("Los Angeles", "CA"),
-                      ("Seattle", "WA"), ("Austin", "TX"), ("Chicago", "IL"), ("New York", "NY"),
-                      ("Boston", "MA"), ("Denver", "CO")],
+    "United States": [
+        ("Phoenix", "AZ"),
+        ("Tempe", "AZ"),
+        ("San Jose", "CA"),
+        ("Los Angeles", "CA"),
+        ("Seattle", "WA"),
+        ("Austin", "TX"),
+        ("Chicago", "IL"),
+        ("New York", "NY"),
+        ("Boston", "MA"),
+        ("Denver", "CO"),
+    ],
 }
 EURO = {"Germany", "France", "Spain", "Belgium", "Portugal", "Netherlands", "Italy", "Finland"}
-FIRST_NAMES = ["Olivia", "Liam", "Amelia", "Noah", "Isla", "Oliver", "Ava", "George", "Mia", "Arthur",
-               "Sofia", "Leo", "Emma", "Lucas", "Hannah", "Mateo", "Chloe", "Ethan", "Priya", "Arjun",
-               "Yuki", "Chen", "Fatima", "Omar", "Ines", "Luca", "Freya", "Hugo", "Elena", "Jonas"]
-LAST_NAMES = ["Smith", "Jones", "Taylor", "Brown", "Williams", "Wilson", "Johnson", "Davies", "Patel",
-              "Garcia", "Muller", "Schmidt", "Martin", "Bernard", "Rossi", "Silva", "Jansen", "Nilsson",
-              "Virtanen", "Kumar", "Nguyen", "Kim", "Lopez", "Dubois", "Fischer", "Novak", "Khan"]
+FIRST_NAMES = [
+    "Olivia",
+    "Liam",
+    "Amelia",
+    "Noah",
+    "Isla",
+    "Oliver",
+    "Ava",
+    "George",
+    "Mia",
+    "Arthur",
+    "Sofia",
+    "Leo",
+    "Emma",
+    "Lucas",
+    "Hannah",
+    "Mateo",
+    "Chloe",
+    "Ethan",
+    "Priya",
+    "Arjun",
+    "Yuki",
+    "Chen",
+    "Fatima",
+    "Omar",
+    "Ines",
+    "Luca",
+    "Freya",
+    "Hugo",
+    "Elena",
+    "Jonas",
+]
+LAST_NAMES = [
+    "Smith",
+    "Jones",
+    "Taylor",
+    "Brown",
+    "Williams",
+    "Wilson",
+    "Johnson",
+    "Davies",
+    "Patel",
+    "Garcia",
+    "Muller",
+    "Schmidt",
+    "Martin",
+    "Bernard",
+    "Rossi",
+    "Silva",
+    "Jansen",
+    "Nilsson",
+    "Virtanen",
+    "Kumar",
+    "Nguyen",
+    "Kim",
+    "Lopez",
+    "Dubois",
+    "Fischer",
+    "Novak",
+    "Khan",
+]
 CARRIERS = ["ROYAL_MAIL", "DHL", "UPS", "FEDEX", "DPD"]
 
 
@@ -178,14 +250,16 @@ class CommerceSimulator:
             for j in range(count):
                 sid += 1
                 city = cities[j % len(cities)][0]
-                rows.append({
-                    "store_id": f"s{sid:04d}",
-                    "name": f"AtlasMart {city}{'' if j < len(cities) else f' {j // len(cities) + 1}'}",
-                    "city": city,
-                    "country": countries[ci],
-                    "currency": currency_for(countries[ci]),
-                    "opened_at_us": cfg.start_us - 3 * 365 * DAY + int(rng.integers(0, 365)) * DAY,
-                })
+                rows.append(
+                    {
+                        "store_id": f"s{sid:04d}",
+                        "name": f"AtlasMart {city}{'' if j < len(cities) else f' {j // len(cities) + 1}'}",
+                        "city": city,
+                        "country": countries[ci],
+                        "currency": currency_for(countries[ci]),
+                        "opened_at_us": cfg.start_us - 3 * 365 * DAY + int(rng.integers(0, 365)) * DAY,
+                    }
+                )
                 store_country.append(ci)
         stores = pd.DataFrame(rows)
         store_country_arr = np.array(store_country)
@@ -201,20 +275,27 @@ class CommerceSimulator:
         )
         signup.sort()
         country_idx = rng.choice(len(countries), size=n, p=country_p)
-        customers = pd.DataFrame({"customer_id": [f"c{i + 1:08d}" for i in range(n)],
-                                  "country_idx": country_idx, "signup_us": signup})
+        customers = pd.DataFrame(
+            {
+                "customer_id": [f"c{i + 1:08d}" for i in range(n)],
+                "country_idx": country_idx,
+                "signup_us": signup,
+            }
+        )
 
         # products from the real catalogue (popularity-weighted)
         cat = ref.products.head(cfg.products).reset_index(drop=True)
         n_p = len(cat)
-        products = pd.DataFrame({
-            "product_id": [f"p{i + 1:05d}" for i in range(n_p)],
-            "sku": cat["stock_code"].astype(str),
-            "name": cat["name"],
-            "category": cat["category"],
-            "unit_price_minor": cat["unit_price_minor"].astype(np.int64),
-            "created_us": cfg.start_us - 400 * DAY,
-        })
+        products = pd.DataFrame(
+            {
+                "product_id": [f"p{i + 1:05d}" for i in range(n_p)],
+                "sku": cat["stock_code"].astype(str),
+                "name": cat["name"],
+                "category": cat["category"],
+                "unit_price_minor": cat["unit_price_minor"].astype(np.int64),
+                "created_us": cfg.start_us - 400 * DAY,
+            }
+        )
         changes = rng.random(n_p) < cfg.product_change_rate
         change_us = np.where(
             changes,
@@ -257,15 +338,26 @@ class CommerceSimulator:
             cities.append(city)
             states.append(state)
         ids = w.customers["customer_id"].tolist()
-        emails = [f"{f.lower()}.{lname.lower()}.{cid[1:]}@example.com"
-                  for f, lname, cid in zip(first, last, ids, strict=True)]
-        created = pd.DataFrame({
-            "event_type": "CUSTOMER_CREATED",
-            "event_timestamp": w.customer_signup_us,
-            "customer_id": ids, "email": emails, "phone": phone,
-            "first_name": first, "last_name": last, "city": cities, "state": states,
-            "country": countries, "segment": segment, "signup_timestamp": w.customer_signup_us,
-        })
+        emails = [
+            f"{f.lower()}.{lname.lower()}.{cid[1:]}@example.com"
+            for f, lname, cid in zip(first, last, ids, strict=True)
+        ]
+        created = pd.DataFrame(
+            {
+                "event_type": "CUSTOMER_CREATED",
+                "event_timestamp": w.customer_signup_us,
+                "customer_id": ids,
+                "email": emails,
+                "phone": phone,
+                "first_name": first,
+                "last_name": last,
+                "city": cities,
+                "state": states,
+                "country": countries,
+                "segment": segment,
+                "signup_timestamp": w.customer_signup_us,
+            }
+        )
         movers = np.flatnonzero(rng.random(n) < cfg.customer_move_rate)
         moved = created.iloc[movers].copy()
         lo = np.maximum(w.customer_signup_us[movers] + HOUR, cfg.start_us)
@@ -282,27 +374,39 @@ class CommerceSimulator:
         moved["state"] = new_states
         moved["event_type"] = "CUSTOMER_UPDATED"
         out = pd.concat([created, moved], ignore_index=True)
-        names = [f"customer:{cid}:{et}:{ts}" for cid, et, ts in
-                 zip(out["customer_id"], out["event_type"], out["event_timestamp"], strict=True)]
+        names = [
+            f"customer:{cid}:{et}:{ts}"
+            for cid, et, ts in zip(out["customer_id"], out["event_type"], out["event_timestamp"], strict=True)
+        ]
         out.insert(0, "event_id", self.ids.many(names))
         return out.sort_values(["event_timestamp", "event_id"], kind="stable").reset_index(drop=True)
 
     def product_events(self) -> pd.DataFrame:
         w = self.world
         p = w.products
-        created = pd.DataFrame({
-            "event_type": "PRODUCT_CREATED", "event_timestamp": p["created_us"].to_numpy(),
-            "product_id": p["product_id"], "sku": p["sku"], "name": p["name"], "category": p["category"],
-            "unit_price_minor": p["unit_price_minor"].to_numpy(), "currency": "GBP", "active": True,
-        })
+        created = pd.DataFrame(
+            {
+                "event_type": "PRODUCT_CREATED",
+                "event_timestamp": p["created_us"].to_numpy(),
+                "product_id": p["product_id"],
+                "sku": p["sku"],
+                "name": p["name"],
+                "category": p["category"],
+                "unit_price_minor": p["unit_price_minor"].to_numpy(),
+                "currency": "GBP",
+                "active": True,
+            }
+        )
         changed = np.flatnonzero(w.product_change_us < np.iinfo(np.int64).max)
         upd = created.iloc[changed].copy()
         upd["event_type"] = "PRODUCT_UPDATED"
         upd["event_timestamp"] = w.product_change_us[changed]
         upd["unit_price_minor"] = w.product_new_price_gbp[changed]
         out = pd.concat([created, upd], ignore_index=True)
-        names = [f"product:{pid}:{et}:{ts}" for pid, et, ts in
-                 zip(out["product_id"], out["event_type"], out["event_timestamp"], strict=True)]
+        names = [
+            f"product:{pid}:{et}:{ts}"
+            for pid, et, ts in zip(out["product_id"], out["event_type"], out["event_timestamp"], strict=True)
+        ]
         out.insert(0, "event_id", self.ids.many(names))
         return out.sort_values(["event_timestamp", "event_id"], kind="stable").reset_index(drop=True)
 
@@ -327,10 +431,15 @@ class CommerceSimulator:
     # ------------------------------------------------------- order lifecycle
     def price_at(self, product_idx: np.ndarray, t_us: np.ndarray) -> np.ndarray:
         w = self.world
-        return np.where(t_us >= w.product_change_us[product_idx],
-                        w.product_new_price_gbp[product_idx], w.product_price_gbp[product_idx])
+        return np.where(
+            t_us >= w.product_change_us[product_idx],
+            w.product_new_price_gbp[product_idx],
+            w.product_price_gbp[product_idx],
+        )
 
-    def generate_orders(self, first_index: int, created_us: np.ndarray, stream: int = 2) -> dict[str, pd.DataFrame]:
+    def generate_orders(
+        self, first_index: int, created_us: np.ndarray, stream: int = 2
+    ) -> dict[str, pd.DataFrame]:
         """Full lifecycle for orders ``first_index .. first_index+len(created_us)-1``."""
         cfg, ref, w = self.cfg, self.ref, self.world
         rng = np.random.default_rng([cfg.seed, stream, first_index])
@@ -380,14 +489,18 @@ class CommerceSimulator:
         cancel_post = paid & (rng.random(n) < cfg.p_cancel_after_paid)
         cancel_at = np.full(n, never, dtype=np.int64)
         cancel_reason = np.full(n, None, dtype=object)
-        cancel_at[cancel_pre] = created_us[cancel_pre] + (60 + exp(1800, int(cancel_pre.sum()))).astype(np.int64) * MICROS
+        cancel_at[cancel_pre] = (
+            created_us[cancel_pre] + (60 + exp(1800, int(cancel_pre.sum()))).astype(np.int64) * MICROS
+        )
         cancel_reason[cancel_pre] = "CUSTOMER_REQUEST"
         pay_failed = ~cancel_pre & ~paid
         fail_end = np.where(retry, pay2_end, pay1_end)
         cancel_at[pay_failed] = fail_end[pay_failed] + 5 * MICROS
         cancel_reason[pay_failed] = "PAYMENT_FAILED"
-        cancel_at[cancel_post] = paid_at[cancel_post] + (
-            (600 + exp(2 * 3600, int(cancel_post.sum()))) * scale).astype(np.int64) * MICROS
+        cancel_at[cancel_post] = (
+            paid_at[cancel_post]
+            + ((600 + exp(2 * 3600, int(cancel_post.sum()))) * scale).astype(np.int64) * MICROS
+        )
         cancel_reason[cancel_post] = "CUSTOMER_REQUEST"
         ships = paid & ~cancel_post
         ship_at = paid_at + (rng.lognormal(np.log(18 * 3600), 0.6, n) * scale).astype(np.int64) * MICROS
@@ -397,8 +510,9 @@ class CommerceSimulator:
         tracking = rng.integers(10**11, 10**12, n)
         method1 = rng.choice(ev.PAYMENT_METHODS, n, p=[0.6, 0.2, 0.15, 0.05])
         method2 = np.where(rng.random(n) < 0.5, method1, rng.choice(ev.PAYMENT_METHODS, n))
-        failure_reasons = rng.choice(["INSUFFICIENT_FUNDS", "CARD_DECLINED", "FRAUD_SUSPECTED", "TIMEOUT"], n,
-                                     p=[0.4, 0.35, 0.1, 0.15])
+        failure_reasons = rng.choice(
+            ["INSUFFICIENT_FUNDS", "CARD_DECLINED", "FRAUD_SUSPECTED", "TIMEOUT"], n, p=[0.4, 0.35, 0.1, 0.15]
+        )
 
         cust_ids = w.customers["customer_id"].to_numpy()[cust_idx]
         store_ids = w.stores["store_id"].to_numpy()[store_idx]
@@ -406,63 +520,170 @@ class CommerceSimulator:
 
         # ---- commerce.orders
         items = [
-            [{"line_number": int(line_no[j]), "product_id": prod_ids[j], "quantity": int(qty[j]),
-              "unit_price_minor": int(unit_price[j])} for j in range(offsets[i], offsets[i] + k[i])]
+            [
+                {
+                    "line_number": int(line_no[j]),
+                    "product_id": prod_ids[j],
+                    "quantity": int(qty[j]),
+                    "unit_price_minor": int(unit_price[j]),
+                }
+                for j in range(offsets[i], offsets[i] + k[i])
+            ]
             for i in range(n)
         ]
-        base = {"order_id": order_ids, "customer_id": cust_ids, "store_id": store_ids,
-                "amount_minor": amount, "currency": currency, "sales_channel": channel}
-        frames = [pd.DataFrame({**base, "event_type": "ORDER_CREATED", "event_timestamp": created_us,
-                                "status": "CREATED", "items": items})]
-        frames.append(pd.DataFrame({**base, "event_type": "ORDER_UPDATED", "event_timestamp": paid_at,
-                                    "status": "PAID"})[paid])
-        frames.append(pd.DataFrame({**base, "event_type": "ORDER_CANCELLED", "event_timestamp": cancel_at,
-                                    "status": "CANCELLED", "cancel_reason": cancel_reason})[cancelled])
-        frames.append(pd.DataFrame({**base, "event_type": "ORDER_SHIPPED", "event_timestamp": ship_at,
-                                    "status": "SHIPPED", "carrier": carrier,
-                                    "tracking_number": [f"TRK{x}" for x in tracking]})[ships])
-        frames.append(pd.DataFrame({**base, "event_type": "ORDER_DELIVERED", "event_timestamp": deliver_at,
-                                    "status": "DELIVERED"})[ships])
+        base = {
+            "order_id": order_ids,
+            "customer_id": cust_ids,
+            "store_id": store_ids,
+            "amount_minor": amount,
+            "currency": currency,
+            "sales_channel": channel,
+        }
+        frames = [
+            pd.DataFrame(
+                {
+                    **base,
+                    "event_type": "ORDER_CREATED",
+                    "event_timestamp": created_us,
+                    "status": "CREATED",
+                    "items": items,
+                }
+            )
+        ]
+        frames.append(
+            pd.DataFrame(
+                {**base, "event_type": "ORDER_UPDATED", "event_timestamp": paid_at, "status": "PAID"}
+            )[paid]
+        )
+        frames.append(
+            pd.DataFrame(
+                {
+                    **base,
+                    "event_type": "ORDER_CANCELLED",
+                    "event_timestamp": cancel_at,
+                    "status": "CANCELLED",
+                    "cancel_reason": cancel_reason,
+                }
+            )[cancelled]
+        )
+        frames.append(
+            pd.DataFrame(
+                {
+                    **base,
+                    "event_type": "ORDER_SHIPPED",
+                    "event_timestamp": ship_at,
+                    "status": "SHIPPED",
+                    "carrier": carrier,
+                    "tracking_number": [f"TRK{x}" for x in tracking],
+                }
+            )[ships]
+        )
+        frames.append(
+            pd.DataFrame(
+                {
+                    **base,
+                    "event_type": "ORDER_DELIVERED",
+                    "event_timestamp": deliver_at,
+                    "status": "DELIVERED",
+                }
+            )[ships]
+        )
         orders = pd.concat(frames, ignore_index=True)
 
         # ---- commerce.payments
         pbase = {"order_id": order_ids, "amount_minor": amount, "currency": currency}
         att1 = ~cancel_pre
         pay_frames = [
-            pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_1" for o in order_ids], "attempt": 1,
-                          "method": method1, "event_type": "PAYMENT_STARTED", "status": "STARTED",
-                          "event_timestamp": pay1_start})[att1],
-            pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_1" for o in order_ids], "attempt": 1,
-                          "method": method1, "event_type": np.where(fail1, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
-                          "status": np.where(fail1, "FAILED", "COMPLETED"),
-                          "failure_reason": np.where(fail1, failure_reasons, None),  # type: ignore[call-overload]
-                          "event_timestamp": pay1_end})[att1],
-            pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_2" for o in order_ids], "attempt": 2,
-                          "method": method2, "event_type": "PAYMENT_STARTED", "status": "STARTED",
-                          "event_timestamp": pay2_start})[retry],
-            pd.DataFrame({**pbase, "payment_id": [f"pay{o[1:]}_2" for o in order_ids], "attempt": 2,
-                          "method": method2, "event_type": np.where(fail2, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
-                          "status": np.where(fail2, "FAILED", "COMPLETED"),
-                          "failure_reason": np.where(fail2, failure_reasons, None),  # type: ignore[call-overload]
-                          "event_timestamp": pay2_end})[retry],
+            pd.DataFrame(
+                {
+                    **pbase,
+                    "payment_id": [f"pay{o[1:]}_1" for o in order_ids],
+                    "attempt": 1,
+                    "method": method1,
+                    "event_type": "PAYMENT_STARTED",
+                    "status": "STARTED",
+                    "event_timestamp": pay1_start,
+                }
+            )[att1],
+            pd.DataFrame(
+                {
+                    **pbase,
+                    "payment_id": [f"pay{o[1:]}_1" for o in order_ids],
+                    "attempt": 1,
+                    "method": method1,
+                    "event_type": np.where(fail1, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
+                    "status": np.where(fail1, "FAILED", "COMPLETED"),
+                    "failure_reason": np.where(fail1, failure_reasons, None),  # type: ignore[call-overload]
+                    "event_timestamp": pay1_end,
+                }
+            )[att1],
+            pd.DataFrame(
+                {
+                    **pbase,
+                    "payment_id": [f"pay{o[1:]}_2" for o in order_ids],
+                    "attempt": 2,
+                    "method": method2,
+                    "event_type": "PAYMENT_STARTED",
+                    "status": "STARTED",
+                    "event_timestamp": pay2_start,
+                }
+            )[retry],
+            pd.DataFrame(
+                {
+                    **pbase,
+                    "payment_id": [f"pay{o[1:]}_2" for o in order_ids],
+                    "attempt": 2,
+                    "method": method2,
+                    "event_type": np.where(fail2, "PAYMENT_FAILED", "PAYMENT_COMPLETED"),
+                    "status": np.where(fail2, "FAILED", "COMPLETED"),
+                    "failure_reason": np.where(fail2, failure_reasons, None),  # type: ignore[call-overload]
+                    "event_timestamp": pay2_end,
+                }
+            )[retry],
         ]
         payments = pd.concat(pay_frames, ignore_index=True)
 
         # ---- commerce.inventory (reservation / release / shipment per line; restock added at emit)
         lo = line_order
         inv_key = np.char.add(np.char.add(store_ids[lo].astype(str), ":"), prod_ids.astype(str))
-        ibase = {"store_id": store_ids[lo], "product_id": prod_ids, "inventory_key": inv_key,
-                 "order_id": order_ids[lo], "line_number": line_no}
+        ibase = {
+            "store_id": store_ids[lo],
+            "product_id": prod_ids,
+            "inventory_key": inv_key,
+            "order_id": order_ids[lo],
+            "line_number": line_no,
+        }
         inv_frames = [
-            pd.DataFrame({**ibase, "event_type": "INVENTORY_RESERVED", "reason": "RESERVATION",
-                          "on_hand_delta": 0, "reserved_delta": qty,
-                          "event_timestamp": created_us[lo] + line_no * 1000}),
-            pd.DataFrame({**ibase, "event_type": "INVENTORY_UPDATED", "reason": "RELEASE",
-                          "on_hand_delta": 0, "reserved_delta": -qty,
-                          "event_timestamp": cancel_at[lo] + line_no * 1000})[cancelled[lo]],
-            pd.DataFrame({**ibase, "event_type": "INVENTORY_UPDATED", "reason": "SHIPMENT",
-                          "on_hand_delta": -qty, "reserved_delta": -qty,
-                          "event_timestamp": ship_at[lo] + line_no * 1000})[ships[lo]],
+            pd.DataFrame(
+                {
+                    **ibase,
+                    "event_type": "INVENTORY_RESERVED",
+                    "reason": "RESERVATION",
+                    "on_hand_delta": 0,
+                    "reserved_delta": qty,
+                    "event_timestamp": created_us[lo] + line_no * 1000,
+                }
+            ),
+            pd.DataFrame(
+                {
+                    **ibase,
+                    "event_type": "INVENTORY_UPDATED",
+                    "reason": "RELEASE",
+                    "on_hand_delta": 0,
+                    "reserved_delta": -qty,
+                    "event_timestamp": cancel_at[lo] + line_no * 1000,
+                }
+            )[cancelled[lo]],
+            pd.DataFrame(
+                {
+                    **ibase,
+                    "event_type": "INVENTORY_UPDATED",
+                    "reason": "SHIPMENT",
+                    "on_hand_delta": -qty,
+                    "reserved_delta": -qty,
+                    "event_timestamp": ship_at[lo] + line_no * 1000,
+                }
+            )[ships[lo]],
         ]
         inventory = pd.concat(inv_frames, ignore_index=True)
 
@@ -473,8 +694,10 @@ class CommerceSimulator:
             elif topic == ev.TOPIC_PAYMENTS:
                 names = [f"{p}:{t}" for p, t in zip(df["payment_id"], df["event_type"], strict=True)]
             else:
-                names = [f"{o}:{ln}:{r}" for o, ln, r in
-                         zip(df["order_id"], df["line_number"], df["reason"], strict=True)]
+                names = [
+                    f"{o}:{ln}:{r}"
+                    for o, ln, r in zip(df["order_id"], df["line_number"], df["reason"], strict=True)
+                ]
             df.insert(0, "event_id", self.ids.many(names))
         return out
 
@@ -561,17 +784,19 @@ class InventoryTracker:
             self.restocks[key] = n
             names.append(f"restock:{key}:{n}")
         keys_arr = [r[0] for r in new_rows]
-        restock = pd.DataFrame({
-            "event_id": self.ids.many(names),
-            "store_id": [k.split(":")[0] for k in keys_arr],
-            "product_id": [k.split(":")[1] for k in keys_arr],
-            "inventory_key": keys_arr,
-            "order_id": None,
-            "line_number": 0,
-            "event_type": "INVENTORY_UPDATED",
-            "reason": "RESTOCK",
-            "on_hand_delta": [r[2] for r in new_rows],
-            "reserved_delta": 0,
-            "event_timestamp": [r[1] for r in new_rows],
-        })
+        restock = pd.DataFrame(
+            {
+                "event_id": self.ids.many(names),
+                "store_id": [k.split(":")[0] for k in keys_arr],
+                "product_id": [k.split(":")[1] for k in keys_arr],
+                "inventory_key": keys_arr,
+                "order_id": None,
+                "line_number": 0,
+                "event_type": "INVENTORY_UPDATED",
+                "reason": "RESTOCK",
+                "on_hand_delta": [r[2] for r in new_rows],
+                "reserved_delta": 0,
+                "event_timestamp": [r[1] for r in new_rows],
+            }
+        )
         return pd.concat([inv, restock], ignore_index=True)

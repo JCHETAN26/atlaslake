@@ -16,9 +16,21 @@ from benchmarks import suites as S
 
 log = logging.getLogger(__name__)
 
-ORDER = ["baseline_pipeline", "spark_performance", "query_performance", "full_vs_incremental",
-         "backfill_benchmark", "iceberg_partitioning", "duplicate_test", "late_event_test", "schema_evolution",
-         "iceberg_compaction", "streaming_throughput", "consumer_recovery", "final_state"]
+ORDER = [
+    "baseline_pipeline",
+    "spark_performance",
+    "query_performance",
+    "full_vs_incremental",
+    "backfill_benchmark",
+    "iceberg_partitioning",
+    "duplicate_test",
+    "late_event_test",
+    "schema_evolution",
+    "iceberg_compaction",
+    "streaming_throughput",
+    "consumer_recovery",
+    "final_state",
+]
 
 
 def run_benchmarks(suite: str = "all", scale: str = "small") -> dict[str, Any]:
@@ -69,8 +81,12 @@ def run_benchmarks(suite: str = "all", scale: str = "small") -> dict[str, Any]:
             results[name] = {"ok": True, "elapsed_s": round(time.time() - t0, 1)}
         except Exception as exc:
             log.error("suite %s failed: %s", name, exc)
-            results[name] = {"ok": False, "elapsed_s": round(time.time() - t0, 1),
-                             "error": f"{type(exc).__name__}: {exc}", "trace": traceback.format_exc()[-2000:]}
+            results[name] = {
+                "ok": False,
+                "elapsed_s": round(time.time() - t0, 1),
+                "error": f"{type(exc).__name__}: {exc}",
+                "trace": traceback.format_exc()[-2000:],
+            }
     results["_total_elapsed_s"] = round(time.time() - t_all, 1)
     from benchmarks.common import write_result
 

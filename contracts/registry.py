@@ -51,8 +51,11 @@ class SchemaRegistry:
         self._req("PUT", path, content=json.dumps({"compatibility": level}))
 
     def register(self, subject: str, schema_str: str) -> int:
-        return int(self._req("POST", f"/subjects/{subject}/versions",
-                             content=json.dumps({"schema": schema_str}))["id"])
+        return int(
+            self._req("POST", f"/subjects/{subject}/versions", content=json.dumps({"schema": schema_str}))[
+                "id"
+            ]
+        )
 
     def delete_subject(self, subject: str, permanent: bool = False) -> None:
         try:
@@ -64,10 +67,15 @@ class SchemaRegistry:
                 raise
 
     # --------------------------------------------------------------- reads
-    def check_compatibility(self, subject: str, schema_str: str, version: str = "latest") -> CompatibilityResult:
+    def check_compatibility(
+        self, subject: str, schema_str: str, version: str = "latest"
+    ) -> CompatibilityResult:
         try:
-            body = self._req("POST", f"/compatibility/subjects/{subject}/versions/{version}?verbose=true",
-                             content=json.dumps({"schema": schema_str}))
+            body = self._req(
+                "POST",
+                f"/compatibility/subjects/{subject}/versions/{version}?verbose=true",
+                content=json.dumps({"schema": schema_str}),
+            )
         except RegistryError as e:
             if e.status == 404:  # no subject yet => anything is compatible
                 return CompatibilityResult(True, [])
@@ -104,7 +112,9 @@ class SchemaRegistry:
         return self._by_id[schema_id]
 
 
-def register_all(registry: SchemaRegistry, max_versions: dict[str, int] | None = None) -> dict[str, dict[int, int]]:
+def register_all(
+    registry: SchemaRegistry, max_versions: dict[str, int] | None = None
+) -> dict[str, dict[int, int]]:
     """Register every contract version in order (v1, v2, ...). Returns {topic: {version: schema_id}}."""
     out: dict[str, dict[int, int]] = {}
     for topic in ev.TOPICS:
@@ -113,5 +123,7 @@ def register_all(registry: SchemaRegistry, max_versions: dict[str, int] | None =
         for version in sorted(schemas.SCHEMA_FILES[topic]):
             if version > limit:
                 continue
-            out[topic][version] = registry.register(schemas.subject(topic), schemas.schema_text(topic, version))
+            out[topic][version] = registry.register(
+                schemas.subject(topic), schemas.schema_text(topic, version)
+            )
     return out

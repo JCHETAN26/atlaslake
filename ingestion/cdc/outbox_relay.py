@@ -91,8 +91,12 @@ def run_relay(
             log.warning("relay metrics port %s busy", metrics_port)
     read_conn = connect()
     log_conn = connect()
-    producer = EventProducer(schema_versions=schema_versions, chaos=chaos, delivery_sink=log_conn,
-                             run_id=f"{name}-{int(time.time())}")
+    producer = EventProducer(
+        schema_versions=schema_versions,
+        chaos=chaos,
+        delivery_sink=log_conn,
+        run_id=f"{name}-{int(time.time())}",
+    )
     last = get_checkpoint(read_conn, name)
     started = time.time()
     sent = 0

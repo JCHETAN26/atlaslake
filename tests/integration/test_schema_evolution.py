@@ -29,7 +29,9 @@ def test_v1_and_v2_producers_coexist_through_to_silver(clean_platform, producer)
     v1_event = sc.order_event("o_v1", "ORDER_CREATED", T0, sales_channel="MOBILE")  # v1 cannot carry it
     old.send(v1_event, ev.TOPIC_ORDERS)
     old.flush()
-    send_all(producer, [(ev.TOPIC_ORDERS, sc.order_event("o_v2", "ORDER_CREATED", T0, sales_channel="MOBILE"))])
+    send_all(
+        producer, [(ev.TOPIC_ORDERS, sc.order_event("o_v2", "ORDER_CREATED", T0, sales_channel="MOBILE"))]
+    )
 
     t = totals(drain(spark))
     assert t["accepted_new"] == 2 and t["rejected"] == 0

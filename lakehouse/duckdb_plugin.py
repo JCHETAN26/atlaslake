@@ -16,8 +16,20 @@ from dbt.adapters.duckdb.plugins import BasePlugin
 from core.config import settings
 
 LAKE_TABLES = {
-    "silver": ["orders", "order_items", "payments", "customers", "customer_changes", "products",
-               "product_changes", "inventory", "inventory_movements", "stores", "events", "realtime_sales_1m"],
+    "silver": [
+        "orders",
+        "order_items",
+        "payments",
+        "customers",
+        "customer_changes",
+        "products",
+        "product_changes",
+        "inventory",
+        "inventory_movements",
+        "stores",
+        "events",
+        "realtime_sales_1m",
+    ],
     "ops": ["dlq", "stream_batches"],
 }
 
@@ -35,7 +47,9 @@ def configure(conn: duckdb.DuckDBPyConnection, tables: dict[str, list[str]] | No
                          USE_SSL {str(cfg.use_ssl).lower()}, REGION '{cfg.region}')""")
     else:  # AWS: IAM role credentials via the default chain
         conn.execute("INSTALL aws; LOAD aws;")
-        conn.execute(f"CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, PROVIDER credential_chain, REGION '{cfg.region}')")
+        conn.execute(
+            f"CREATE OR REPLACE SECRET atlas_s3 (TYPE s3, PROVIDER credential_chain, REGION '{cfg.region}')"
+        )
     cat = catalog()
     out = {}
     for ns, names in (tables or LAKE_TABLES).items():

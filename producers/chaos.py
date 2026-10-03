@@ -30,8 +30,15 @@ class ChaosConfig:
 
     @property
     def enabled(self) -> bool:
-        return any((self.duplicate_probability, self.late_probability, self.reorder_window,
-                    self.invalid_probability, self.corrupt_probability))
+        return any(
+            (
+                self.duplicate_probability,
+                self.late_probability,
+                self.reorder_window,
+                self.invalid_probability,
+                self.corrupt_probability,
+            )
+        )
 
 
 class Chaos:

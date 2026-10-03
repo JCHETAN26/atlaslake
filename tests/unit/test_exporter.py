@@ -9,7 +9,8 @@ from monitoring import exporter as ex
 
 def test_duplicate_count_sql():
     assert ex.duplicate_count_sql("silver.orders", "order_id") == (
-        "SELECT count(*) - count(DISTINCT order_id) FROM silver.orders")
+        "SELECT count(*) - count(DISTINCT order_id) FROM silver.orders"
+    )
 
 
 def test_seconds_since_handles_naive_utc():
@@ -56,8 +57,12 @@ def test_webhook_appends_jsonl(tmp_path):
     try:
         port = server.server_address[1]
         body = json.dumps({"alerts": [{"labels": {"alertname": "DuplicateLeak"}}]}).encode()
-        req = urllib.request.Request(f"http://127.0.0.1:{port}/alerts", data=body, method="POST",
-                                     headers={"Content-Type": "application/json"})
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/alerts",
+            data=body,
+            method="POST",
+            headers={"Content-Type": "application/json"},
+        )
         assert urllib.request.urlopen(req, timeout=5).status == 200
     finally:
         server.shutdown()

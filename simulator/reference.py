@@ -34,8 +34,14 @@ CATEGORY_RULES: list[tuple[str, str]] = [
     (r"\bBAG\b|BAGS|PURSE|TOTE|SHOPPER", "Bags"),
     (r"CANDLE|T-LIGHT|TEA LIGHT|LANTERN|LIGHT HOLDER", "Candles & Lighting"),
     (r"\bLIGHTS?\b|LAMP", "Candles & Lighting"),
-    (r"\bMUG\b|\bCUP\b|PLATE|BOWL|TEAPOT|JUG|GLASS|CAKE|BAKING|KITCHEN|LUNCH BOX|NAPKIN|TRAY", "Kitchen & Dining"),
-    (r"\bCARD\b|CARDS|WRAP|PAPER|NOTEBOOK|PENCIL|PEN\b|STICKER|CHALK|STATIONERY|ENVELOPE", "Stationery & Gifts"),
+    (
+        r"\bMUG\b|\bCUP\b|PLATE|BOWL|TEAPOT|JUG|GLASS|CAKE|BAKING|KITCHEN|LUNCH BOX|NAPKIN|TRAY",
+        "Kitchen & Dining",
+    ),
+    (
+        r"\bCARD\b|CARDS|WRAP|PAPER|NOTEBOOK|PENCIL|PEN\b|STICKER|CHALK|STATIONERY|ENVELOPE",
+        "Stationery & Gifts",
+    ),
     (r"CHILDREN|CHILDS|TOY|DOLL|GAME|SPACEBOY|DINOSAUR|PARTY", "Kids & Party"),
     (r"FRAME|CLOCK|SIGN|MIRROR|CUSHION|DOORMAT|WALL|HOOK|STORAGE|BOX|DRAWER|BASKET|VASE", "Home Decor"),
     (r"GARDEN|PLANT|FLOWER|BIRD|WATERING", "Garden"),
@@ -43,10 +49,25 @@ CATEGORY_RULES: list[tuple[str, str]] = [
 ]
 
 US_CITIES: list[tuple[str, str]] = [
-    ("Phoenix", "AZ"), ("Tempe", "AZ"), ("Tucson", "AZ"), ("San Jose", "CA"), ("Los Angeles", "CA"),
-    ("San Diego", "CA"), ("San Francisco", "CA"), ("Seattle", "WA"), ("Portland", "OR"),
-    ("Denver", "CO"), ("Austin", "TX"), ("Dallas", "TX"), ("Houston", "TX"), ("Chicago", "IL"),
-    ("New York", "NY"), ("Boston", "MA"), ("Atlanta", "GA"), ("Miami", "FL"), ("Minneapolis", "MN"),
+    ("Phoenix", "AZ"),
+    ("Tempe", "AZ"),
+    ("Tucson", "AZ"),
+    ("San Jose", "CA"),
+    ("Los Angeles", "CA"),
+    ("San Diego", "CA"),
+    ("San Francisco", "CA"),
+    ("Seattle", "WA"),
+    ("Portland", "OR"),
+    ("Denver", "CO"),
+    ("Austin", "TX"),
+    ("Dallas", "TX"),
+    ("Houston", "TX"),
+    ("Chicago", "IL"),
+    ("New York", "NY"),
+    ("Boston", "MA"),
+    ("Atlanta", "GA"),
+    ("Miami", "FL"),
+    ("Minneapolis", "MN"),
     ("Salt Lake City", "UT"),
 ]
 
@@ -126,7 +147,10 @@ def prepare(raw_path: Path, out_dir: Path = REFERENCE_DIR, n_products: int = 300
         "line_quantity": _histogram(df["Quantity"], 1, 6, divisor=6),
         "hour_of_day": (hours / hours.sum()).round(8).tolist(),
         "weekday": (weekdays / weekdays.sum()).round(8).tolist(),
-        "countries": {"values": list(countries.index), "probs": (countries / countries.sum()).round(8).tolist()},
+        "countries": {
+            "values": list(countries.index),
+            "probs": (countries / countries.sum()).round(8).tolist(),
+        },
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     products.to_csv(out_dir / "products.csv", index=False)
