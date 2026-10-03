@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 
 from pyspark.sql import SparkSession
 
@@ -27,6 +28,8 @@ def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
         f"{prefix}.uri": cfg.pg.jdbc_url(cfg.pg.catalog_db),
         f"{prefix}.jdbc.user": cfg.pg.user,
         f"{prefix}.jdbc.password": cfg.pg.password,
+        # V1 catalog schema: required for view resolution (MERGE ... USING <temp view>).
+        f"{prefix}.jdbc.schema-version": "V1",
         f"{prefix}.warehouse": cfg.s3.warehouse,
         f"{prefix}.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
         f"{prefix}.s3.endpoint": cfg.s3.endpoint,
@@ -41,6 +44,9 @@ def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
 def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = None) -> SparkSession:
     cfg = settings()
     os.environ.setdefault("AWS_REGION", cfg.s3.region)
+    # Workers must run the driver's interpreter (and see the repo packages).
+    os.environ["PYSPARK_PYTHON"] = sys.executable
+    os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
     local_dir = cfg.data_dir / "spark-local"
     local_dir.mkdir(parents=True, exist_ok=True)
     builder = (

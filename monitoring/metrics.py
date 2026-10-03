@@ -55,6 +55,7 @@ class StreamingMetrics:
     processing_lag: Gauge
     watermark_lag: Gauge
     last_progress: Gauge
+    consumer_lag: Gauge
 
 
 @lru_cache(maxsize=1)
@@ -78,6 +79,8 @@ def streaming_metrics() -> StreamingMetrics:
                             registry=REGISTRY),
         last_progress=Gauge("atlas_stream_last_progress_timestamp", "Unix time of last progress", lbl,
                             registry=REGISTRY),
+        consumer_lag=Gauge("atlas_stream_consumer_lag", "Kafka records not yet processed (latest - end offset)",
+                           lbl, registry=REGISTRY),
     )
 
 
