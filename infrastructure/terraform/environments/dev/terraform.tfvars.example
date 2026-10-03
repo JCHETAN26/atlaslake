@@ -1,0 +1,18 @@
+# cp terraform.tfvars.example terraform.tfvars
+region       = "us-west-2"
+alert_emails = ["you@example.com"]
+
+# Everything is created with desired_count = 0 (no Fargate spend). Turn services on explicitly:
+# relay_desired_count  = 1
+# stream_desired_count = 1
+
+# Kafka: either MSK Serverless ...
+# enable_msk = true
+# ... or a self-managed broker reachable from the VPC:
+external_kafka_bootstrap = "kafka.internal:9092"
+schema_registry_url      = "http://schema-registry.internal:8081"
+app_image_tag            = "latest"
+
+# Private ECS tasks have no NAT: they reach ECR/logs/Secrets Manager through interface endpoints.
+# Turn these on together with any service (they cost ~$100/month in 2 AZs):
+# enable_interface_endpoints = true
