@@ -128,4 +128,10 @@ tests/          unit · contracts · integration (live stack) · failure
   against a live account, because no credentials were available.
 * AWS infrastructure is complete Terraform that passes `validate`, but it was **not applied**,
   to avoid cloud spend. All results are from the local stack. The host is listed in every JSON file.
-* The scale ladder stopped where this machine's disk and RAM said so. See `PROJECT_SPEC.md §7–8`.
+* The full-pipeline scale ladder stopped at **10M events**, because Postgres plus Kafka for 50M would
+  not fit on this machine's root disk. See `PROJECT_SPEC.md §7`.
+* The sustained *live* rate (about 7K events/s) is bounded by the single-process Postgres workload
+  generator, not by Kafka or Spark. Spark drains a 10M-event backlog at about 30K events/s.
+* Every defect the experiments found is listed, with its fix and regression test, in
+  `PROJECT_SPEC.md §8`, "Defects found by the experiments". Among them, the first chaos run left
+  1 of 2.75M events unexplained before the fix.
