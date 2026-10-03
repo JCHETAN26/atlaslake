@@ -16,7 +16,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock /tmp/atlas/
 RUN cd /tmp/atlas \
  && uv export --frozen --no-dev --all-extras --no-emit-project --no-hashes -o requirements.txt \
- && uv venv --python /usr/local/bin/python3.12 /opt/atlas-venv \
+ && uv venv --python "$(command -v python3.12 || command -v python3)" /opt/atlas-venv \
  && VIRTUAL_ENV=/opt/atlas-venv uv pip install --no-cache -r requirements.txt \
  && rm -rf /tmp/atlas \
  && printf '#!/bin/sh\ncd /opt/atlaslake && PYTHONPATH=/opt/atlaslake ATLAS_SPARK_LOCAL_DIR=/tmp/spark-local exec /opt/atlas-venv/bin/python -m cli.main "$@"\n' > /usr/local/bin/atlas \

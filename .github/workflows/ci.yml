@@ -1,0 +1,189 @@
+# AtlasLake CI/CD (Phase 34). Gates run in order; nothing deploys unless every correctness gate passes.
+#
+#   lint → typecheck → unit-tests → spark-tests → contract-tests → dbt-compile
+#        → terraform-validate → docker-build → integration-tests → deploy-gate (main only)
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv
+  ATLAS_SPARK_LOCAL_DIR: /tmp/spark-local
+  ATLAS_SPARK_DRIVER_MEMORY: 2g
+  DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - run: uv sync --frozen --all-extras
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+
+  typecheck:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - run: uv sync --frozen --all-extras
+      - run: >-
+          uv run --no-sync mypy core simulator contracts producers ingestion spark baseline quality
+          reconciliation lineage monitoring cli benchmarks lakehouse
+
+  unit-tests:
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - run: uv sync --frozen --all-extras
+      - run: uv run --no-sync python -m pytest tests/unit tests/contracts -m "not spark" -p no:cacheprovider
+
+  spark-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - name: Cache Ivy (Spark packages)
+        uses: actions/cache@v4
+        with:
+          path: ~/.ivy2
+          key: ivy-${{ hashFiles('spark/common/session.py') }}
+      - run: uv sync --frozen --all-extras
+      - run: uv run --no-sync python -m pytest tests/unit -m spark -p no:cacheprovider
+
+  contract-tests:
+    needs: spark-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - run: uv sync --frozen --all-extras
+      - run: uv run --no-sync python -m pytest tests/contracts -p no:cacheprovider
+
+  dbt-compile:
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    env:
+      ATLAS_LAKE_OPTIONAL: "1"  # duckdb plugin tolerates the absence of a lake for parse/compile
+      ATLAS_GOLD_DUCKDB: /tmp/gold.duckdb
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - run: uv sync --frozen --all-extras
+      - run: uv run --no-sync dbt parse --project-dir dbt --profiles-dir dbt
+      - run: uv run --no-sync dbt ls --project-dir dbt --profiles-dir dbt --resource-type model
+
+  terraform-validate:
+    needs: dbt-compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: {terraform_version: "1.9.8"}
+      - run: terraform fmt -check -recursive infrastructure/terraform
+      - name: validate environments
+        run: |
+          for env in dev prod-like; do
+            dir=infrastructure/terraform/environments/$env
+            terraform -chdir=$dir init -backend=false -input=false
+            terraform -chdir=$dir validate
+          done
+
+  docker-build:
+    needs: terraform-validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build app image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/app/Dockerfile
+          push: false
+          tags: atlaslake/app:ci
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,mode=max,scope=app
+      - name: Build airflow image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/airflow/Dockerfile
+          push: false
+          load: true
+          tags: atlaslake/airflow:local
+          cache-from: type=gha,scope=airflow
+          cache-to: type=gha,mode=max,scope=airflow
+      - name: DAG integrity tests (inside the Airflow image)
+        run: >-
+          docker run --rm -v "$PWD":/opt/atlaslake -e PYTHONPATH=/opt/atlaslake atlaslake/airflow:local
+          python -m pytest /opt/atlaslake/tests/unit/test_airflow_dags.py -q -p no:cacheprovider
+
+  integration-tests:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - uses: astral-sh/setup-uv@v6
+        with: {enable-cache: true, python-version: "3.12"}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.ivy2
+          key: ivy-${{ hashFiles('spark/common/session.py') }}
+      - run: uv sync --frozen --all-extras
+      - name: Start core stack
+        run: |
+          mkdir -p data/minio && chmod 777 data/minio
+          docker compose up -d --wait postgres minio kafka schema-registry
+      - run: uv run --no-sync atlas init
+      - run: uv run --no-sync python -m pytest tests/integration -x -p no:cacheprovider
+      - name: End-to-end smoke (simulate → relay → stream → Gold → reconcile)
+        run: |
+          uv run --no-sync atlas simulate --orders 2000 --days 3 --reset-source
+          uv run --no-sync atlas relay
+          uv run --no-sync atlas stream --available-now --metrics-port 0
+          uv run --no-sync atlas silver ingest-stores
+          uv run --no-sync atlas gold build
+          uv run --no-sync atlas reconcile
+      - if: failure()
+        run: docker compose logs --tail 200
+
+  deploy-gate:
+    # Deployment is only reachable when EVERY gate above (incl. correctness/integration tests) passed.
+    needs: [lint, typecheck, unit-tests, spark-tests, contract-tests, dbt-compile, terraform-validate,
+            docker-build, integration-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: prod-like
+    steps:
+      - run: echo "All correctness gates passed — deploy would happen here (terraform apply / image push)."

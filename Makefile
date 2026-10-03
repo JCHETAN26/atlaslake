@@ -14,7 +14,7 @@ PY_PACKAGES := core simulator contracts producers ingestion spark baseline quali
                lineage monitoring cli benchmarks lakehouse
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up up-all down init lint fmt typecheck test test-unit test-integration test-failure \
+.PHONY: images help setup up up-all down init lint fmt typecheck test test-unit test-integration test-failure \
         dbt-build demo benchmark chaos clean
 
 help: ## Show this help
@@ -35,6 +35,10 @@ down: ## Stop all services (data volumes are kept)
 
 init: ## Create bucket, source schema, contracts, topics and Iceberg tables
 	$(ATLAS) init
+
+images: ## Build app + airflow images (host network: this host's dockerd runs with iptables=false)
+	docker build --network host -f docker/app/Dockerfile -t atlaslake/app:local .
+	docker build --network host -f docker/airflow/Dockerfile -t atlaslake/airflow:local .
 
 lint: ## Ruff lint + format check
 	$(RUN) ruff check .

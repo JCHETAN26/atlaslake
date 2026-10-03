@@ -1,9 +1,13 @@
-"""Weekly Iceberg maintenance (Phase 28): compaction, snapshot expiration, orphan-file and metadata
+"""Airflow DAG — Weekly Iceberg maintenance (Phase 28): compaction, snapshot expiration, orphan-file and metadata
 cleanup, per the retention policy in docs/ICEBERG_MAINTENANCE.md."""
 
 from __future__ import annotations
 
+import os
+import sys
 from datetime import datetime, timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # shared helpers live beside the DAGs
 
 from atlas_common import DAG, DEFAULT_ARGS, atlas
 

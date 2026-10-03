@@ -1,4 +1,4 @@
-"""AtlasLake historical backfill (Phase 25) — manually triggered.
+"""Airflow DAG — AtlasLake historical backfill (Phase 25) — manually triggered.
 
 Trigger with params, e.g. {"dataset": "orders", "date_from": "2026-01-01", "date_to": "2026-01-31"}.
 
@@ -9,7 +9,11 @@ and range-based: re-running the same range converges to the same state (no doubl
 
 from __future__ import annotations
 
+import os
+import sys
 from datetime import datetime, timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # shared helpers live beside the DAGs
 
 from atlas_common import DAG, DEFAULT_ARGS, Param, atlas
 
@@ -24,8 +28,9 @@ with DAG(
     dagrun_timeout=timedelta(hours=12),
     default_args={**DEFAULT_ARGS, "retries": 1},
     params={
-        "dataset": Param("orders", type="string",
-                         enum=["orders", "payments", "inventory", "customers", "products"]),
+        "dataset": Param(
+            "orders", type="string", enum=["orders", "payments", "inventory", "customers", "products"]
+        ),
         "date_from": Param("2026-01-01", type="string", format="date"),
         "date_to": Param("2026-01-31", type="string", format="date"),
     },

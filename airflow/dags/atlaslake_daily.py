@@ -1,4 +1,4 @@
-"""AtlasLake daily batch / control-plane DAG (Phase 24).
+"""Airflow DAG — AtlasLake daily batch / control-plane DAG (Phase 24).
 
 check_sources → ingest_batch → validate_bronze → spark_transform → quality_check → dbt_build
 → dbt_test → snowflake_configured → snowflake_publish → reconcile
@@ -10,9 +10,20 @@ rebuilds Gold incrementally, publishes, and proves source → Gold reconciliatio
 
 from __future__ import annotations
 
+import os
+import sys
 from datetime import datetime, timedelta
 
-from atlas_common import DAG, DEFAULT_ARGS, Param, ShortCircuitOperator, atlas, snowflake_configured
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # shared helpers live beside the DAGs
+
+from atlas_common import (
+    DAG,
+    DEFAULT_ARGS,
+    Param,
+    ShortCircuitOperator,
+    atlas,
+    snowflake_configured,
+)
 
 DATASET_FLAG = "{{ '' if params.dataset == 'all' else '--dataset ' ~ params.dataset }}"
 
@@ -27,8 +38,9 @@ with DAG(
     dagrun_timeout=timedelta(hours=4),
     default_args=DEFAULT_ARGS,
     params={
-        "dataset": Param("all", type="string",
-                         enum=["all", "orders", "payments", "inventory", "customers", "products"]),
+        "dataset": Param(
+            "all", type="string", enum=["all", "orders", "payments", "inventory", "customers", "products"]
+        ),
         "scale": Param("small", type="string", enum=["small", "medium", "large"]),
     },
     tags=["atlaslake", "batch"],
@@ -39,24 +51,38 @@ with DAG(
         timeout_min=10,
     )
     ingest_batch = atlas(
-        "ingest_batch", "atlas stream --available-now --metrics-port 0 && atlas silver ingest-stores",
+        "ingest_batch",
+        "atlas stream --available-now --metrics-port 0 && atlas silver ingest-stores",
         timeout_min=120,
     )
     validate_bronze = atlas("validate_bronze", "atlas quality", timeout_min=30)
     spark_transform = atlas(
-        "spark_transform", f"atlas silver rebuild {DATASET_FLAG} --from {{{{ ds }}}} --to {{{{ ds }}}}",
+        "spark_transform",
+        f"atlas silver rebuild {DATASET_FLAG} --from {{{{ ds }}}} --to {{{{ ds }}}}",
         timeout_min=120,
     )
     quality_check = atlas("quality_check", "atlas quality", timeout_min=30)
     dbt_build = atlas("dbt_build", "atlas gold build", timeout_min=60)
     dbt_test = atlas("dbt_test", "atlas gold build --select test_type:singular", timeout_min=30)
     sf_configured = ShortCircuitOperator(
-        task_id="snowflake_configured", python_callable=snowflake_configured,
+        task_id="snowflake_configured",
+        python_callable=snowflake_configured,
         ignore_downstream_trigger_rules=False,  # only skip the publish, never the reconcile
     )
     snowflake_publish = atlas("snowflake_publish", "atlas publish --target snowflake", timeout_min=60)
-    reconcile = atlas("reconcile", "atlas reconcile --date {{ ds }}", timeout_min=30,
-                      trigger_rule="none_failed")
+    reconcile = atlas(
+        "reconcile", "atlas reconcile --date {{ ds }}", timeout_min=30, trigger_rule="none_failed"
+    )
 
-    (check_sources >> ingest_batch >> validate_bronze >> spark_transform >> quality_check
-     >> dbt_build >> dbt_test >> sf_configured >> snowflake_publish >> reconcile)
+    (
+        check_sources
+        >> ingest_batch
+        >> validate_bronze
+        >> spark_transform
+        >> quality_check
+        >> dbt_build
+        >> dbt_test
+        >> sf_configured
+        >> snowflake_publish
+        >> reconcile
+    )

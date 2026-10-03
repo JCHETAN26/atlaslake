@@ -13,10 +13,11 @@ try:  # Airflow 3
     from airflow.providers.standard.operators.python import ShortCircuitOperator
     from airflow.sdk import DAG, Param
 except ImportError:  # Airflow 2 fallback
-    from airflow import DAG  # type: ignore[no-redef]
     from airflow.models.param import Param  # type: ignore[no-redef]
     from airflow.operators.bash import BashOperator  # type: ignore[no-redef]
     from airflow.operators.python import ShortCircuitOperator  # type: ignore[no-redef]
+
+    from airflow import DAG  # type: ignore[no-redef]
 
 log = logging.getLogger(__name__)
 ALERT_WEBHOOK = os.environ.get("ATLAS_ALERT_WEBHOOK", "http://host.docker.internal:9111/alerts")
@@ -37,9 +38,13 @@ def notify_failure(context: dict) -> None:
     }
     log.error("ATLASLAKE TASK FAILED: %s", payload)
     try:
-        req = urllib.request.Request(ALERT_WEBHOOK, data=json.dumps(payload).encode(),
-                                     headers={"Content-Type": "application/json"}, method="POST")
-        urllib.request.urlopen(req, timeout=5)  # noqa: S310 (fixed internal URL)
+        req = urllib.request.Request(
+            ALERT_WEBHOOK,
+            data=json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=5)
     except Exception as exc:  # alerting must not mask the original failure
         log.warning("alert webhook unreachable: %s", exc)
 
@@ -58,8 +63,12 @@ DEFAULT_ARGS = {
 
 def atlas(task_id: str, command: str, timeout_min: int = 60, **kw) -> BashOperator:
     """BashOperator running the AtlasLake CLI (`atlas` wrapper installed in the image)."""
-    return BashOperator(task_id=task_id, bash_command=f"set -euo pipefail; {command}",
-                        execution_timeout=timedelta(minutes=timeout_min), **kw)
+    return BashOperator(
+        task_id=task_id,
+        bash_command=f"set -euo pipefail; {command}",
+        execution_timeout=timedelta(minutes=timeout_min),
+        **kw,
+    )
 
 
 def snowflake_configured() -> bool:
@@ -69,5 +78,13 @@ def snowflake_configured() -> bool:
     return configured
 
 
-__all__ = ["DAG", "DEFAULT_ARGS", "BashOperator", "Param", "ShortCircuitOperator", "atlas",
-           "notify_failure", "snowflake_configured"]
+__all__ = [
+    "DAG",
+    "DEFAULT_ARGS",
+    "BashOperator",
+    "Param",
+    "ShortCircuitOperator",
+    "atlas",
+    "notify_failure",
+    "snowflake_configured",
+]

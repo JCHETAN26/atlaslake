@@ -1,7 +1,8 @@
 # AtlasLake application image: the `atlas` CLI with PySpark (JDK 17), dbt-duckdb and all clients.
 #   docker build -f docker/app/Dockerfile -t atlaslake/app:local .
 #   docker run --rm --network host atlaslake/app:local status
-FROM python:3.12-slim
+# bookworm ships openjdk-17-jre-headless (trixie does not)
+FROM python:3.12-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
