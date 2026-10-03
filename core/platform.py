@@ -49,8 +49,12 @@ def reset_lake(spark=None) -> None:
     from spark.common.session import get_spark
     from spark.common.tables import create_all, drop_all
 
+    from simulator.postgres_sink import connect
+
     spark = spark or get_spark("atlas-reset")
     drop_all(spark)
+    with connect() as conn:  # batch high-water marks describe lake state: reset them with it
+        conn.execute("DELETE FROM ops.batch_watermarks")
     shutil.rmtree(settings().checkpoint_dir, ignore_errors=True)
     create_all(spark)
 

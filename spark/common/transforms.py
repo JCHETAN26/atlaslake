@@ -108,6 +108,7 @@ def reduce_orders(orders: DataFrame) -> DataFrame:
         F.size("items").cast("int").alias("line_count"),
         "paid_at", "cancelled_at", "cancel_reason", "shipped_at", "carrier", "delivered_at", "source",
         F.col("latest.event_id").alias("last_event_id"), "updated_at",
+        F.current_timestamp().alias("silver_updated_at"),
     ).withColumn("line_count", F.when(F.col("line_count") >= 0, F.col("line_count"))))
 
 
@@ -118,7 +119,7 @@ def order_items(orders: DataFrame) -> DataFrame:
             .select("order_id", F.col("i.line_number").alias("line_number"), F.col("i.product_id").alias("product_id"),
                     F.col("i.quantity").alias("quantity"), F.col("i.unit_price_minor").alias("unit_price_minor"),
                     (F.col("i.quantity") * F.col("i.unit_price_minor")).alias("line_amount_minor"),
-                    "currency", "order_timestamp", "event_id")
+                    "currency", "order_timestamp", "event_id", F.current_timestamp().alias("silver_loaded_at"))
             .dropDuplicates(["order_id", "line_number"]))
 
 
@@ -141,7 +142,7 @@ def reduce_payments(payments: DataFrame) -> DataFrame:
              F.col("latest.status_rank").alias("status_rank"),
              F.col("latest.event_timestamp").alias("status_timestamp"), "method", "amount_minor", "currency",
              F.col("latest.failure_reason").alias("failure_reason"), "started_at", "completed_at", "failed_at",
-             "updated_at")
+             "updated_at", F.current_timestamp().alias("silver_updated_at"))
 
 
 def latest_snapshot(df: DataFrame, key: str, cols: list[str]) -> DataFrame:
@@ -149,7 +150,8 @@ def latest_snapshot(df: DataFrame, key: str, cols: list[str]) -> DataFrame:
     latest = F.max_by(F.struct(*cols, "event_timestamp", "event_id"), F.struct("event_timestamp", "event_id"))
     return (df.groupBy(key).agg(latest.alias("l"))
             .select(key, *[F.col(f"l.{c}").alias(c) for c in cols],
-                    F.col("l.event_timestamp").alias("updated_at"), F.col("l.event_id").alias("last_event_id")))
+                    F.col("l.event_timestamp").alias("updated_at"), F.col("l.event_id").alias("last_event_id"),
+                    F.current_timestamp().alias("silver_updated_at")))
 
 
 CUSTOMER_COLS = ["email", "phone", "first_name", "last_name", "city", "state", "country", "segment",
@@ -164,7 +166,8 @@ def customers_state(customers: DataFrame) -> DataFrame:
 
 def customer_changes(customers: DataFrame) -> DataFrame:
     return customers.select("event_id", "customer_id", "event_type", *CUSTOMER_COLS[:-1],
-                            micros_to_ts(F.col("signup_timestamp")).alias("signup_timestamp"), "event_timestamp")
+                            micros_to_ts(F.col("signup_timestamp")).alias("signup_timestamp"), "event_timestamp",
+                            F.current_timestamp().alias("silver_loaded_at"))
 
 
 def products_state(products: DataFrame) -> DataFrame:
@@ -172,12 +175,13 @@ def products_state(products: DataFrame) -> DataFrame:
 
 
 def product_changes(products: DataFrame) -> DataFrame:
-    return products.select("event_id", "product_id", "event_type", *PRODUCT_COLS, "event_timestamp")
+    return products.select("event_id", "product_id", "event_type", *PRODUCT_COLS, "event_timestamp",
+                           F.current_timestamp().alias("silver_loaded_at"))
 
 
 def inventory_movements(inv: DataFrame) -> DataFrame:
     return inv.select("event_id", "inventory_key", "store_id", "product_id", "reason", "on_hand_delta",
-                      "reserved_delta", "order_id", "event_timestamp")
+                      "reserved_delta", "order_id", "event_timestamp", F.current_timestamp().alias("silver_loaded_at"))
 
 
 def inventory_deltas(movements: DataFrame) -> DataFrame:
@@ -223,7 +227,8 @@ WHEN MATCHED THEN UPDATE SET
   carrier          = coalesce(t.carrier, s.carrier),
   delivered_at     = least(t.delivered_at, s.delivered_at),
   source           = coalesce(t.source, s.source),
-  updated_at       = greatest(t.updated_at, s.updated_at)
+  updated_at       = greatest(t.updated_at, s.updated_at),
+  silver_updated_at = s.silver_updated_at
 WHEN NOT MATCHED THEN INSERT *
 """
 
@@ -248,7 +253,8 @@ WHEN MATCHED THEN UPDATE SET
   started_at     = least(t.started_at, s.started_at),
   completed_at   = least(t.completed_at, s.completed_at),
   failed_at      = least(t.failed_at, s.failed_at),
-  updated_at     = greatest(t.updated_at, s.updated_at)
+  updated_at     = greatest(t.updated_at, s.updated_at),
+  silver_updated_at = s.silver_updated_at
 WHEN NOT MATCHED THEN INSERT *
 """
 

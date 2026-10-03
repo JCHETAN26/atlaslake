@@ -26,7 +26,7 @@ app.add_typer(gold_app, name="gold")
 app.add_typer(iceberg_app, name="iceberg")
 console = Console()
 
-DateOpt = Annotated[datetime | None, typer.Option(formats=["%Y-%m-%d"])]
+DATE_FMT = ["%Y-%m-%d"]
 
 
 def _setup_logging(verbose: bool = False) -> None:
@@ -217,8 +217,8 @@ def stream(
 @silver_app.command("rebuild")
 def silver_rebuild(
     dataset: list[str] = typer.Option(None, help="orders/payments/inventory/customers/products"),
-    date_from: DateOpt = typer.Option(None, "--from"),
-    date_to: DateOpt = typer.Option(None, "--to"),
+    date_from: datetime | None = typer.Option(None, "--from", formats=DATE_FMT),
+    date_to: datetime | None = typer.Option(None, "--to", formats=DATE_FMT),
 ) -> None:
     """Batch re-process Bronze → Silver (idempotent)."""
     _setup_logging()
@@ -269,7 +269,7 @@ def gold_build(full_refresh: bool = False, select: str = typer.Option(None)) -> 
 
 @app.command()
 def reconcile(
-    run_date: DateOpt = typer.Option(None, "--date", help="Restrict to one event date"),
+    run_date: datetime | None = typer.Option(None, "--date", formats=DATE_FMT, help="Restrict to one event date"),
     write: bool = typer.Option(True, help="Write evaluation/reconciliation.json"),
 ) -> None:
     """Source → Bronze → Silver → Gold reconciliation (exit 1 on unexplained differences)."""

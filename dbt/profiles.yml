@@ -1,0 +1,13 @@
+atlaslake:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('ATLAS_GOLD_DUCKDB', '../data/gold.duckdb') }}"
+      threads: 4
+      plugins:
+        - module: lakehouse.duckdb_plugin
+          alias: atlas_lake
+      settings:
+        memory_limit: "{{ env_var('ATLAS_DUCKDB_MEMORY', '6GB') }}"
+        preserve_insertion_order: false

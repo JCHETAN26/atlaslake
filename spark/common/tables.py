@@ -83,7 +83,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         delivered_at     timestamp,
         source           string,
         last_event_id    string,
-        updated_at       timestamp
+        updated_at       timestamp,
+        silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
     """, "bucket(8, order_id)", STATE_PROPS),
     "silver.order_items": ("""
         order_id          string NOT NULL,
@@ -94,7 +95,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         line_amount_minor bigint,
         currency          string,
         order_timestamp   timestamp,
-        event_id          string
+        event_id          string,
+        silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
     """, "bucket(8, order_id)", STATE_PROPS),
     "silver.payments": ("""
         payment_id      string NOT NULL,
@@ -110,7 +112,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         started_at      timestamp,
         completed_at    timestamp,
         failed_at       timestamp,
-        updated_at      timestamp
+        updated_at      timestamp,
+        silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
     """, "bucket(8, payment_id)", STATE_PROPS),
     "silver.customers": ("""
         customer_id      string NOT NULL,
@@ -124,7 +127,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         segment          string,
         signup_timestamp timestamp,
         updated_at       timestamp,
-        last_event_id    string
+        last_event_id    string,
+        silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
     """, "", STATE_PROPS),
     "silver.customer_changes": ("""
         event_id         string NOT NULL,
@@ -139,7 +143,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         country          string,
         segment          string,
         signup_timestamp timestamp,
-        event_timestamp  timestamp
+        event_timestamp  timestamp,
+        silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
     """, "", COMMON_PROPS),
     "silver.products": ("""
         product_id        string NOT NULL,
@@ -150,7 +155,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         currency          string,
         active            boolean,
         updated_at        timestamp,
-        last_event_id     string
+        last_event_id     string,
+        silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
     """, "", STATE_PROPS),
     "silver.product_changes": ("""
         event_id          string NOT NULL,
@@ -162,7 +168,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         unit_price_minor  bigint,
         currency          string,
         active            boolean,
-        event_timestamp   timestamp
+        event_timestamp   timestamp,
+        silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
     """, "", COMMON_PROPS),
     "silver.inventory_movements": ("""
         event_id         string NOT NULL,
@@ -173,7 +180,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         on_hand_delta    int,
         reserved_delta   int,
         order_id         string,
-        event_timestamp  timestamp
+        event_timestamp  timestamp,
+        silver_loaded_at timestamp COMMENT 'processing time the row was inserted (incremental key)'
     """, "days(event_timestamp)", COMMON_PROPS),
     "silver.inventory": ("""
         inventory_key      string NOT NULL,
@@ -182,7 +190,8 @@ TABLES: dict[str, tuple[str, str, dict[str, str]]] = {
         quantity_on_hand   bigint,
         quantity_reserved  bigint,
         movement_count     bigint,
-        updated_at         timestamp
+        updated_at         timestamp,
+        silver_updated_at timestamp COMMENT 'processing time of the last change (incremental key)'
     """, "", STATE_PROPS),
     "silver.stores": ("""
         store_id    string NOT NULL,

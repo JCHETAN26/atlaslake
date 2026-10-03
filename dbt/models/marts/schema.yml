@@ -1,0 +1,148 @@
+version: 2
+
+models:
+  # ------------------------------------------------------------------ dimensions
+  - name: dim_customer
+    description: "SCD Type 2 customer dimension. Grain: one row per customer per attribute version. No raw PII (email masked; names/phone excluded)."
+    tests:
+      - scd2_valid:
+          arguments: {key: customer_id}
+    columns:
+      - name: customer_sk
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: email_masked
+        description: "Masked email (first char + domain). Raw email is restricted to Silver."
+      - name: valid_from
+        tests: [not_null]
+      - name: segment
+        tests:
+          - accepted_values:
+              arguments: {values: ['CONSUMER', 'SMALL_BUSINESS', 'WHOLESALE', 'Unknown']}
+
+  - name: dim_product
+    description: "SCD Type 2 product dimension. Grain: one row per product per (name, category, list price, active) version."
+    tests:
+      - scd2_valid:
+          arguments: {key: product_id}
+    columns:
+      - name: product_sk
+        tests: [unique, not_null]
+      - name: list_price_minor
+        tests: [non_negative]
+
+  - name: dim_store
+    description: "Type 1 store dimension. Grain: one row per store."
+    columns:
+      - name: store_sk
+        tests: [unique, not_null]
+      - name: store_id
+        tests: [unique, not_null]
+
+  - name: dim_date
+    description: "Conformed calendar. Grain: one row per day."
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+
+  # ------------------------------------------------------------------ facts
+  - name: fact_orders
+    description: "Accumulating snapshot fact. GRAIN: one row per order (current lifecycle state). Measures: amount_minor, item_count. Revenue rule: is_paid AND NOT is_cancelled."
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_sk
+        tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_customer'), field: customer_sk}
+      - name: store_sk
+        tests:
+          - relationships:
+              arguments: {to: ref('dim_store'), field: store_sk}
+      - name: date_key
+        tests:
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: amount_minor
+        tests: [not_null, non_negative]
+      - name: status
+        tests:
+          - accepted_values:
+              arguments: {values: ['CREATED', 'PAID', 'CANCELLED', 'SHIPPED', 'DELIVERED']}
+      - name: currency
+        tests:
+          - accepted_values:
+              arguments: {values: ['GBP', 'EUR', 'USD']}
+      - name: sales_channel
+        description: "WEB | MOBILE | STORE; null for orders produced with OrderEvent v1 (pre-evolution)."
+        tests:
+          - accepted_values:
+              arguments: {values: ['WEB', 'MOBILE', 'STORE']}
+
+  - name: fact_order_items
+    description: "Transaction fact. GRAIN: one row per order line. product_sk = product version valid at order time."
+    tests:
+      - unique_combination:
+          arguments:
+            columns: [order_id, line_number]
+    columns:
+      - name: product_sk
+        tests:
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_sk}
+      - name: line_amount_minor
+        tests: [non_negative]
+      - name: quantity
+        tests: [not_null]
+
+  - name: fact_payments
+    description: "Accumulating fact. GRAIN: one row per payment attempt."
+    columns:
+      - name: payment_id
+        tests: [unique, not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              arguments: {values: ['STARTED', 'COMPLETED', 'FAILED']}
+      - name: amount_minor
+        tests: [non_negative]
+
+  - name: fact_inventory
+    description: "Transaction fact. GRAIN: one row per inventory movement event."
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: reason
+        tests:
+          - accepted_values:
+              arguments: {values: ['RESERVATION', 'SHIPMENT', 'RELEASE', 'RESTOCK']}
+
+  # ------------------------------------------------------------------ marts
+  - name: mart_daily_sales
+    description: "GRAIN: order_date × store × currency. gross_revenue_minor = sum(amount) of paid, not-cancelled orders created that day."
+    tests:
+      - unique_combination:
+          arguments:
+            columns: [order_date, store_id, currency]
+    columns:
+      - name: gross_revenue_minor
+        tests: [not_null, non_negative]
+  - name: mart_order_funnel
+    description: "GRAIN: order_date. Lifecycle stage counts of orders created that day."
+    columns:
+      - name: order_date
+        tests: [unique, not_null]
+  - name: mart_payment_metrics
+    description: "GRAIN: payment_date × method × currency."
+    tests:
+      - unique_combination:
+          arguments:
+            columns: [payment_date, method, currency]
+  - name: mart_inventory_health
+    description: "GRAIN: store × product. Current stock; is_low_stock when available < var(low_stock_threshold)."
+    tests:
+      - unique_combination:
+          arguments:
+            columns: [store_id, product_id]

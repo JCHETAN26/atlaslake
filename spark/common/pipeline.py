@@ -228,6 +228,8 @@ class SilverProcessor:
                         (F.coalesce("c.quantity_reserved", F.lit(0)) + F.coalesce("d.quantity_reserved", F.lit(0))).alias("quantity_reserved"),
                         (F.coalesce("c.movement_count", F.lit(0)) + F.coalesce("d.movement_count", F.lit(0))).alias("movement_count"),
                         F.greatest("c.updated_at", "d.updated_at").alias("updated_at"),
+                        F.when(F.col("d.inventory_key").isNotNull(), F.current_timestamp())
+                         .otherwise(F.col("c.silver_updated_at")).alias("silver_updated_at"),
                     )).localCheckpoint(eager=True)
                     (merged.writeTo(fq("silver.inventory"))
                      .option(f"snapshot-property.{BATCH_KEY_PROP}", key).overwrite(F.lit(True)))

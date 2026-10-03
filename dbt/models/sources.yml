@@ -1,0 +1,49 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      Trusted operational state on Apache Iceberg (Spark-maintained). Exposed to DuckDB as views over
+      the current Iceberg snapshot by lakehouse/duckdb_plugin.py.
+    schema: silver
+    loaded_at_field: silver_updated_at
+    freshness:
+      warn_after: {count: 6, period: hour}
+      error_after: {count: 24, period: hour}
+    tables:
+      - name: orders
+        description: One row per order — current state, merged from all order events (LWW by event time).
+        columns:
+          - name: order_id
+            tests: [unique, not_null]
+      - name: order_items
+        loaded_at_field: silver_loaded_at
+        description: One row per order line (from ORDER_CREATED).
+      - name: payments
+        description: One row per payment attempt — current state.
+        columns:
+          - name: payment_id
+            tests: [unique, not_null]
+      - name: customers
+        description: Current customer state (contains PII — restricted).
+      - name: customer_changes
+        loaded_at_field: silver_loaded_at
+        description: Every customer snapshot event (history for SCD2).
+      - name: products
+        description: Current product state.
+      - name: product_changes
+        loaded_at_field: silver_loaded_at
+        description: Every product snapshot event (history for SCD2).
+      - name: inventory
+        description: Current stock position per store × product (sum of movements).
+      - name: inventory_movements
+        loaded_at_field: silver_loaded_at
+        description: One row per inventory delta event.
+      - name: stores
+        loaded_at_field: extracted_at
+        description: Store reference data (batch-extracted from Postgres).
+        freshness:
+          warn_after: {count: 7, period: day}
+      - name: events
+        loaded_at_field: silver_loaded_at
+        description: Ledger of every accepted event (unique event_id).
