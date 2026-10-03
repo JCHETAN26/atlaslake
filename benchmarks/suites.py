@@ -841,7 +841,7 @@ def consumer_recovery(spark, rate: int = 150, warmup_s: int = 45, outage_s: int 
     restart_at = time.time()
     stream2 = _start(["stream", "--trigger-s", "2", "--metrics-port", "9108"], "recovery_stream_2")
     recovered_at = None
-    peak = max(x["lag"] or 0 for x in lag_timeline) if lag_timeline else 0
+    peak: int = max(int(x["lag"] or 0) for x in lag_timeline) if lag_timeline else 0
     while time.time() - restart_at < 600:
         lag = _checkpoint_lag()
         lag_timeline.append({"t": round(time.time() - kill_at, 1), "lag": lag, "phase": "recovering"})

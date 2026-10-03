@@ -231,6 +231,19 @@ Scale ladder: **100K → 1M → 10M → 50M → 100M+ events**. We stop climbing
 demonstrated *and* explained, or when hardware limits are hit — whichever comes first. The stopping
 point and reason are recorded in §8.
 
+**Where the ladder stopped: 10M events for the full pipeline.** Measured footprint is ~525 bytes/event
+in Postgres (source + outbox) and ~300 bytes/event in Kafka, both on the root disk (33 GB free after
+images). 50M events would need ~26 GB of Postgres plus ~15 GB of Kafka, which does not fit alongside
+the Docker images. The bottlenecks that *were* exposed and explained before that point:
+
+* **Spark micro-batch fixed cost.** Throughput rises steeply with batch size (`spark_performance.json`)
+  because every batch pays ~10 Iceberg commits plus MERGE planning; independent table writes were
+  parallelised as a result.
+* **Copy-on-write MERGE rewrites.** Every micro-batch rewrites the touched buckets of `silver.orders`,
+  so file-level pruning by processing time is impossible downstream.
+* **The live source is the throughput ceiling for live tests.** The single-process Postgres workload
+  generator, not Kafka or Spark, bounds the sustained live rate (`streaming_throughput.json`).
+
 ---
 
 ## 8. Decision log
@@ -254,6 +267,16 @@ alternatives rejected.
 | 2026-10-03 | 22 | Great Expectations 1.x (programmatic, ephemeral context) + dbt tests | Resolved cleanly alongside Spark/dbt; suites are code (`quality/suites.py`) | Soda Core |
 | 2026-10-03 | 21 | Snowflake as *serving* target loaded from Gold (dims full-replace, facts/marts MERGE by grain key with a watermark) | Exercised against a fake connector in CI; no live account used | Snowflake reading Iceberg directly (documented as alternative) |
 | 2026-10-03 | 7 | MinIO via `bitnamilegacy/minio` | Docker Hub `minio/*` images no longer available | SeaweedFS, RustFS |
+
+### Defects found by the experiments (and fixed)
+
+| Found by | Defect | Fix | Regression test |
+|---|---|---|---|
+| dbt singular test `assert_gold_revenue_reconciles_to_silver` | Order dates depended on the host timezone (DuckDB casts `timestamptz` with the session zone) | `TZ=UTC` platform-wide + `SET TimeZone='UTC'` in every DuckDB session | revenue + reconciliation tests |
+| `backfill_benchmark` (Silver wiped → rebuilt from Bronze) | Content-addressed batch markers outlived a table wipe; a backfill chunk equal to an earlier micro-batch was skipped (inventory missing) | markers only count within the current table lineage (stop at unkeyed delete/overwrite) | `tests/unit/test_idempotency_markers.py` |
+| `consumer_recovery` showing a zero backlog | Live workload restock ids restarted per run → outbox unique violation → workload died silently | per-run id namespace; live suites now fail loudly if the workload dies | `test_restock_ids_are_unique_across_independent_live_runs` |
+| `full_vs_incremental` (incremental slower than full) | Look-back window (clock-skew guard) larger than the run cadence re-read everything | 1-minute look-back; key-set semi-join in `fact_orders` | `results_identical` in the benchmark |
+| repeated `Connection reset` from S3 | (1) Bitnami MinIO wrapper exited every ~70 s; (2) Docker userland proxy (daemon has `iptables=false`) reset connections under many small writes; (3) container `nofile=1024` | run MinIO binary directly, host networking, `nofile=65536`, S3 retry/backoff policy | small-file experiment: 0 resets |
 
 ---
 
