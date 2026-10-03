@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import sys
 import time
+from pathlib import Path
 
 from pyspark.sql import SparkSession
 
@@ -51,7 +52,8 @@ def get_spark(app_name: str = "atlaslake", extra_conf: dict[str, str] | None = N
     # Workers must run the driver's interpreter (and see the repo packages).
     os.environ["PYSPARK_PYTHON"] = sys.executable
     os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
-    local_dir = cfg.data_dir / "spark-local"
+    # Scratch space must support hard links (RocksDB state store) => not the exFAT data drive.
+    local_dir = Path(os.environ.get("ATLAS_SPARK_LOCAL_DIR", Path.home() / ".cache" / "atlaslake" / "spark-local"))
     local_dir.mkdir(parents=True, exist_ok=True)
     builder = (
         SparkSession.builder.appName(app_name)

@@ -54,7 +54,7 @@ build-backend = "hatchling.build"
 packages = [
     "core", "simulator", "contracts", "producers", "ingestion", "spark",
     "baseline", "quality", "reconciliation", "lineage", "monitoring",
-    "cli", "benchmarks",
+    "cli", "benchmarks", "lakehouse",
 ]
 
 [tool.ruff]
