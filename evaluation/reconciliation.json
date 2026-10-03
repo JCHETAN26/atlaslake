@@ -1,8 +1,8 @@
 {
   "benchmark": "reconciliation",
   "context": {
-    "generated_at": "2026-10-03T08:16:30+00:00",
-    "git_sha": "9edc945-dirty",
+    "generated_at": "2026-10-03T10:23:22+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -24,12 +24,12 @@
   "scope": {
     "event_date": "all",
     "gold_checked": true,
-    "relay_checkpoint_seq": 851451
+    "relay_checkpoint_seq": 982469
   },
   "summary": {
     "passed": true,
-    "source_events": 851451,
-    "accepted": 851451,
+    "source_events": 982469,
+    "accepted": 982469,
     "rejected": 0,
     "in_flight": 0,
     "pending_processing": 0,
@@ -41,13 +41,13 @@
     "orders_excluded_from_financials": 0,
     "incomplete_orders_held_from_gold": 0,
     "invariant": "source = accepted + rejected + in_flight + pending_processing (+ unexplained == 0)",
-    "runtime_s": 45.169
+    "runtime_s": 1.846
   },
   "events_by_topic": [
     {
       "topic": "commerce.customers",
-      "source_events": 15964,
-      "accepted": 15964,
+      "source_events": 18682,
+      "accepted": 18682,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -55,8 +55,8 @@
     },
     {
       "topic": "commerce.inventory",
-      "source_events": 486580,
-      "accepted": 486580,
+      "source_events": 558389,
+      "accepted": 558389,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -64,8 +64,8 @@
     },
     {
       "topic": "commerce.orders",
-      "source_events": 224646,
-      "accepted": 224646,
+      "source_events": 260085,
+      "accepted": 260085,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -73,8 +73,8 @@
     },
     {
       "topic": "commerce.payments",
-      "source_events": 121948,
-      "accepted": 121948,
+      "source_events": 143020,
+      "accepted": 143020,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -82,8 +82,8 @@
     },
     {
       "topic": "commerce.products",
-      "source_events": 2313,
-      "accepted": 2313,
+      "source_events": 2293,
+      "accepted": 2293,
       "rejected": 0,
       "in_flight": 0,
       "pending_processing": 0,
@@ -92,7 +92,7 @@
   ],
   "events_by_date": [
     {
-      "event_date": "2024-11-26",
+      "event_date": "2024-11-27",
       "source_events": 2000,
       "accepted": 2000,
       "rejected": 0,
@@ -100,335 +100,87 @@
       "unexplained": 0
     },
     {
-      "event_date": "2024-12-31",
-      "source_events": 6,
-      "accepted": 6,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
       "event_date": "2025-01-01",
-      "source_events": 30,
-      "accepted": 30,
+      "source_events": 24,
+      "accepted": 24,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-02",
-      "source_events": 24,
-      "accepted": 24,
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-03",
-      "source_events": 25,
-      "accepted": 25,
+      "source_events": 29,
+      "accepted": 29,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-04",
-      "source_events": 29,
-      "accepted": 29,
+      "source_events": 30,
+      "accepted": 30,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-05",
-      "source_events": 38,
-      "accepted": 38,
+      "source_events": 47,
+      "accepted": 47,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-06",
-      "source_events": 31,
-      "accepted": 31,
+      "source_events": 40,
+      "accepted": 40,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-07",
-      "source_events": 22,
-      "accepted": 22,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-08",
-      "source_events": 29,
-      "accepted": 29,
+      "source_events": 42,
+      "accepted": 42,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-09",
-      "source_events": 33,
-      "accepted": 33,
+      "source_events": 32,
+      "accepted": 32,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-10",
-      "source_events": 23,
-      "accepted": 23,
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-01-11",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-12",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-13",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-14",
-      "source_events": 35,
-      "accepted": 35,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-15",
-      "source_events": 19,
-      "accepted": 19,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-16",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-17",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-18",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-19",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-20",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-21",
-      "source_events": 35,
-      "accepted": 35,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-22",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-23",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-24",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-25",
-      "source_events": 35,
-      "accepted": 35,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-26",
-      "source_events": 18,
-      "accepted": 18,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-27",
-      "source_events": 37,
-      "accepted": 37,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-28",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-29",
-      "source_events": 36,
-      "accepted": 36,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-30",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-01-31",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-01",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-02",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-03",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-04",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-05",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-06",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-07",
-      "source_events": 20,
-      "accepted": 20,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-08",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-09",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-10",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -436,15 +188,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-11",
-      "source_events": 21,
-      "accepted": 21,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-12",
+      "event_date": "2025-01-12",
       "source_events": 33,
       "accepted": 33,
       "rejected": 0,
@@ -452,31 +196,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-13",
-      "source_events": 38,
-      "accepted": 38,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-14",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-15",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-16",
+      "event_date": "2025-01-13",
       "source_events": 22,
       "accepted": 22,
       "rejected": 0,
@@ -484,7 +204,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-17",
+      "event_date": "2025-01-14",
       "source_events": 37,
       "accepted": 37,
       "rejected": 0,
@@ -492,15 +212,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-18",
-      "source_events": 31,
-      "accepted": 31,
+      "event_date": "2025-01-15",
+      "source_events": 39,
+      "accepted": 39,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-19",
+      "event_date": "2025-01-16",
       "source_events": 36,
       "accepted": 36,
       "rejected": 0,
@@ -508,31 +228,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-20",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-21",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-22",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-02-23",
+      "event_date": "2025-01-17",
       "source_events": 36,
       "accepted": 36,
       "rejected": 0,
@@ -540,15 +236,31 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-24",
-      "source_events": 36,
-      "accepted": 36,
+      "event_date": "2025-01-18",
+      "source_events": 35,
+      "accepted": 35,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-25",
+      "event_date": "2025-01-19",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-01-20",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-01-21",
       "source_events": 30,
       "accepted": 30,
       "rejected": 0,
@@ -556,111 +268,47 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-26",
-      "source_events": 23,
-      "accepted": 23,
+      "event_date": "2025-01-22",
+      "source_events": 39,
+      "accepted": 39,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-27",
-      "source_events": 31,
-      "accepted": 31,
+      "event_date": "2025-01-23",
+      "source_events": 26,
+      "accepted": 26,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-02-28",
-      "source_events": 19,
-      "accepted": 19,
+      "event_date": "2025-01-24",
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-01",
-      "source_events": 30,
-      "accepted": 30,
+      "event_date": "2025-01-25",
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-02",
-      "source_events": 28,
-      "accepted": 28,
+      "event_date": "2025-01-26",
+      "source_events": 35,
+      "accepted": 35,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-03",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-04",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-05",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-06",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-07",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-08",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-09",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-10",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-11",
+      "event_date": "2025-01-27",
       "source_events": 41,
       "accepted": 41,
       "rejected": 0,
@@ -668,47 +316,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-12",
-      "source_events": 30,
-      "accepted": 30,
+      "event_date": "2025-01-28",
+      "source_events": 48,
+      "accepted": 48,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-13",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-14",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-15",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-16",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-17",
+      "event_date": "2025-01-29",
       "source_events": 38,
       "accepted": 38,
       "rejected": 0,
@@ -716,15 +332,135 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-18",
-      "source_events": 31,
-      "accepted": 31,
+      "event_date": "2025-01-30",
+      "source_events": 38,
+      "accepted": 38,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-19",
+      "event_date": "2025-01-31",
+      "source_events": 44,
+      "accepted": 44,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-01",
+      "source_events": 23,
+      "accepted": 23,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-02",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-03",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-04",
+      "source_events": 27,
+      "accepted": 27,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-05",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-06",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-07",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-08",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-09",
+      "source_events": 41,
+      "accepted": 41,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-10",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-11",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-12",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-13",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-14",
+      "source_events": 40,
+      "accepted": 40,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-15",
       "source_events": 28,
       "accepted": 28,
       "rejected": 0,
@@ -732,7 +468,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-20",
+      "event_date": "2025-02-16",
       "source_events": 30,
       "accepted": 30,
       "rejected": 0,
@@ -740,9 +476,265 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-03-21",
+      "event_date": "2025-02-17",
+      "source_events": 49,
+      "accepted": 49,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-18",
+      "source_events": 43,
+      "accepted": 43,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-19",
+      "source_events": 44,
+      "accepted": 44,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-20",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-21",
+      "source_events": 47,
+      "accepted": 47,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-22",
+      "source_events": 21,
+      "accepted": 21,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-23",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-24",
+      "source_events": 41,
+      "accepted": 41,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-25",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-26",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-27",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-02-28",
       "source_events": 30,
       "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-01",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-02",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-03",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-04",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-05",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-06",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-07",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-08",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-09",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-10",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-11",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-12",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-13",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-14",
+      "source_events": 23,
+      "accepted": 23,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-15",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-16",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-17",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-18",
+      "source_events": 45,
+      "accepted": 45,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-19",
+      "source_events": 23,
+      "accepted": 23,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-20",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-03-21",
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -757,70 +749,38 @@
     },
     {
       "event_date": "2025-03-23",
-      "source_events": 21,
-      "accepted": 21,
+      "source_events": 32,
+      "accepted": 32,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-03-24",
-      "source_events": 22,
-      "accepted": 22,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-03-25",
-      "source_events": 33,
-      "accepted": 33,
+      "source_events": 45,
+      "accepted": 45,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-03-26",
-      "source_events": 32,
-      "accepted": 32,
+      "source_events": 27,
+      "accepted": 27,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-03-27",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-28",
-      "source_events": 40,
-      "accepted": 40,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-29",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-30",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-03-31",
       "source_events": 32,
       "accepted": 32,
       "rejected": 0,
@@ -828,23 +788,23 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-01",
-      "source_events": 34,
-      "accepted": 34,
+      "event_date": "2025-03-28",
+      "source_events": 51,
+      "accepted": 51,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-02",
-      "source_events": 28,
-      "accepted": 28,
+      "event_date": "2025-03-29",
+      "source_events": 50,
+      "accepted": 50,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-03",
+      "event_date": "2025-03-30",
       "source_events": 37,
       "accepted": 37,
       "rejected": 0,
@@ -852,47 +812,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-04",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-05",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-06",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-07",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-08",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-09",
+      "event_date": "2025-03-31",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -900,39 +820,31 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-10",
-      "source_events": 32,
-      "accepted": 32,
+      "event_date": "2025-04-01",
+      "source_events": 39,
+      "accepted": 39,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-11",
-      "source_events": 16,
-      "accepted": 16,
+      "event_date": "2025-04-02",
+      "source_events": 34,
+      "accepted": 34,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-12",
-      "source_events": 25,
-      "accepted": 25,
+      "event_date": "2025-04-03",
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-04-13",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-14",
+      "event_date": "2025-04-04",
       "source_events": 36,
       "accepted": 36,
       "rejected": 0,
@@ -940,191 +852,87 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-04-05",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-06",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-07",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-08",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-09",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-10",
+      "source_events": 45,
+      "accepted": 45,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-11",
+      "source_events": 18,
+      "accepted": 18,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-12",
+      "source_events": 27,
+      "accepted": 27,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-13",
+      "source_events": 26,
+      "accepted": 26,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-14",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-04-15",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-16",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-17",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-18",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-19",
-      "source_events": 37,
-      "accepted": 37,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-20",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-21",
-      "source_events": 17,
-      "accepted": 17,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-22",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-23",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-24",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-25",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-26",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-27",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-28",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-29",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-04-30",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-01",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-02",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-03",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-04",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-05",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-06",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-07",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-08",
       "source_events": 35,
       "accepted": 35,
       "rejected": 0,
@@ -1132,7 +940,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-09",
+      "event_date": "2025-04-16",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-17",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -1140,7 +956,71 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-10",
+      "event_date": "2025-04-18",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-19",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-20",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-21",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-22",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-23",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-24",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-25",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-04-26",
       "source_events": 28,
       "accepted": 28,
       "rejected": 0,
@@ -1148,23 +1028,23 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-11",
-      "source_events": 27,
-      "accepted": 27,
+      "event_date": "2025-04-27",
+      "source_events": 30,
+      "accepted": 30,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-12",
-      "source_events": 27,
-      "accepted": 27,
+      "event_date": "2025-04-28",
+      "source_events": 22,
+      "accepted": 22,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-13",
+      "event_date": "2025-04-29",
       "source_events": 33,
       "accepted": 33,
       "rejected": 0,
@@ -1172,15 +1052,23 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-14",
-      "source_events": 26,
-      "accepted": 26,
+      "event_date": "2025-04-30",
+      "source_events": 39,
+      "accepted": 39,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-05-15",
+      "event_date": "2025-05-01",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-02",
       "source_events": 32,
       "accepted": 32,
       "rejected": 0,
@@ -1188,49 +1076,153 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-05-03",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-04",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-05",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-06",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-07",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-08",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-09",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-10",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-11",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-12",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-13",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-14",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-05-15",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-05-16",
-      "source_events": 21,
-      "accepted": 21,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-17",
-      "source_events": 25,
-      "accepted": 25,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-18",
-      "source_events": 34,
-      "accepted": 34,
+      "source_events": 31,
+      "accepted": 31,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-19",
-      "source_events": 34,
-      "accepted": 34,
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-20",
-      "source_events": 34,
-      "accepted": 34,
+      "source_events": 55,
+      "accepted": 55,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-21",
-      "source_events": 30,
-      "accepted": 30,
+      "source_events": 29,
+      "accepted": 29,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -1245,32 +1237,32 @@
     },
     {
       "event_date": "2025-05-23",
-      "source_events": 33,
-      "accepted": 33,
+      "source_events": 41,
+      "accepted": 41,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-24",
-      "source_events": 24,
-      "accepted": 24,
+      "source_events": 29,
+      "accepted": 29,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-25",
-      "source_events": 21,
-      "accepted": 21,
+      "source_events": 35,
+      "accepted": 35,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-26",
-      "source_events": 29,
-      "accepted": 29,
+      "source_events": 31,
+      "accepted": 31,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -1285,118 +1277,14 @@
     },
     {
       "event_date": "2025-05-28",
-      "source_events": 27,
-      "accepted": 27,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-05-29",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-30",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-05-31",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-01",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-02",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-03",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-04",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-05",
-      "source_events": 19,
-      "accepted": 19,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-06",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-07",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-08",
-      "source_events": 20,
-      "accepted": 20,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-09",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-10",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-11",
       "source_events": 33,
       "accepted": 33,
       "rejected": 0,
@@ -1404,23 +1292,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-12",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-13",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-14",
+      "event_date": "2025-05-30",
       "source_events": 35,
       "accepted": 35,
       "rejected": 0,
@@ -1428,23 +1300,31 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-15",
-      "source_events": 35,
-      "accepted": 35,
+      "event_date": "2025-05-31",
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-16",
-      "source_events": 21,
-      "accepted": 21,
+      "event_date": "2025-06-01",
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-17",
+      "event_date": "2025-06-02",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-03",
       "source_events": 28,
       "accepted": 28,
       "rejected": 0,
@@ -1452,39 +1332,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-18",
-      "source_events": 27,
-      "accepted": 27,
+      "event_date": "2025-06-04",
+      "source_events": 44,
+      "accepted": 44,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-19",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-20",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-21",
-      "source_events": 36,
-      "accepted": 36,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-22",
+      "event_date": "2025-06-05",
       "source_events": 38,
       "accepted": 38,
       "rejected": 0,
@@ -1492,71 +1348,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-06-23",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-24",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-25",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-26",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-27",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-28",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-29",
-      "source_events": 41,
-      "accepted": 41,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-06-30",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-01",
+      "event_date": "2025-06-06",
       "source_events": 28,
       "accepted": 28,
       "rejected": 0,
@@ -1564,7 +1356,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-02",
+      "event_date": "2025-06-07",
+      "source_events": 49,
+      "accepted": 49,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-08",
       "source_events": 31,
       "accepted": 31,
       "rejected": 0,
@@ -1572,7 +1372,31 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-03",
+      "event_date": "2025-06-09",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-10",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-11",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-12",
       "source_events": 37,
       "accepted": 37,
       "rejected": 0,
@@ -1580,23 +1404,87 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-04",
-      "source_events": 18,
-      "accepted": 18,
+      "event_date": "2025-06-13",
+      "source_events": 26,
+      "accepted": 26,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-05",
-      "source_events": 30,
-      "accepted": 30,
+      "event_date": "2025-06-14",
+      "source_events": 38,
+      "accepted": 38,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-06",
+      "event_date": "2025-06-15",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-16",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-17",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-18",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-19",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-20",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-21",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-22",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-23",
       "source_events": 27,
       "accepted": 27,
       "rejected": 0,
@@ -1604,9 +1492,113 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-07",
+      "event_date": "2025-06-24",
+      "source_events": 26,
+      "accepted": 26,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-25",
+      "source_events": 23,
+      "accepted": 23,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-26",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-27",
+      "source_events": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-28",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-29",
+      "source_events": 43,
+      "accepted": 43,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-06-30",
+      "source_events": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-01",
       "source_events": 37,
       "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-02",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-03",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-04",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-05",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-06",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-07",
+      "source_events": 27,
+      "accepted": 27,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -1621,30 +1613,14 @@
     },
     {
       "event_date": "2025-07-09",
-      "source_events": 30,
-      "accepted": 30,
+      "source_events": 34,
+      "accepted": 34,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-07-10",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-11",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-12",
       "source_events": 37,
       "accepted": 37,
       "rejected": 0,
@@ -1652,23 +1628,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-13",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-14",
-      "source_events": 18,
-      "accepted": 18,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-15",
+      "event_date": "2025-07-11",
       "source_events": 32,
       "accepted": 32,
       "rejected": 0,
@@ -1676,87 +1636,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-16",
-      "source_events": 23,
-      "accepted": 23,
+      "event_date": "2025-07-12",
+      "source_events": 38,
+      "accepted": 38,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-17",
-      "source_events": 20,
-      "accepted": 20,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-18",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-19",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-20",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-21",
-      "source_events": 35,
-      "accepted": 35,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-22",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-23",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-24",
-      "source_events": 20,
-      "accepted": 20,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-25",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-07-26",
+      "event_date": "2025-07-13",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -1764,7 +1652,31 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-27",
+      "event_date": "2025-07-14",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-15",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-16",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-17",
       "source_events": 23,
       "accepted": 23,
       "rejected": 0,
@@ -1772,7 +1684,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-28",
+      "event_date": "2025-07-18",
       "source_events": 29,
       "accepted": 29,
       "rejected": 0,
@@ -1780,7 +1692,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-29",
+      "event_date": "2025-07-19",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -1788,7 +1700,39 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-30",
+      "event_date": "2025-07-20",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-21",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-22",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-23",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-24",
       "source_events": 30,
       "accepted": 30,
       "rejected": 0,
@@ -1796,15 +1740,39 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-07-31",
-      "source_events": 28,
-      "accepted": 28,
+      "event_date": "2025-07-25",
+      "source_events": 31,
+      "accepted": 31,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-08-01",
+      "event_date": "2025-07-26",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-27",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-28",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-07-29",
       "source_events": 41,
       "accepted": 41,
       "rejected": 0,
@@ -1812,15 +1780,23 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-08-02",
-      "source_events": 26,
-      "accepted": 26,
+      "event_date": "2025-07-30",
+      "source_events": 32,
+      "accepted": 32,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-08-03",
+      "event_date": "2025-07-31",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-01",
       "source_events": 28,
       "accepted": 28,
       "rejected": 0,
@@ -1828,9 +1804,25 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-08-04",
+      "event_date": "2025-08-02",
       "source_events": 34,
       "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-03",
+      "source_events": 26,
+      "accepted": 26,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-04",
+      "source_events": 43,
+      "accepted": 43,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -1845,342 +1837,14 @@
     },
     {
       "event_date": "2025-08-06",
-      "source_events": 33,
-      "accepted": 33,
+      "source_events": 43,
+      "accepted": 43,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-08-07",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-08",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-09",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-10",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-11",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-12",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-13",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-14",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-15",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-16",
-      "source_events": 41,
-      "accepted": 41,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-17",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-18",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-19",
-      "source_events": 18,
-      "accepted": 18,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-20",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-21",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-22",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-23",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-24",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-25",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-26",
-      "source_events": 39,
-      "accepted": 39,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-27",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-28",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-29",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-30",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-08-31",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-01",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-02",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-03",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-04",
-      "source_events": 21,
-      "accepted": 21,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-05",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-06",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-07",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-08",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-09",
-      "source_events": 21,
-      "accepted": 21,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-10",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-11",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-12",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-13",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-14",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-15",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-16",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-17",
       "source_events": 35,
       "accepted": 35,
       "rejected": 0,
@@ -2188,7 +1852,135 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-09-18",
+      "event_date": "2025-08-08",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-09",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-10",
+      "source_events": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-11",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-12",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-13",
+      "source_events": 27,
+      "accepted": 27,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-14",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-15",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-16",
+      "source_events": 44,
+      "accepted": 44,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-17",
+      "source_events": 45,
+      "accepted": 45,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-18",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-19",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-20",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-21",
+      "source_events": 40,
+      "accepted": 40,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-22",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-23",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-24",
       "source_events": 34,
       "accepted": 34,
       "rejected": 0,
@@ -2196,9 +1988,209 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-08-25",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-26",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-27",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-28",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-29",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-30",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-08-31",
+      "source_events": 43,
+      "accepted": 43,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-01",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-02",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-03",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-04",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-05",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-06",
+      "source_events": 39,
+      "accepted": 39,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-07",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-08",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-09",
+      "source_events": 26,
+      "accepted": 26,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-10",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-11",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-12",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-13",
+      "source_events": 41,
+      "accepted": 41,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-14",
+      "source_events": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-15",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-16",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-17",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-09-18",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-09-19",
-      "source_events": 20,
-      "accepted": 20,
+      "source_events": 23,
+      "accepted": 23,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -2213,206 +2205,38 @@
     },
     {
       "event_date": "2025-09-21",
-      "source_events": 31,
-      "accepted": 31,
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-09-22",
-      "source_events": 32,
-      "accepted": 32,
+      "source_events": 36,
+      "accepted": 36,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-09-23",
-      "source_events": 27,
-      "accepted": 27,
+      "source_events": 31,
+      "accepted": 31,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-09-24",
-      "source_events": 33,
-      "accepted": 33,
+      "source_events": 29,
+      "accepted": 29,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-09-25",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-26",
-      "source_events": 34,
-      "accepted": 34,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-27",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-28",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-29",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-09-30",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-01",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-02",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-03",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-04",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-05",
-      "source_events": 21,
-      "accepted": 21,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-06",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-07",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-08",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-09",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-10",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-11",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-12",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-13",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-14",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-15",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-16",
       "source_events": 38,
       "accepted": 38,
       "rejected": 0,
@@ -2420,55 +2244,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-10-17",
-      "source_events": 24,
-      "accepted": 24,
+      "event_date": "2025-09-26",
+      "source_events": 49,
+      "accepted": 49,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-10-18",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-19",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-20",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-21",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-22",
-      "source_events": 33,
-      "accepted": 33,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-23",
+      "event_date": "2025-09-27",
       "source_events": 29,
       "accepted": 29,
       "rejected": 0,
@@ -2476,79 +2260,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-10-24",
-      "source_events": 25,
-      "accepted": 25,
+      "event_date": "2025-09-28",
+      "source_events": 29,
+      "accepted": 29,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-10-25",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-26",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-27",
-      "source_events": 25,
-      "accepted": 25,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-28",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-29",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-30",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-10-31",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-01",
-      "source_events": 32,
-      "accepted": 32,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-02",
+      "event_date": "2025-09-29",
       "source_events": 35,
       "accepted": 35,
       "rejected": 0,
@@ -2556,119 +2276,47 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-03",
-      "source_events": 25,
-      "accepted": 25,
+      "event_date": "2025-09-30",
+      "source_events": 39,
+      "accepted": 39,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-04",
-      "source_events": 29,
-      "accepted": 29,
+      "event_date": "2025-10-01",
+      "source_events": 30,
+      "accepted": 30,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-05",
-      "source_events": 24,
-      "accepted": 24,
+      "event_date": "2025-10-02",
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-06",
-      "source_events": 40,
-      "accepted": 40,
+      "event_date": "2025-10-03",
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-07",
-      "source_events": 22,
-      "accepted": 22,
+      "event_date": "2025-10-04",
+      "source_events": 32,
+      "accepted": 32,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-08",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-09",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-10",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-11",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-12",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-13",
-      "source_events": 40,
-      "accepted": 40,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-14",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-15",
-      "source_events": 24,
-      "accepted": 24,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-16",
-      "source_events": 26,
-      "accepted": 26,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-17",
+      "event_date": "2025-10-05",
       "source_events": 20,
       "accepted": 20,
       "rejected": 0,
@@ -2676,17 +2324,361 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-10-06",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-07",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-08",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-09",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-10",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-11",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-12",
+      "source_events": 45,
+      "accepted": 45,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-13",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-14",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-15",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-16",
+      "source_events": 40,
+      "accepted": 40,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-17",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-18",
+      "source_events": 27,
+      "accepted": 27,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-19",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-20",
+      "source_events": 44,
+      "accepted": 44,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-21",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-22",
+      "source_events": 27,
+      "accepted": 27,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-23",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-24",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-25",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-26",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-27",
+      "source_events": 32,
+      "accepted": 32,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-28",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-29",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-30",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-10-31",
+      "source_events": 40,
+      "accepted": 40,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-01",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-02",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-03",
+      "source_events": 44,
+      "accepted": 44,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-04",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-05",
+      "source_events": 34,
+      "accepted": 34,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-06",
+      "source_events": 49,
+      "accepted": 49,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-07",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-08",
+      "source_events": 31,
+      "accepted": 31,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-09",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-10",
+      "source_events": 43,
+      "accepted": 43,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-11",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-12",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-13",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-14",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-15",
+      "source_events": 30,
+      "accepted": 30,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-16",
+      "source_events": 29,
+      "accepted": 29,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-17",
+      "source_events": 22,
+      "accepted": 22,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-11-18",
-      "source_events": 21,
-      "accepted": 21,
+      "source_events": 27,
+      "accepted": 27,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-11-19",
-      "source_events": 31,
-      "accepted": 31,
+      "source_events": 44,
+      "accepted": 44,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -2701,6 +2693,22 @@
     },
     {
       "event_date": "2025-11-21",
+      "source_events": 36,
+      "accepted": 36,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-22",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-11-23",
       "source_events": 30,
       "accepted": 30,
       "rejected": 0,
@@ -2708,57 +2716,41 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-11-22",
-      "source_events": 39,
-      "accepted": 39,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-11-23",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
       "event_date": "2025-11-24",
-      "source_events": 31,
-      "accepted": 31,
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-11-25",
-      "source_events": 32,
-      "accepted": 32,
+      "source_events": 38,
+      "accepted": 38,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-11-26",
-      "source_events": 29,
-      "accepted": 29,
+      "source_events": 36,
+      "accepted": 36,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-11-27",
-      "source_events": 25,
-      "accepted": 25,
+      "source_events": 26,
+      "accepted": 26,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-11-28",
-      "source_events": 21,
-      "accepted": 21,
+      "source_events": 19,
+      "accepted": 19,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -2773,14 +2765,6 @@
     },
     {
       "event_date": "2025-11-30",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-01",
       "source_events": 31,
       "accepted": 31,
       "rejected": 0,
@@ -2788,15 +2772,7 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-12-02",
-      "source_events": 29,
-      "accepted": 29,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-03",
+      "event_date": "2025-12-01",
       "source_events": 35,
       "accepted": 35,
       "rejected": 0,
@@ -2804,23 +2780,23 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-12-02",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-03",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-12-04",
-      "source_events": 23,
-      "accepted": 23,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-05",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-06",
       "source_events": 24,
       "accepted": 24,
       "rejected": 0,
@@ -2828,33 +2804,49 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-12-05",
+      "source_events": 47,
+      "accepted": 47,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-06",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-12-07",
-      "source_events": 35,
-      "accepted": 35,
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-08",
-      "source_events": 23,
-      "accepted": 23,
+      "source_events": 27,
+      "accepted": 27,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-09",
-      "source_events": 35,
-      "accepted": 35,
+      "source_events": 31,
+      "accepted": 31,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-10",
-      "source_events": 23,
-      "accepted": 23,
+      "source_events": 37,
+      "accepted": 37,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -2869,102 +2861,38 @@
     },
     {
       "event_date": "2025-12-12",
-      "source_events": 22,
-      "accepted": 22,
+      "source_events": 34,
+      "accepted": 34,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-13",
-      "source_events": 28,
-      "accepted": 28,
+      "source_events": 23,
+      "accepted": 23,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-14",
-      "source_events": 30,
-      "accepted": 30,
+      "source_events": 41,
+      "accepted": 41,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-15",
-      "source_events": 30,
-      "accepted": 30,
+      "source_events": 28,
+      "accepted": 28,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-16",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-17",
-      "source_events": 21,
-      "accepted": 21,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-18",
-      "source_events": 22,
-      "accepted": 22,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-19",
-      "source_events": 31,
-      "accepted": 31,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-20",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-21",
-      "source_events": 30,
-      "accepted": 30,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-22",
-      "source_events": 36,
-      "accepted": 36,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-23",
-      "source_events": 36,
-      "accepted": 36,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-24",
       "source_events": 25,
       "accepted": 25,
       "rejected": 0,
@@ -2972,39 +2900,15 @@
       "unexplained": 0
     },
     {
-      "event_date": "2025-12-25",
-      "source_events": 28,
-      "accepted": 28,
+      "event_date": "2025-12-17",
+      "source_events": 33,
+      "accepted": 33,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
-      "event_date": "2025-12-26",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-27",
-      "source_events": 27,
-      "accepted": 27,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-28",
-      "source_events": 28,
-      "accepted": 28,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2025-12-29",
+      "event_date": "2025-12-18",
       "source_events": 31,
       "accepted": 31,
       "rejected": 0,
@@ -3012,265 +2916,337 @@
       "unexplained": 0
     },
     {
+      "event_date": "2025-12-19",
+      "source_events": 24,
+      "accepted": 24,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-20",
+      "source_events": 42,
+      "accepted": 42,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-21",
+      "source_events": 33,
+      "accepted": 33,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-22",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-23",
+      "source_events": 47,
+      "accepted": 47,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-24",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-25",
+      "source_events": 37,
+      "accepted": 37,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-26",
+      "source_events": 35,
+      "accepted": 35,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-27",
+      "source_events": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-28",
+      "source_events": 38,
+      "accepted": 38,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
+      "event_date": "2025-12-29",
+      "source_events": 28,
+      "accepted": 28,
+      "rejected": 0,
+      "not_yet_accepted": 0,
+      "unexplained": 0
+    },
+    {
       "event_date": "2025-12-30",
-      "source_events": 20,
-      "accepted": 20,
+      "source_events": 32,
+      "accepted": 32,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2025-12-31",
-      "source_events": 725,
-      "accepted": 725,
+      "source_events": 36,
+      "accepted": 36,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-01",
-      "source_events": 37211,
-      "accepted": 37211,
+      "source_events": 42692,
+      "accepted": 42692,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-02",
-      "source_events": 30506,
-      "accepted": 30506,
+      "source_events": 39253,
+      "accepted": 39253,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-03",
-      "source_events": 6541,
-      "accepted": 6541,
+      "source_events": 10629,
+      "accepted": 10629,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-04",
-      "source_events": 22484,
-      "accepted": 22484,
+      "source_events": 26386,
+      "accepted": 26386,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-05",
-      "source_events": 30275,
-      "accepted": 30275,
+      "source_events": 37195,
+      "accepted": 37195,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-06",
-      "source_events": 34368,
-      "accepted": 34368,
+      "source_events": 42381,
+      "accepted": 42381,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-07",
-      "source_events": 34640,
-      "accepted": 34640,
+      "source_events": 43416,
+      "accepted": 43416,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-08",
-      "source_events": 38599,
-      "accepted": 38599,
+      "source_events": 48112,
+      "accepted": 48112,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-09",
-      "source_events": 31071,
-      "accepted": 31071,
+      "source_events": 40262,
+      "accepted": 40262,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-10",
-      "source_events": 8195,
-      "accepted": 8195,
+      "source_events": 13399,
+      "accepted": 13399,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-11",
-      "source_events": 21670,
-      "accepted": 21670,
+      "source_events": 25445,
+      "accepted": 25445,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-12",
-      "source_events": 28837,
-      "accepted": 28837,
+      "source_events": 34994,
+      "accepted": 34994,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-13",
-      "source_events": 32324,
-      "accepted": 32324,
+      "source_events": 40605,
+      "accepted": 40605,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-14",
-      "source_events": 32865,
-      "accepted": 32865,
+      "source_events": 41823,
+      "accepted": 41823,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-15",
-      "source_events": 37176,
-      "accepted": 37176,
+      "source_events": 46567,
+      "accepted": 46567,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-16",
-      "source_events": 29826,
-      "accepted": 29826,
+      "source_events": 39264,
+      "accepted": 39264,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-17",
-      "source_events": 8126,
-      "accepted": 8126,
+      "source_events": 13504,
+      "accepted": 13504,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-18",
-      "source_events": 21651,
-      "accepted": 21651,
+      "source_events": 24919,
+      "accepted": 24919,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-19",
-      "source_events": 27493,
-      "accepted": 27493,
+      "source_events": 34603,
+      "accepted": 34603,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-20",
-      "source_events": 32268,
-      "accepted": 32268,
+      "source_events": 39915,
+      "accepted": 39915,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-21",
-      "source_events": 32587,
-      "accepted": 32587,
+      "source_events": 41539,
+      "accepted": 41539,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-22",
-      "source_events": 36793,
-      "accepted": 36793,
+      "source_events": 45946,
+      "accepted": 45946,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-23",
-      "source_events": 29555,
-      "accepted": 29555,
+      "source_events": 38914,
+      "accepted": 38914,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-24",
-      "source_events": 8354,
-      "accepted": 8354,
+      "source_events": 13508,
+      "accepted": 13508,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-25",
-      "source_events": 20803,
-      "accepted": 20803,
+      "source_events": 24311,
+      "accepted": 24311,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-26",
-      "source_events": 27823,
-      "accepted": 27823,
+      "source_events": 34130,
+      "accepted": 34130,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-27",
-      "source_events": 31645,
-      "accepted": 31645,
+      "source_events": 39584,
+      "accepted": 39584,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-28",
-      "source_events": 32717,
-      "accepted": 32717,
+      "source_events": 40676,
+      "accepted": 40676,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
     },
     {
       "event_date": "2026-01-29",
-      "source_events": 35903,
-      "accepted": 35903,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2026-01-30",
-      "source_events": 29707,
-      "accepted": 29707,
-      "rejected": 0,
-      "not_yet_accepted": 0,
-      "unexplained": 0
-    },
-    {
-      "event_date": "2026-01-31",
-      "source_events": 6292,
-      "accepted": 6292,
+      "source_events": 4234,
+      "accepted": 4234,
       "rejected": 0,
       "not_yet_accepted": 0,
       "unexplained": 0
@@ -3279,40 +3255,40 @@
   "physical_deliveries": [
     {
       "topic": "commerce.customers",
-      "bronze_rows": 15964,
-      "deliveries_logged": 15964,
+      "bronze_rows": 18682,
+      "deliveries_logged": 18682,
       "duplicates_injected": 0,
       "corrupt_injected": 0,
       "invalid_injected": 0
     },
     {
       "topic": "commerce.inventory",
-      "bronze_rows": 486580,
-      "deliveries_logged": 486580,
+      "bronze_rows": 558389,
+      "deliveries_logged": 558389,
       "duplicates_injected": 0,
       "corrupt_injected": 0,
       "invalid_injected": 0
     },
     {
       "topic": "commerce.orders",
-      "bronze_rows": 224646,
-      "deliveries_logged": 224646,
+      "bronze_rows": 260085,
+      "deliveries_logged": 260085,
       "duplicates_injected": 0,
       "corrupt_injected": 0,
       "invalid_injected": 0
     },
     {
       "topic": "commerce.payments",
-      "bronze_rows": 121948,
-      "deliveries_logged": 121948,
+      "bronze_rows": 143020,
+      "deliveries_logged": 143020,
       "duplicates_injected": 0,
       "corrupt_injected": 0,
       "invalid_injected": 0
     },
     {
       "topic": "commerce.products",
-      "bronze_rows": 2313,
-      "deliveries_logged": 2313,
+      "bronze_rows": 2293,
+      "deliveries_logged": 2293,
       "duplicates_injected": 0,
       "corrupt_injected": 0,
       "invalid_injected": 0
@@ -3329,47 +3305,47 @@
   "financials_source_vs_silver": [
     {
       "currency": "EUR",
-      "source_orders": 8805,
-      "silver_orders": 8805,
-      "source_revenue_minor": 19462933,
-      "silver_revenue_minor": 19462933
+      "source_orders": 10255,
+      "silver_orders": 10255,
+      "source_revenue_minor": 22281602,
+      "silver_revenue_minor": 22281602
     },
     {
       "currency": "GBP",
-      "source_orders": 41459,
-      "silver_orders": 41459,
-      "source_revenue_minor": 76910873,
-      "silver_revenue_minor": 76910873
+      "source_orders": 48761,
+      "silver_orders": 48761,
+      "source_revenue_minor": 90545622,
+      "silver_revenue_minor": 90545622
     },
     {
       "currency": "USD",
-      "source_orders": 4658,
-      "silver_orders": 4658,
-      "source_revenue_minor": 10730466,
-      "silver_revenue_minor": 10730466
+      "source_orders": 5408,
+      "silver_orders": 5408,
+      "source_revenue_minor": 12598675,
+      "silver_revenue_minor": 12598675
     }
   ],
   "financials_silver_vs_gold": [
     {
       "currency": "EUR",
-      "silver_orders": 8805,
-      "gold_orders": 8805,
-      "silver_revenue_minor": 19462933,
-      "gold_revenue_minor": 19462933
+      "silver_orders": 10255,
+      "gold_orders": 10255,
+      "silver_revenue_minor": 22281602,
+      "gold_revenue_minor": 22281602
     },
     {
       "currency": "GBP",
-      "silver_orders": 41459,
-      "gold_orders": 41459,
-      "silver_revenue_minor": 76910873,
-      "gold_revenue_minor": 76910873
+      "silver_orders": 48761,
+      "gold_orders": 48761,
+      "silver_revenue_minor": 90545622,
+      "gold_revenue_minor": 90545622
     },
     {
       "currency": "USD",
-      "silver_orders": 4658,
-      "gold_orders": 4658,
-      "silver_revenue_minor": 10730466,
-      "gold_revenue_minor": 10730466
+      "silver_orders": 5408,
+      "gold_orders": 5408,
+      "silver_revenue_minor": 12598675,
+      "gold_revenue_minor": 12598675
     }
   ],
   "unexplained_examples": []

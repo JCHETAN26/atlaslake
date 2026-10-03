@@ -46,6 +46,11 @@ services:
     image: bitnamilegacy/minio:2025.7.23
     container_name: atlas-minio
     user: "1000:1000"   # matches the owner of the exFAT bind mount
+    # Host networking: this Docker daemon runs with iptables=false, so published ports go through the
+    # userland docker-proxy, which reset S3 connections under many concurrent small writes (measured:
+    # 35 resets per small-file run via the proxy, 0 when bypassed). Containers reach it via
+    # host.docker.internal:9000.
+    network_mode: host
     # Run the server binary directly: the Bitnami setup wrapper cannot write its pid file as uid 1000,
     # fails its readiness loop and exits every ~70 s (observed: 76 restarts under load).
     entrypoint: ["/opt/bitnami/minio/bin/minio"]
@@ -58,7 +63,6 @@ services:
       MINIO_ROOT_PASSWORD: ${ATLAS_S3_SECRET_KEY:-atlas-secret-key}
       MINIO_PROMETHEUS_AUTH_TYPE: public
       MINIO_DATA_DIR: /bitnami/minio/data
-    ports: ["9000:9000", "9001:9001"]
     volumes:
       - ./data/minio:/bitnami/minio/data
     healthcheck:
@@ -248,7 +252,7 @@ services:
       ATLAS_PG_HOST: postgres
       ATLAS_KAFKA_BOOTSTRAP: kafka:29092
       ATLAS_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      ATLAS_S3_ENDPOINT: http://minio:9000
+      ATLAS_S3_ENDPOINT: http://host.docker.internal:9000
       ATLAS_PUSHGATEWAY: pushgateway:9091
       ATLAS_OPENLINEAGE_URL: http://marquez:5000
     volumes:

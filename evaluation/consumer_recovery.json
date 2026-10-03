@@ -1,0 +1,168 @@
+{
+  "benchmark": "consumer_recovery",
+  "context": {
+    "generated_at": "2026-10-03T10:20:36+00:00",
+    "git_sha": "6205b6d-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "workload_orders_per_s": 150,
+  "outage_s": 45,
+  "steady_state_lag": 11453,
+  "peak_backlog": 50150,
+  "recovery_time_s": 52.6,
+  "time_from_crash_to_recovered_s": 100.0,
+  "records_lost": 0,
+  "unknown_origin": 0,
+  "unexpected_logical_duplicates": 0,
+  "reconciliation_passed": true,
+  "source_events": 1501085,
+  "valid_experiment": true,
+  "lag_timeline": [
+    {
+      "t": 0.0,
+      "lag": 11453,
+      "phase": "down"
+    },
+    {
+      "t": 5.2,
+      "lag": 15905,
+      "phase": "down"
+    },
+    {
+      "t": 10.5,
+      "lag": 21034,
+      "phase": "down"
+    },
+    {
+      "t": 15.8,
+      "lag": 25448,
+      "phase": "down"
+    },
+    {
+      "t": 21.1,
+      "lag": 29848,
+      "phase": "down"
+    },
+    {
+      "t": 26.4,
+      "lag": 34516,
+      "phase": "down"
+    },
+    {
+      "t": 31.6,
+      "lag": 40197,
+      "phase": "down"
+    },
+    {
+      "t": 36.9,
+      "lag": 45194,
+      "phase": "down"
+    },
+    {
+      "t": 42.2,
+      "lag": 50150,
+      "phase": "down"
+    },
+    {
+      "t": 47.7,
+      "lag": 55119,
+      "phase": "recovering"
+    },
+    {
+      "t": 50.9,
+      "lag": 59267,
+      "phase": "recovering"
+    },
+    {
+      "t": 54.2,
+      "lag": 62107,
+      "phase": "recovering"
+    },
+    {
+      "t": 57.5,
+      "lag": 65151,
+      "phase": "recovering"
+    },
+    {
+      "t": 60.8,
+      "lag": 68430,
+      "phase": "recovering"
+    },
+    {
+      "t": 64.0,
+      "lag": 71557,
+      "phase": "recovering"
+    },
+    {
+      "t": 67.3,
+      "lag": 75794,
+      "phase": "recovering"
+    },
+    {
+      "t": 70.6,
+      "lag": 79120,
+      "phase": "recovering"
+    },
+    {
+      "t": 73.9,
+      "lag": 82704,
+      "phase": "recovering"
+    },
+    {
+      "t": 77.2,
+      "lag": 87249,
+      "phase": "recovering"
+    },
+    {
+      "t": 80.4,
+      "lag": 81516,
+      "phase": "recovering"
+    },
+    {
+      "t": 83.6,
+      "lag": 84736,
+      "phase": "recovering"
+    },
+    {
+      "t": 86.9,
+      "lag": 88386,
+      "phase": "recovering"
+    },
+    {
+      "t": 90.2,
+      "lag": 93266,
+      "phase": "recovering"
+    },
+    {
+      "t": 93.4,
+      "lag": 17839,
+      "phase": "recovering"
+    },
+    {
+      "t": 96.8,
+      "lag": 21517,
+      "phase": "recovering"
+    },
+    {
+      "t": 100.0,
+      "lag": 11308,
+      "phase": "recovering"
+    }
+  ]
+}

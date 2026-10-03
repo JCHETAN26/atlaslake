@@ -31,6 +31,7 @@ LAKE_TABLES = {
         "realtime_sales_1m",
     ],
     "ops": ["dlq", "stream_batches"],
+    "bronze": ["orders", "payments", "inventory", "customers", "products"],
 }
 
 

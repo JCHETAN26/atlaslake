@@ -1,8 +1,8 @@
 {
   "benchmark": "benchmark_run",
   "context": {
-    "generated_at": "2026-10-03T09:19:49+00:00",
-    "git_sha": "cd7c5d4-dirty",
+    "generated_at": "2026-10-03T10:58:19+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -22,12 +22,12 @@
     }
   },
   "scale": "small",
-  "suite": "late_event_test",
+  "suite": "iceberg_compaction",
   "results": {
-    "late_event_test": {
+    "iceberg_compaction": {
       "ok": true,
-      "elapsed_s": 42.5
+      "elapsed_s": 890.9
     },
-    "_total_elapsed_s": 42.5
+    "_total_elapsed_s": 890.9
   }
 }

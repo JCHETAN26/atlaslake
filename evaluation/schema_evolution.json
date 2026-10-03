@@ -1,8 +1,8 @@
 {
   "benchmark": "schema_evolution",
   "context": {
-    "generated_at": "2026-10-03T09:11:38+00:00",
-    "git_sha": "cd7c5d4-dirty",
+    "generated_at": "2026-10-03T09:41:07+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -49,45 +49,45 @@
     "mixed_versions": {
       "batches": 1,
       "received": 1000,
-      "elapsed_s": 4.31,
-      "events_per_s": 232.1,
+      "elapsed_s": 4.3,
+      "events_per_s": 232.7,
       "accepted_new": 1000,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 1000,
       "stage_seconds_total": {
-        "decode_validate": 0.656,
-        "bronze_append": 0.334,
-        "dlq_merge": 0.047,
-        "dedup_ledger_antijoin": 0.22,
-        "batch_stats": 0.351,
-        "entity_merges": 1.27,
-        "ledger_append": 0.156
+        "decode_validate": 0.661,
+        "bronze_append": 0.318,
+        "dlq_merge": 0.043,
+        "dedup_ledger_antijoin": 0.221,
+        "batch_stats": 0.357,
+        "entity_merges": 1.312,
+        "ledger_append": 0.15
       },
       "batch_durations_s": [
-        3.048
+        3.077
       ]
     },
     "after_rejection": {
       "batches": 1,
       "received": 100,
-      "elapsed_s": 4.1,
-      "events_per_s": 24.4,
+      "elapsed_s": 4.11,
+      "events_per_s": 24.3,
       "accepted_new": 100,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 100,
       "stage_seconds_total": {
-        "decode_validate": 0.578,
-        "bronze_append": 0.311,
-        "dlq_merge": 0.053,
-        "dedup_ledger_antijoin": 0.241,
-        "batch_stats": 0.381,
-        "entity_merges": 1.26,
-        "ledger_append": 0.193
+        "decode_validate": 0.574,
+        "bronze_append": 0.312,
+        "dlq_merge": 0.064,
+        "dedup_ledger_antijoin": 0.244,
+        "batch_stats": 0.416,
+        "entity_merges": 1.274,
+        "ledger_append": 0.157
       },
       "batch_durations_s": [
-        3.032
+        3.056
       ]
     }
   }

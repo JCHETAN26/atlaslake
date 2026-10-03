@@ -81,7 +81,11 @@ def full_vs_incremental(spark) -> dict[str, Any]:
     from lakehouse.fingerprint import gold_fingerprint
     from lineage.dbt_runner import dbt_build
 
+    # Realistic cadence: data lands, dbt runs on a schedule. Wait past the incremental look-back window
+    # (dbt var incremental_lookback_minutes, a clock-skew guard) so the increment is not swallowed by it.
+    time.sleep(65)
     full_1 = E.build_gold(full_refresh=True)
+    time.sleep(65)
     # a realistic increment: a short burst of live activity
     inc_src = subprocess.run(
         [*ATLAS, "workload", "--rate", "40", "--duration", "30"],
@@ -665,7 +669,7 @@ def schema_evolution(spark) -> dict[str, Any]:
         "events_by_schema_version": versions,
         "breaking_change": {
             "compatible": check.compatible,
-            "messages": check.messages[:3],
+            "messages": [m[:240] for m in check.messages[:2]],
             "registered": registered,
             "rejected_safely": not registered,
         },
@@ -767,6 +771,10 @@ def streaming_throughput(spark, rates: list[int], seconds: int = 90) -> dict[str
             capture_output=True,
             text=True,
         )
+        if work.returncode != 0:
+            _stop(relay)
+            _stop(stream)
+            raise RuntimeError(f"workload failed at {rate} orders/s: {(work.stdout + work.stderr)[-1500:]}")
         stats = json.loads(work.stdout[work.stdout.index("{") :]) if "{" in work.stdout else {}
         lag_samples = []
         for _ in range(30):  # let the pipeline catch up, sampling lag
@@ -836,7 +844,11 @@ def consumer_recovery(spark, rate: int = 150, warmup_s: int = 45, outage_s: int 
             recovered_at = time.time()
             break
         time.sleep(3)
-    work.wait()
+    if work.wait() != 0:
+        _stop(relay)
+        _stop(stream2)
+        log_tail = (settings().data_dir / "logs" / "recovery_workload.log").read_text()[-1500:]
+        raise RuntimeError(f"workload died during the recovery experiment: {log_tail}")
     for _ in range(60):  # drain fully before reconciling
         if _checkpoint_lag() == 0:
             from ingestion.cdc.outbox_relay import outbox_backlog
@@ -860,6 +872,8 @@ def consumer_recovery(spark, rate: int = 150, warmup_s: int = 45, outage_s: int 
         "unexpected_logical_duplicates": rec["summary"]["logical_duplicates"],
         "reconciliation_passed": rec["summary"]["passed"],
         "source_events": rec["summary"]["source_events"],
+        # the experiment is only meaningful if a backlog actually built up while Spark was down
+        "valid_experiment": peak > 0,
         "lag_timeline": lag_timeline,
     }
     write_result("consumer_recovery", payload)

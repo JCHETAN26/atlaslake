@@ -112,8 +112,8 @@ def run_workload(
             "SELECT store_id, product_id, quantity_on_hand, quantity_reserved FROM commerce.inventory"
         ).fetchall()
     }
-    tracker = InventoryTracker(sim.ids, available=avail)
     run_id = f"live-{seed}-{int(time.time())}"
+    tracker = InventoryTracker(sim.ids, available=avail, namespace=f"{run_id}:")
     record_run(conn, run_id, "live", {**cfg.to_json(), "rate": rate, "tick_s": tick_s})
     rng = np.random.default_rng([seed, 99, next_index])
     pending: dict[str, list[pd.DataFrame]] = {t: [] for t in ev.TOPICS}

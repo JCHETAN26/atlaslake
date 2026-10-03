@@ -36,6 +36,12 @@ def iceberg_catalog_conf(cfg: Settings) -> dict[str, str]:
         f"{prefix}.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
         f"{prefix}.client.region": cfg.s3.region,
         f"{prefix}.cache-enabled": "false",
+        # Ride out transient object-store overload (observed: MinIO on the exFAT drive saturating under
+        # thousands of tiny concurrent writes) instead of failing the micro-batch after 6 quick retries.
+        f"{prefix}.s3.retry.num-retries": "12",
+        f"{prefix}.s3.retry.min-wait-ms": "500",
+        f"{prefix}.s3.retry.max-wait-ms": "20000",
+        f"{prefix}.http-client.apache.max-connections": "64",
     }
     if cfg.s3.endpoint:  # MinIO locally; empty in AWS (real S3, virtual-hosted style)
         conf[f"{prefix}.s3.endpoint"] = cfg.s3.endpoint

@@ -122,3 +122,30 @@ def test_outbox_rows_are_time_ordered_with_json_payloads(small):
     assert len(ob) == sum(len(df) for df in batch.values())
     assert ob["event_timestamp"].is_monotonic_increasing
     assert np.all(ob["payload"].str.startswith("{"))
+
+
+def test_restock_ids_are_unique_across_independent_live_runs():
+    """Regression: each live workload run restarted restock counters → duplicate outbox event_ids."""
+    from simulator.generator import EventIds, InventoryTracker
+
+    inv = pd.DataFrame(
+        {
+            "event_id": ["e1"],
+            "store_id": ["s1"],
+            "product_id": ["p1"],
+            "inventory_key": ["s1:p1"],
+            "order_id": ["o1"],
+            "line_number": [1],
+            "event_type": ["INVENTORY_RESERVED"],
+            "reason": ["RESERVATION"],
+            "on_hand_delta": [0],
+            "reserved_delta": [3],
+            "event_timestamp": [1_000],
+        }
+    )
+    ids = EventIds(1)
+    a = InventoryTracker(ids, namespace="live-1:").add_restocks(inv)
+    b = InventoryTracker(ids, namespace="live-2:").add_restocks(inv)
+    restock_a = set(a.query("reason == 'RESTOCK'")["event_id"])
+    restock_b = set(b.query("reason == 'RESTOCK'")["event_id"])
+    assert restock_a and restock_b and not (restock_a & restock_b)

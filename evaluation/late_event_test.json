@@ -1,8 +1,8 @@
 {
   "benchmark": "late_event_test",
   "context": {
-    "generated_at": "2026-10-03T09:19:49+00:00",
-    "git_sha": "cd7c5d4-dirty",
+    "generated_at": "2026-10-03T09:40:55+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,

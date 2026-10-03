@@ -1,8 +1,8 @@
 {
   "benchmark": "spark_performance",
   "context": {
-    "generated_at": "2026-10-03T09:03:22+00:00",
-    "git_sha": "cd7c5d4-dirty",
+    "generated_at": "2026-10-03T09:33:08+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -24,16 +24,16 @@
   "scale": "1m",
   "relay": {
     "events": 982469,
-    "elapsed_s": 27.018,
-    "events_per_s": 36363.5,
+    "elapsed_s": 37.674,
+    "events_per_s": 26078.2,
     "producer": {
       "deliveries": 982469,
       "failed": 0,
       "by_fault": {
         "none": 982469
       },
-      "elapsed_s": 27.02,
-      "deliveries_per_s": 36361.1
+      "elapsed_s": 37.676,
+      "deliveries_per_s": 26077.1
     }
   },
   "drains": [
@@ -42,32 +42,32 @@
       "parallel_table_writes": true,
       "batches": 10,
       "received": 982469,
-      "elapsed_s": 124.0,
-      "events_per_s": 7923.4,
+      "elapsed_s": 124.41,
+      "events_per_s": 7896.9,
       "accepted_new": 982469,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 982469,
       "stage_seconds_total": {
-        "decode_validate": 25.813,
-        "bronze_append": 11.203,
-        "dlq_merge": 0.848,
-        "dedup_ledger_antijoin": 10.996,
-        "batch_stats": 9.037,
-        "entity_merges": 49.648,
-        "ledger_append": 4.845
+        "decode_validate": 24.558,
+        "bronze_append": 12.177,
+        "dlq_merge": 0.819,
+        "dedup_ledger_antijoin": 11.281,
+        "batch_stats": 8.64,
+        "entity_merges": 50.096,
+        "ledger_append": 4.955
       },
       "batch_durations_s": [
-        17.068,
-        11.703,
-        10.492,
-        10.598,
-        10.611,
-        10.069,
-        10.471,
-        10.19,
-        10.767,
-        10.628
+        19.049,
+        11.336,
+        10.957,
+        10.425,
+        10.236,
+        9.778,
+        10.215,
+        10.293,
+        10.524,
+        9.922
       ]
     },
     {
@@ -75,26 +75,26 @@
       "parallel_table_writes": true,
       "batches": 4,
       "received": 982469,
-      "elapsed_s": 60.44,
-      "events_per_s": 16254.4,
+      "elapsed_s": 57.31,
+      "events_per_s": 17144.1,
       "accepted_new": 982469,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 982469,
       "stage_seconds_total": {
-        "decode_validate": 14.035,
-        "bronze_append": 4.86,
-        "dlq_merge": 0.28,
-        "dedup_ledger_antijoin": 6.041,
-        "batch_stats": 4.874,
-        "entity_merges": 22.56,
-        "ledger_append": 3.574
+        "decode_validate": 11.842,
+        "bronze_append": 4.935,
+        "dlq_merge": 0.259,
+        "dedup_ledger_antijoin": 5.524,
+        "batch_stats": 4.258,
+        "entity_merges": 22.697,
+        "ledger_append": 3.43
       },
       "batch_durations_s": [
-        13.544,
-        13.512,
-        14.559,
-        14.675
+        13.91,
+        13.238,
+        13.322,
+        12.539
       ]
     },
     {
@@ -102,24 +102,24 @@
       "parallel_table_writes": true,
       "batches": 2,
       "received": 982469,
-      "elapsed_s": 43.32,
-      "events_per_s": 22680.2,
+      "elapsed_s": 41.28,
+      "events_per_s": 23802.1,
       "accepted_new": 982469,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 982469,
       "stage_seconds_total": {
-        "decode_validate": 11.348,
-        "bronze_append": 3.823,
-        "dlq_merge": 0.123,
-        "dedup_ledger_antijoin": 4.451,
-        "batch_stats": 2.777,
-        "entity_merges": 15.63,
-        "ledger_append": 2.968
+        "decode_validate": 8.962,
+        "bronze_append": 3.626,
+        "dlq_merge": 0.122,
+        "dedup_ledger_antijoin": 3.989,
+        "batch_stats": 2.729,
+        "entity_merges": 16.679,
+        "ledger_append": 2.906
       },
       "batch_durations_s": [
-        20.477,
-        20.675
+        19.953,
+        19.094
       ]
     },
     {
@@ -127,24 +127,24 @@
       "parallel_table_writes": false,
       "batches": 2,
       "received": 982469,
-      "elapsed_s": 50.07,
-      "events_per_s": 19622.9,
+      "elapsed_s": 49.24,
+      "events_per_s": 19951.9,
       "accepted_new": 982469,
       "rejected": 0,
       "duplicates_detected": 0,
       "late_events": 982469,
       "stage_seconds_total": {
-        "decode_validate": 11.228,
-        "bronze_append": 6.383,
-        "dlq_merge": 0.133,
-        "dedup_ledger_antijoin": 4.331,
-        "batch_stats": 2.748,
-        "entity_merges": 20.125,
-        "ledger_append": 2.945
+        "decode_validate": 9.26,
+        "bronze_append": 6.444,
+        "dlq_merge": 0.12,
+        "dedup_ledger_antijoin": 4.446,
+        "batch_stats": 2.452,
+        "entity_merges": 21.646,
+        "ledger_append": 2.736
       },
       "batch_durations_s": [
-        23.739,
-        24.186
+        22.28,
+        24.853
       ]
     }
   ],

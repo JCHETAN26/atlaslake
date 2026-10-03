@@ -1,8 +1,8 @@
 {
   "benchmark": "duplicate_test",
   "context": {
-    "generated_at": "2026-10-03T09:11:01+00:00",
-    "git_sha": "cd7c5d4-dirty",
+    "generated_at": "2026-10-03T09:40:30+00:00",
+    "git_sha": "6205b6d-dirty",
     "host": {
       "cpus": 16,
       "memory_gb": 19.4,
@@ -36,25 +36,25 @@
   "stream": {
     "batches": 3,
     "received": 1080620,
-    "elapsed_s": 69.22,
-    "events_per_s": 15612.4,
+    "elapsed_s": 52.6,
+    "events_per_s": 20545.9,
     "accepted_new": 982469,
     "rejected": 0,
     "duplicates_detected": 98151,
     "late_events": 982469,
     "stage_seconds_total": {
-      "decode_validate": 21.714,
-      "bronze_append": 5.518,
-      "dlq_merge": 0.237,
-      "dedup_ledger_antijoin": 6.06,
-      "batch_stats": 3.949,
-      "entity_merges": 23.761,
-      "ledger_append": 3.565
+      "decode_validate": 14.275,
+      "bronze_append": 4.47,
+      "dlq_merge": 0.201,
+      "dedup_ledger_antijoin": 4.594,
+      "batch_stats": 3.329,
+      "entity_merges": 18.616,
+      "ledger_append": 3.049
     },
     "batch_durations_s": [
-      28.15,
-      23.587,
-      13.114
+      21.381,
+      17.845,
+      9.353
     ]
   },
   "all_duplicates_detected": true

@@ -748,7 +748,10 @@ class InventoryTracker:
     REORDER_POINT = 25
     RESTOCK_QTY = 150
 
-    def __init__(self, ids: EventIds, available: dict[str, int] | None = None) -> None:
+    def __init__(self, ids: EventIds, available: dict[str, int] | None = None, namespace: str = "") -> None:
+        # ``namespace`` keeps restock event ids unique across independent runs (e.g. each live workload
+        # run restarts its counters); the historical generator uses "" so its ids stay stable.
+        self.namespace = namespace
         self.ids = ids
         self.available: dict[str, int] = dict(available or {})
         self.restocks: dict[str, int] = {}
@@ -782,7 +785,7 @@ class InventoryTracker:
         for key, _, _ in new_rows:
             n = self.restocks.get(key, 0) + 1
             self.restocks[key] = n
-            names.append(f"restock:{key}:{n}")
+            names.append(f"restock:{self.namespace}{key}:{n}")
         keys_arr = [r[0] for r in new_rows]
         restock = pd.DataFrame(
             {

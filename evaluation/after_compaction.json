@@ -1,0 +1,142 @@
+{
+  "benchmark": "after_compaction",
+  "context": {
+    "generated_at": "2026-10-03T10:58:19+00:00",
+    "git_sha": "6205b6d-dirty",
+    "host": {
+      "cpus": 16,
+      "memory_gb": 19.4,
+      "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+      "python": "3.12.11"
+    },
+    "versions": {
+      "pyspark": "3.5.9",
+      "pyiceberg": "0.12.0",
+      "duckdb": "1.5.6",
+      "dbt-core": "1.12.5",
+      "dbt-duckdb": "1.11.0",
+      "confluent-kafka": "2.15.1",
+      "pandas": "2.2.3",
+      "pyarrow": "19.0.1",
+      "iceberg-spark-runtime": "1.10.0"
+    }
+  },
+  "tables": {
+    "bronze.orders": {
+      "data_files": 1,
+      "total_bytes": 1864063,
+      "avg_file_bytes": 1864063,
+      "small_files_lt_8mb": 1,
+      "records": 22385,
+      "snapshots": 5,
+      "manifests": 1,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.025,
+        "p95": 0.0318,
+        "p99": 0.0335,
+        "min": 0.0244,
+        "max": 0.0339,
+        "mean": 0.0264
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.0028,
+        "p95": 0.0031,
+        "p99": 0.0031,
+        "min": 0.0026,
+        "max": 0.0031,
+        "mean": 0.0028
+      },
+      "planning_s": 0.0083
+    },
+    "silver.events": {
+      "data_files": 5,
+      "total_bytes": 8327258,
+      "avg_file_bytes": 1665451,
+      "small_files_lt_8mb": 5,
+      "records": 106685,
+      "snapshots": 5,
+      "manifests": 1,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0261,
+        "p95": 0.028,
+        "p99": 0.0284,
+        "min": 0.0257,
+        "max": 0.0285,
+        "mean": 0.0265
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.0028,
+        "p95": 0.003,
+        "p99": 0.003,
+        "min": 0.0027,
+        "max": 0.003,
+        "mean": 0.0028
+      },
+      "planning_s": 0.008
+    },
+    "silver.inventory_movements": {
+      "data_files": 7,
+      "total_bytes": 2223501,
+      "avg_file_bytes": 317643,
+      "small_files_lt_8mb": 7,
+      "records": 65740,
+      "snapshots": 5,
+      "manifests": 1,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.0248,
+        "p95": 0.0253,
+        "p99": 0.0253,
+        "min": 0.0236,
+        "max": 0.0253,
+        "mean": 0.0247
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.003,
+        "p95": 0.0031,
+        "p99": 0.0032,
+        "min": 0.0029,
+        "max": 0.0032,
+        "mean": 0.003
+      },
+      "planning_s": 0.0084
+    },
+    "silver.order_items": {
+      "data_files": 60,
+      "total_bytes": 677524,
+      "avg_file_bytes": 11292,
+      "small_files_lt_8mb": 60,
+      "records": 26082,
+      "snapshots": 5,
+      "manifests": 1,
+      "metadata_log_entries": 50,
+      "spark_count_latency_s": {
+        "n": 6,
+        "p50": 0.026,
+        "p95": 0.0268,
+        "p99": 0.0268,
+        "min": 0.0255,
+        "max": 0.0269,
+        "mean": 0.0261
+      },
+      "duckdb_count_latency_s": {
+        "n": 6,
+        "p50": 0.0039,
+        "p95": 0.0043,
+        "p99": 0.0044,
+        "min": 0.0035,
+        "max": 0.0044,
+        "mean": 0.0039
+      },
+      "planning_s": 0.0097
+    }
+  }
+}
